@@ -15,7 +15,6 @@ return {
         return not (lhs:find("<.*Left>") or lhs:find("<.*Right>") or lhs:find("<.*Up>") or lhs:find("<.*Down>"))
       end
     end,
-    defaults = {},
     icons = {
       rules = {
         { pattern = "window", icon = " ", color = "blue" },

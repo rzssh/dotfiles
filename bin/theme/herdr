@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+import os
+import subprocess
+import sys
+
+
+def splice(config_text, block):
+    out, skip = [], False
+    for line in config_text.splitlines(keepends=True):
+        t = line.strip()
+        if t.startswith("[") and t.endswith("]"):
+            skip = t == "[theme.custom]"
+        if skip:
+            continue
+        out.append(line)
+    body = "".join(out).rstrip() + "\n\n" + block.strip() + "\n"
+    return body
+
+
+def main():
+    cache = os.path.expanduser("~/.cache/matugen/herdr-theme.toml")
+    config = os.path.expanduser("~/.config/herdr/config.toml")
+    if not (os.path.exists(cache) and os.path.exists(config)):
+        return
+    with open(cache) as f:
+        block = f.read()
+    with open(config) as f:
+        current = f.read()
+    with open(config, "w") as f:
+        f.write(splice(current, block))
+    subprocess.run(
+        ["herdr", "server", "reload-config"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+def _selftest():
+    cfg = "[theme]\nname = \"terminal\"\n\n[theme.custom]\naccent = \"old\"\ntext = \"old\"\n"
+    new = splice(cfg, "[theme.custom]\naccent = \"new\"\n")
+    assert "[theme]" in new and 'name = "terminal"' in new
+    assert new.count("[theme.custom]") == 1
+    assert 'accent = "new"' in new and "old" not in new
+    cfg2 = "[theme]\nname = \"terminal\"\n"
+    new2 = splice(cfg2, "[theme.custom]\naccent = \"x\"\n")
+    assert new2.count("[theme.custom]") == 1 and 'accent = "x"' in new2
+    print("ok")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        _selftest()
+    else:
+        main()

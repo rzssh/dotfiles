@@ -40,16 +40,14 @@ return {
           vim.fn.setreg(vim.v.register, get_path_under_cursor(true))
         end,
       },
-
-      -- Allow navigation between panes
       ["<C-h>"] = {
         callback = function()
-          return require("core.tmux").navigate("h")
+          return require("herdr-splits").move_cursor_left()
         end,
       },
       ["<C-l>"] = {
         callback = function()
-          return require("core.tmux").navigate("l")
+          return require("herdr-splits").move_cursor_right()
         end,
       },
     },

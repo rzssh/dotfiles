@@ -22,6 +22,11 @@ input_path = "/home/razen/.config/matugen/templates/tmux-colors.conf"
 output_path = "/home/razen/.cache/matugen/tmux-colors.conf"
 post_hook = "tmux source-file /home/razen/.cache/matugen/tmux-colors.conf 2>/dev/null || true"
 
+[templates.herdr]
+input_path = "/home/razen/.config/matugen/templates/herdr.toml"
+output_path = "/home/razen/.cache/matugen/herdr-theme.toml"
+post_hook = "/home/razen/.local/bin/theme-herdr || true"
+
 [templates.btop]
 input_path = "/home/razen/.config/matugen/templates/btop.theme"
 output_path = "/home/razen/.config/btop/themes/matugen.theme"
@@ -44,7 +49,7 @@ post_hook = "/home/razen/.local/bin/theme-kde matugen 2>/dev/null || true"
 [templates.ghostty]
 input_path = "/home/razen/.config/matugen/templates/ghostty"
 output_path = "/home/razen/.config/ghostty/themes/matugen"
-post_hook = "pkill -SIGUSR2 -x ghostty 2>/dev/null || true"
+post_hook = "pkill -SIGUSR2 ghostty 2>/dev/null || true"
 
 [templates.mango]
 input_path = "/home/razen/.config/matugen/templates/mango.conf"
@@ -69,4 +74,9 @@ post_hook = "/home/razen/.local/bin/theme-zen || true"
 [templates.yt_music]
 input_path = "/home/razen/.config/matugen/templates/yt-music.css"
 output_path = "/home/razen/.cache/matugen/yt-music-theme.css"
+
+[templates.wled]
+input_path = "/home/razen/.config/matugen/templates/wled.json"
+output_path = "/home/razen/.cache/matugen/wled.json"
+post_hook = "sh -c 'curl -s --connect-timeout 2 -m 4 --retry 1 -X POST \"http://192.168.0.18/json/state\" -H \"Content-Type: application/json\" -d @/home/razen/.cache/matugen/wled.json >/dev/null 2>&1 &'"
 

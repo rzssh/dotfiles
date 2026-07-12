@@ -118,17 +118,23 @@ end
 
 M.matugen_data = nil
 M._matugen_raw = nil
-M._has_focus = true
-M._pending_theme = nil
 
-local function load_matugen_data()
+local function read_colors()
   local file = io.open(vim.fn.expand("~/.cache/matugen/colors.json"), "r")
   if not file then
-    vim.notify("matugen: No colors at ~/.cache/matugen/colors.json", vim.log.levels.WARN)
     return nil
   end
   local content = file:read("*all")
   file:close()
+  return content
+end
+
+local function load_matugen_data()
+  local content = read_colors()
+  if not content then
+    vim.notify("matugen: No colors at ~/.cache/matugen/colors.json", vim.log.levels.WARN)
+    return nil
+  end
 
   local ok, data = pcall(vim.json.decode, content)
   if not ok or not data then
@@ -415,14 +421,12 @@ function M.get_theme(name)
   return nil
 end
 
-function M.apply(name, opts)
-  opts = opts or {}
+function M.apply(name)
   local theme = M.get_theme(name)
   if not theme then
     return false
   end
 
-  M._pending_theme = nil
   vim.g.THEME = name
 
   local ok
@@ -484,43 +488,20 @@ vim.api.nvim_create_autocmd("VimEnter", {
   end,
 })
 
+local function refresh_matugen()
+  if not tostring(vim.g.THEME):match("^System %(") then
+    return
+  end
+  local content = read_colors()
+  if not content or #content == 0 or content == M._matugen_raw then
+    return
+  end
+  M.apply(vim.g.THEME)
+end
+
 vim.api.nvim_create_autocmd("FocusGained", {
   group = group,
-  callback = function()
-    M._has_focus = true
-
-    if M._pending_theme then
-      local pending = M._pending_theme
-      M._pending_theme = nil
-      M.apply(pending)
-      return
-    end
-
-    if not tostring(vim.g.THEME):match("^System %(") then
-      return
-    end
-
-    local file = io.open(vim.fn.expand("~/.cache/matugen/colors.json"), "r")
-    if not file then
-      return
-    end
-
-    local content = file:read("*all")
-    file:close()
-
-    if content == M._matugen_raw then
-      return
-    end
-
-    M.apply(vim.g.THEME)
-  end,
-})
-
-vim.api.nvim_create_autocmd("FocusLost", {
-  group = group,
-  callback = function()
-    M._has_focus = false
-  end,
+  callback = refresh_matugen,
 })
 
 function M.pick()
@@ -584,36 +565,14 @@ end
 
 vim.keymap.set("n", "<leader>uc", M.pick, { desc = "Colorscheme picker" })
 
-local uv = vim.uv or vim.loop
-local matugen_watcher = uv.new_fs_event()
+local matugen_watcher = vim.uv.new_fs_event()
 if matugen_watcher then
   matugen_watcher:start(vim.fn.expand("~/.cache/matugen"), {}, vim.schedule_wrap(function(err, fname)
     if err or fname ~= "colors.json" then
       return
     end
-    if not tostring(vim.g.THEME):match("^System %(") then
-      return
-    end
-    local file = io.open(vim.fn.expand("~/.cache/matugen/colors.json"), "r")
-    if not file then
-      return
-    end
-    local content = file:read("*all")
-    file:close()
-    if content == M._matugen_raw or #content == 0 then
-      return
-    end
-    M.apply(vim.g.THEME, { silent = true })
+    refresh_matugen()
   end))
 end
-
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    if vim.g.THEME == "System (pywal)" then
-      vim.g.THEME = "System (matugen)"
-      M.apply("System (matugen)")
-    end
-  end,
-})
 
 return M

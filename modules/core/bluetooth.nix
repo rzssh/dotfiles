@@ -1,11 +1,16 @@
 { pkgs, ... }:
 {
   hardware.bluetooth.enable = true;
+  hardware.bluetooth.settings.LE = {
+    MinConnectionInterval = 6;
+    MaxConnectionInterval = 6;
+    ConnectionLatency = 0;
+  };
   boot.extraModprobeConfig = "options btusb enable_autosuspend=n";
   services.blueman.enable = true;
 
   services.udev.extraRules = ''
-    SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="8087", ATTR{idProduct}=="0032", ATTR{authorized}="0"
+    SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="2357", ATTR{idProduct}=="0604", ATTR{authorized}="0"
   '';
 
   systemd.services.dms-bluetooth-resume = {

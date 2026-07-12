@@ -39,7 +39,7 @@ function wallpaper --description "Manage wallpapers via DMS"
         set -l live "$dir/.live"
         command mkdir -p "$live"
         set -l src "$dir"
-        test "$area" = root; or set src "$dir/$area"
+        test "$area" = root; or set src "$dir/.$area"
         test -d "$src" -a -r "$src"; or return
         for f in (_wp_find "$src")
             command ln -sf "$f" "$live/$area"__(string replace -r '.*/' '' "$f")

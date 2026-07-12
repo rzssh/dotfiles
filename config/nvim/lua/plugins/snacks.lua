@@ -1,5 +1,72 @@
 local M = {}
 
+local function bad_dim(value)
+  return type(value) ~= "number" or value <= 0 or value ~= value
+end
+
+local function patch_snacks_image()
+  local terminal = require("snacks.image.terminal")
+  if not terminal._razen_size_patch then
+    terminal._razen_size_patch = true
+
+    local size = terminal.size
+    terminal.size = function(...)
+      local dim = size(...)
+      if
+        bad_dim(dim.width)
+        or bad_dim(dim.height)
+        or bad_dim(dim.cell_width)
+        or bad_dim(dim.cell_height)
+      then
+        local columns = bad_dim(dim.columns) and vim.o.columns or dim.columns
+        local rows = bad_dim(dim.rows) and vim.o.lines or dim.rows
+        local cell_width = 9
+        local cell_height = 18
+
+        return {
+          width = columns * cell_width,
+          height = rows * cell_height,
+          columns = columns,
+          rows = rows,
+          cell_width = cell_width,
+          cell_height = cell_height,
+          scale = math.max(1, cell_width / 8),
+        }
+      end
+
+      return dim
+    end
+  end
+
+  local image = require("snacks.image.image")
+  if not image._razen_resend_patch then
+    image._razen_resend_patch = true
+
+    local del = image.del
+    image.del = function(self, ...)
+      del(self, ...)
+      if not next(self.placements) then
+        self.sent = false
+      end
+    end
+  end
+
+  local placement = require("snacks.image.placement")
+  if placement._razen_unhide_patch then
+    return
+  end
+  placement._razen_unhide_patch = true
+
+  local update = placement.update
+  placement.update = function(self, ...)
+    if self.hidden and self.wins and #self:wins() > 0 then
+      self.hidden = false
+      self._state = nil
+    end
+    return update(self, ...)
+  end
+end
+
 M.plugin = {
   "folke/snacks.nvim",
   priority = 1000,
@@ -113,9 +180,6 @@ M.plugin = {
     },
     statuscolumn = {
       enabled = true,
-      -- TODO:
-      -- left = { "mark", "fold" },
-      -- right = { "git" },
       left = { "sign", "mark", "fold" },
       right = {},
       folds = {
@@ -123,7 +187,6 @@ M.plugin = {
         git_hl = true,
       },
       git = {
-        -- patterns = { "GitSign", "MiniDiffSign" },
         patterns = { "MiniDiffSign", "DiagnosticSign" },
       },
       refresh = 50,
@@ -226,9 +289,6 @@ M.plugin = {
     },
     { "<leader>sH", function() Snacks.picker.man() end, desc = "Man Pages" },
     { "<leader>sR", function() Snacks.picker.resume() end, desc = "Resume" },
-    { "<leader>sn", function() Snacks.picker.files({ cwd = "~/notes" }) end, desc = "Grep Notes" },
-    { "<leader>sN", function() Snacks.picker.grep({ cwd = "~/notes" }) end, desc = "Search Notes" },
-
     -- NOTE: LSP
     { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
     { "gD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
@@ -269,6 +329,10 @@ M.plugin = {
     },
     -- stylua: ignore end
   },
+  config = function(_, opts)
+    require("snacks").setup(opts)
+    patch_snacks_image()
+  end,
   init = function(plugin)
     require("which-key").add({
       { "<leader>s", group = "Search", icon = { icon = "󰍉", color = "green" } },
@@ -338,13 +402,9 @@ M.plugin = {
     end
 
     -- AI completion toggle
-    vim.g.copilot_enabled = false
     vim.g.llama_enabled = true
-    vim.g.nova_enabled = false
 
-    local is_copilot_enabled = vim.g.copilot_enabled == nil or vim.g.copilot_enabled
     local is_llama_enabled = vim.g.llama_enabled == nil or vim.g.llama_enabled
-    local is_nova_enabled = vim.g.nova_enabled == nil or vim.g.nova_enabled
 
     vim.g.enable_ai_completion = true
     vim.schedule(function()
@@ -356,19 +416,15 @@ M.plugin = {
         set = function(state)
           vim.g.enable_ai_completion = state
 
-          if is_copilot_enabled then
-            vim.cmd("silent! Copilot" .. (state and " enable" or " disable"))
-            vim.g.copilot_enabled = state
-          end
-
           if is_llama_enabled then
             vim.cmd("silent! Llama" .. (state and "Enable" or "Disable"))
             vim.g.llama_enabled = state
           end
 
-          if is_nova_enabled then
-            vim.cmd("silent! Nova" .. (state and "Enable" or "Disable"))
-            vim.g.nova_enabled = state
+          local ct_ok, cursortab = pcall(require, "cursortab")
+          local daemon_ok, daemon = pcall(require, "cursortab.daemon")
+          if ct_ok and daemon_ok and daemon.is_enabled() ~= state then
+            cursortab.toggle()
           end
         end,
       }):map("<leader>a-")
@@ -471,20 +527,6 @@ function M.grep_git_files()
       end,
     })
     :sync()
-
-  -- Untracked files
-  -- require("plenary.job")
-  --   :new({
-  --     command = "git",
-  --     args = { "ls-files", "--others", "--exclude-standard" },
-  --     cwd = git_root,
-  --     on_stdout = function(_, line)
-  --       if line and #line > 0 then
-  --         files[line] = true
-  --       end
-  --     end,
-  --   })
-  --   :sync()
 
   local file_list = {}
   for file, _ in pairs(files) do

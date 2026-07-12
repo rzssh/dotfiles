@@ -3,6 +3,6 @@ return {
   ft = "typst",
   opts = {},
   keys = {
-    { "<leader>tp", vim.cmd.TypstToggle, desc = "Toggle Typst Preview" },
+    { "<leader>tp", vim.cmd.TypstPreview, desc = "Toggle Typst Preview" },
   },
 }

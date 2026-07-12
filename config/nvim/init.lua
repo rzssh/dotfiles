@@ -31,9 +31,9 @@ require("lazy").setup({
   defaults = { lazy = true },
 })
 
-require("todo_list").setup({
-  target_file = "~/notes/todo.md",
+require("notes").setup({
+  dir = "~/notes",
+  float_file = "inbox.md",
 })
 
-local ok, matugen = pcall(require, 'matugen')
-if ok then matugen.setup() end
+require("herdr").setup()

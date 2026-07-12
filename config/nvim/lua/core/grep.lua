@@ -7,7 +7,7 @@ vim.api.nvim_create_user_command("Grep", function(opts)
     return
   end
 
-  local root = require("utils").workspace_root()
+  local root = vim.fs.root(0, { ".git" }) or vim.uv.cwd()
 
   vim.fn.setqflist({})
   local cmd = string.format(

@@ -30,8 +30,6 @@ return {
         },
       },
       completion = {
-        -- Whether to show brackets in completion
-        -- accept = { auto_brackets = { enabled = true } },
         trigger = {
           show_on_trigger_character = true,
         },
@@ -74,9 +72,7 @@ return {
           },
         },
       },
-      appearance = {
-        nerd_font_variant = "mono",
-      },
+      appearance = {},
       sources = {
         default = { "lazydev", "lsp", "path", "snippets", "buffer" },
         providers = {
@@ -90,30 +86,6 @@ return {
       signature = {
         enabled = true,
       },
-    },
-    -- init = function()
-    --   -- Overriding vim.lsp.get_clients to filter out Augment Server for completion requests
-    --   local original_get_clients = vim.lsp.get_clients
-    --
-    --   --- @diagnostic disable-next-line: duplicate-set-field
-    --   vim.lsp.get_clients = function(opts)
-    --     local clients = original_get_clients(opts)
-    --
-    --     if opts and opts.method == "textDocument/completion" then
-    --       return vim.tbl_filter(function(client)
-    --         return client.name ~= "Augment Server"
-    --       end, clients)
-    --     end
-    --
-    --     return clients
-    --   end
-    -- end,
-  },
-  {
-    "saghen/blink.compat",
-    version = "*",
-    opts = {
-      impersonate_nvim_cmp = true,
     },
   },
 }

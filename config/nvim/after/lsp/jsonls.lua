@@ -5,7 +5,6 @@ if not schemastore_ok then
 end
 
 local settings = {
-  -- https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting
   redhat = { telemetry = { enabled = false } },
 }
 
@@ -18,7 +17,7 @@ end
 
 return {
   init_options = {
-    provideFormatter = true,
+    provideFormatter = false,
   },
   settings = settings,
 }

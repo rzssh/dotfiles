@@ -75,11 +75,6 @@ map({ "n", "v" }, "<Down>", function()
   return vim.v.count == 0 and "gj" or "j"
 end, { expr = true })
 
--- repeat dot multiple times
--- map("n", "<leader>.", function()
---   return "<esc>" .. string.rep(".", vim.v.count1)
--- end, { expr = true, desc = "Repeat dot action" })
-
 vim.keymap.set("x", "<leader>=", function()
   vim.cmd('normal! "xy')
 

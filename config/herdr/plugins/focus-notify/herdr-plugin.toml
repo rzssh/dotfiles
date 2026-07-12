@@ -1,0 +1,15 @@
+id = "razen.focus-notify"
+name = "Focus Notify"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "Clickable desktop notifications for Herdr agent status changes."
+platforms = ["linux"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["python3", "focus_notify.py"]
+
+[[actions]]
+id = "test"
+title = "Send test notification"
+command = ["python3", "focus_notify.py", "--test"]

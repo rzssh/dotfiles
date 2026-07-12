@@ -1,5 +1,6 @@
 local opt = vim.opt
 
+opt.cmdheight = 0
 opt.updatetime = 100
 opt.timeout = true
 opt.timeoutlen = 500

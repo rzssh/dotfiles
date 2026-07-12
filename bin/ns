@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd="${NIX_SEARCH_TV:-nix-search-tv}"
+opener="${OPENER:-xdg-open}"
+
+"$cmd" print | fzf \
+  --layout reverse \
+  --scheme history \
+  --header 'ctrl-s source | ctrl-o homepage | ctrl-p preview' \
+  --preview "$cmd preview {}" \
+  --bind "ctrl-s:execute-silent($cmd source {} | xargs -r $opener)" \
+  --bind "ctrl-o:execute-silent($cmd homepage {} | xargs -r $opener)" \
+  --bind "ctrl-p:become($cmd preview {})"

@@ -1,0 +1,29 @@
+{
+  "lead": {
+    "provider": "openai",
+    "model": "gpt-5.5:high",
+    "team": true,
+    "split": "right",
+    "description": "architecture, coordination, and final judgment"
+  },
+  "build": {
+    "provider": "opencode-go",
+    "model": "glm-5.2:high",
+    "team": true,
+    "split": "down",
+    "description": "scoped implementation"
+  },
+  "scout": {
+    "provider": "opencode-go",
+    "model": "deepseek-v4-flash:medium",
+    "team": false,
+    "split": "down",
+    "description": "read-only exploration and context compression"
+  },
+  "review": {
+    "command": "claude",
+    "team": true,
+    "split": "down",
+    "description": "independent high-risk review"
+  }
+}

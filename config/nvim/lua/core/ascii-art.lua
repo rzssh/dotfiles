@@ -27,17 +27,6 @@ vim.keymap.set("x", "<leader>*", function()
         vim.cmd('normal! gv"_c')
         local lines = vim.split(result, "\n", { trimempty = true })
 
-        -- Automatically comment out the ASCII result (optional)
-        --
-        -- local cs = vim.bo.commentstring
-        -- local prefix = cs:match("^(.-)%%s") or "# "
-        --
-        -- for i, line in ipairs(lines) do
-        --   lines[i] = prefix .. line
-        -- end
-        --
-        -- vim.cmd('normal! gv"_c')
-
         vim.api.nvim_put(lines, "c", false, true)
       end
     end,

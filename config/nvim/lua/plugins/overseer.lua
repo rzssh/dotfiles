@@ -93,7 +93,7 @@ return {
         return run("zig build")
       end
 
-      local r = require("utils").workspace_root()
+      local r = vim.fs.root(0, { ".git" }) or vim.uv.cwd()
       if exists(r .. "/Cargo.toml") then
         return run("cargo build")
       end

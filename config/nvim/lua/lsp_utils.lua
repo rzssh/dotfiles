@@ -19,7 +19,13 @@ M.on_attach = function(_, bufnr)
     map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts("See available code actions"))
   end
 
-  map("n", "<leader>cn", vim.lsp.buf.rename, opts("Smart rename"))
+  if pcall(require, "inc_rename") then
+    map("n", "<leader>cn", function()
+      return ":IncRename " .. vim.fn.expand("<cword>")
+    end, vim.tbl_extend("force", opts("Smart rename"), { expr = true }))
+  else
+    map("n", "<leader>cn", vim.lsp.buf.rename, opts("Smart rename"))
+  end
   map("n", "<leader>cd", function()
     vim.diagnostic.open_float()
     vim.diagnostic.open_float()
@@ -118,192 +124,6 @@ function M.insert_package_json(config_files, field, fname)
     end
   end
   return config_files
-end
-
-M.validate_bufnr = function(bufnr)
-  vim.validate("bufnr", bufnr, "number")
-  return bufnr == 0 and vim.api.nvim_get_current_buf() or bufnr
-end
-
-local function is_fs_root(path)
-  if iswin then
-    return path:match("^%a:$")
-  else
-    return path == "/"
-  end
-end
-
--- Traverse the path calling cb along the way.
-local function traverse_parents(path, cb)
-  path = vim.loop.fs_realpath(path)
-  local dir = path
-  -- Just in case our algo is buggy, don't infinite loop.
-  for _ = 1, 100 do
-    dir = vim.fs.dirname(dir)
-    if not dir then
-      return
-    end
-    -- If we can't ascend further, then stop looking.
-    if cb(dir, path) then
-      return dir, path
-    end
-    if is_fs_root(dir) then
-      break
-    end
-  end
-end
-
-M.is_descendant = function(root, path)
-  if not path then
-    return false
-  end
-
-  local function cb(dir, _)
-    return dir == root
-  end
-
-  local dir, _ = traverse_parents(path, cb)
-
-  return dir == root
-end
-
-function M.search_ancestors(startpath, func)
-  vim.validate("func", func, "function")
-  if func(startpath) then
-    return startpath
-  end
-  local guard = 100
-  for path in vim.fs.parents(startpath) do
-    -- Prevent infinite recursion if our algorithm breaks
-    guard = guard - 1
-    if guard == 0 then
-      return
-    end
-
-    if func(path) then
-      return path
-    end
-  end
-end
-
-local function escape_wildcards(path)
-  return path:gsub("([%[%]%?%*])", "\\%1")
-end
-
-function M.strip_archive_subpath(path)
-  -- Matches regex from zip.vim / tar.vim
-  path = vim.fn.substitute(path, "zipfile://\\(.\\{-}\\)::[^\\\\].*$", "\\1", "")
-  path = vim.fn.substitute(path, "tarfile:\\(.\\{-}\\)::.*$", "\\1", "")
-  return path
-end
-
-function M.root_pattern(...)
-  local patterns = vim.iter({ ... }):flatten():totable()
-  return function(startpath)
-    startpath = M.strip_archive_subpath(startpath)
-    for _, pattern in ipairs(patterns) do
-      local match = M.search_ancestors(startpath, function(path)
-        for _, p in
-          ipairs(vim.fn.glob(table.concat({ escape_wildcards(path), pattern }, "/"), true, true))
-        do
-          if vim.loop.fs_stat(p) then
-            return path
-          end
-        end
-      end)
-
-      if match ~= nil then
-        return match
-      end
-    end
-  end
-end
-
--- ##################
--- ### NOT IN USE ###
--- ##################
-
-M.get_servers = function()
-  local server_configs = {}
-  for _, filepath in ipairs(vim.api.nvim_get_runtime_file("lsp/*.lua", true)) do
-    local server_name = vim.fn.fnamemodify(filepath, ":t:r")
-    if server_name ~= "utils" then
-      server_configs[#server_configs + 1] = server_name
-    end
-  end
-  return server_configs
-end
-
-M.get_servers_with_configs = function()
-  local server_configs = {}
-
-  for _, filepath in ipairs(vim.api.nvim_get_runtime_file("lsp/*.lua", true)) do
-    local server_name = vim.fn.fnamemodify(filepath, ":t:r")
-
-    if server_name == "utils" then
-      goto continue
-    end
-
-    local chunk, load_err = loadfile(filepath)
-    if not chunk then
-      vim.notify(
-        string.format(
-          "Failed to load LSP config file: %s\nError: %s",
-          filepath,
-          load_err or "Unknown error"
-        ),
-        vim.log.levels.ERROR
-      )
-      goto continue
-    end
-
-    local exec_ok, config_or_err = pcall(chunk)
-    if not exec_ok then
-      vim.notify(
-        string.format(
-          "Failed to execute LSP config file: %s\nError: %s",
-          filepath,
-          tostring(config_or_err)
-        ),
-        vim.log.levels.ERROR
-      )
-      goto continue
-    end
-
-    if type(config_or_err) ~= "table" then
-      vim.notify(
-        string.format("LSP config file did not return a table: %s", filepath),
-        vim.log.levels.WARN
-      )
-      goto continue
-    end
-
-    server_configs[server_name] = config_or_err
-
-    ::continue::
-  end
-
-  return server_configs
-end
-
----@param client vim.lsp.Client
-M.toggle_ts_server = function(client)
-  local new_server_name = client.name == "vtsls" and "ts_ls" or "vtsls"
-  vim.lsp.enable("vtsls", new_server_name == "vtsls")
-  vim.lsp.enable("ts_ls", new_server_name == "ts_ls")
-
-  for buf_id, _ in pairs(client.attached_buffers) do
-    vim.lsp.buf_detach_client(buf_id, client.id)
-  end
-
-  vim.cmd("silent! e")
-
-  vim.defer_fn(function()
-    local new_server_id = vim.lsp.get_clients({ name = new_server_name })[1].id
-    for buf_id, _ in pairs(client.attached_buffers) do
-      vim.lsp.buf_attach_client(buf_id, new_server_id)
-    end
-  end, 1000)
 end
 
 return M

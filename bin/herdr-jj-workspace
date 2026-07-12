@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+import json
+import subprocess
+import sys
+
+
+def run(*args):
+    return subprocess.run(args, capture_output=True, text=True)
+
+
+def notify(message):
+    run("herdr", "notification", "show", "jj workspace", "--body", message, "--sound", "none")
+
+
+def focused_cwd():
+    r = run("herdr", "pane", "list")
+    if r.returncode != 0:
+        return ""
+    try:
+        panes = json.loads(r.stdout)["result"]["panes"]
+    except Exception:
+        return ""
+    focused = next((pane for pane in panes if pane.get("focused")), None)
+    return (focused or panes[0]).get("foreground_cwd") or (focused or panes[0]).get("cwd") or ""
+
+
+def jj_root(cwd):
+    r = run("jj", "-R", cwd, "root")
+    return r.stdout.strip() if r.returncode == 0 else ""
+
+
+def open_workspace(mode, repo):
+    subprocess.run(
+        [
+            "herdr",
+            "plugin",
+            "pane",
+            "open",
+            "--plugin",
+            "nathanflurry.jj-workspace",
+            "--entrypoint",
+            "wizard",
+            "--env",
+            f"JJ_REPO={repo}",
+            "--env",
+            f"JJ_OPEN={mode}",
+            "--focus",
+        ]
+    )
+
+
+def main():
+    action = sys.argv[1] if len(sys.argv) > 1 else "workspace"
+    cwd = focused_cwd()
+    repo = jj_root(cwd) if cwd else ""
+    if not repo:
+        notify(f"{cwd or 'current pane'} is not inside a jj repo")
+        return
+    if action == "remove":
+        subprocess.run(["herdr", "plugin", "action", "invoke", "nathanflurry.jj-workspace.remove"])
+    else:
+        open_workspace(action, repo)
+
+
+if __name__ == "__main__":
+    main()

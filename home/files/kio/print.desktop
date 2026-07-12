@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/pdf;application/postscript;image/jpeg;image/png;text/plain;
+Actions=printDefault;
+
+[Desktop Action printDefault]
+Name=Print
+Icon=document-print
+Exec=okular --print-and-exit %f

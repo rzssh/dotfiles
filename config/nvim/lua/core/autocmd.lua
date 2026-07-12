@@ -37,11 +37,8 @@ autocmd("FileType", {
     "qf",
     "lspinfo",
     "git",
-    "copilot",
     "grug-far",
     "vim",
-    "fugitive",
-    -- "codecompanion"
   },
   callback = function()
     vim.bo.buflisted = false
@@ -53,10 +50,9 @@ autocmd("FileType", {
 
 -- Window layout
 autocmd("FileType", {
-  pattern = { "help", "qf", "copilot", "vim" },
+  pattern = { "help", "qf", "vim" },
   callback = function()
     -- Move to bottom (hJkl)
-    -- vim.cmd("wincmd J")
     vim.cmd("horizontal resize 14")
   end,
 })
@@ -70,46 +66,3 @@ autocmd("TextYankPost", {
     vim.hl.on_yank()
   end,
 })
-
--- Alternative for dropbar.nvim plugin that I use
--- Displays the file path in the winbar, with certain exceptions
--- vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
---   callback = function()
---     local empty_for = {
---       "oil",
---       "NvimTree",
---       "fugitiveblame",
---     }
---     local disable_for = {
---       "help",
---       "qf",
---       "netrw",
---       "Trouble",
---       "neo-tree",
---       "nofile",
---       "snacks_picker_input",
---       "snacks_picker_list",
---       "snacks_picker_preview",
---     }
---     local ft = vim.bo.filetype
---     local bt = vim.bo.buftype
---
---     if vim.tbl_contains(disable_for, ft) then
---       vim.wo.winbar = ""
---       return
---     elseif vim.tbl_contains(empty_for, ft) or bt ~= "" then
---       vim.wo.winbar = " "
---     else
---       vim.wo.winbar = "%f"
---     end
---   end,
--- })
-
--- Disable extending comments on new lines.
--- autocmd("BufEnter", {
---   pattern = "*",
---   desc = "Disable auto comment",
---   callback = function()
---     vim.opt.formatoptions:remove({ "c", "r", "o" })
---   end,
--- })

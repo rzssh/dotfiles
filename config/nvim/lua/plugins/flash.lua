@@ -1,6 +1,6 @@
 return {
   "folke/flash.nvim",
-  enabled = not require("utils").check_arg("+Man!"),
+  enabled = not vim.list_contains(vim.v.argv, "+Man!"),
   event = "VeryLazy",
   specs = {
     -- Quick item selection with flash

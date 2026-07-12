@@ -13,7 +13,59 @@ return {
     keys = {
       { "<leader>mt", "<cmd>Markview toggle<cr>", desc = "Toggle Markview" },
     },
-    opts = {},
+    opts = {
+      preview = {
+        map_gx = false,
+      },
+    },
+    config = function(_, opts)
+      require("markview").setup(opts)
+
+      local native_gx = vim.iter(vim.api.nvim_get_keymap("n")):find(function(map)
+        return map.lhs == "gx"
+      end).callback
+
+      local markview_nodes = {
+        "email_autolink",
+        "image",
+        "inline_link",
+        "link_reference_definition",
+        "shortcut_link",
+        "uri_autolink",
+        "url",
+      }
+
+      local function open_markdown_link()
+        local node = vim.treesitter.get_node({ ignore_injections = false })
+
+        while node do
+          if vim.list_contains(markview_nodes, node:type()) then
+            vim.cmd("Markview open")
+            return
+          end
+
+          node = node:parent()
+        end
+
+        native_gx()
+      end
+
+      local function map_gx(args)
+        vim.keymap.set("n", "gx", open_markdown_link, {
+          buffer = args.buf,
+          desc = "Open markdown link or URI",
+        })
+      end
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = map_gx,
+      })
+
+      if vim.bo.filetype == "markdown" then
+        map_gx({ buf = 0 })
+      end
+    end,
     init = function()
       require("which-key").add({
         { "<leader>m", group = "Markdown", icon = { icon = "", color = "green" } },

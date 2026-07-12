@@ -30,7 +30,7 @@ return {
           }
 
           prettier_root_file = util.insert_package_json(prettier_root_file, "prettier", fname)
-          return util.root_pattern(prettier_root_file)(fname)
+          return vim.fs.find(prettier_root_file, { path = vim.fs.dirname(fname), upward = true })[1] ~= nil
         end,
       },
     },

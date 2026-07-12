@@ -126,7 +126,7 @@ local function build_picker_items(filter_to_cwd)
 
       if filter_to_cwd then
         local file_path = vim.fn.fnamemodify(file, ":p")
-        if file_path:find(cwd, 1, true) ~= 1 then
+        if not vim.startswith(file_path, cwd) then
           goto continue
         end
       end
