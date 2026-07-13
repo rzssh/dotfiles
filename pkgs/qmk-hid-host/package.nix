@@ -9,7 +9,7 @@
   systemd,
   pulseaudio,
   dbus,
-  xorg,
+  libx11,
   curl,
   hyprland,
   wireplumber,
@@ -39,7 +39,7 @@ rustPlatform.buildRustPackage {
     systemd
     pulseaudio
     dbus
-    xorg.libX11
+    libx11
   ];
 
   postInstall = ''

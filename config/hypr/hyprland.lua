@@ -54,8 +54,7 @@ hl.config({
         layout = "dwindle",
     },
     input = {
-        kb_layout  = "us,ru,ua",
-        kb_options = "grp:win_space_toggle",
+        kb_layout  = "us",
         repeat_rate  = 40,
         repeat_delay = 300,
         follow_mouse = 1,
@@ -120,6 +119,7 @@ hl.window_rule({ match = { class = "^com.mitchellh.ghostty$" }, no_blur = true }
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("1password"))
 hl.bind(mainMod .. " + CTRL + SHIFT + Q", hl.dsp.exec_cmd("systemctl poweroff"))
 
 hl.bind(mainMod .. " + R",       hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
@@ -198,6 +198,7 @@ hl.bind("Z", function()
 end, { release = true, ignore_mods = true, non_consuming = true, transparent = true })
 
 hl.bind(mainMod .. " + ALT + S", hl.dsp.exec_cmd("hyprwhspr record toggle"))
+hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_ru_translit.sh"))
 
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("dms screenshot region"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("dms screenshot full"))

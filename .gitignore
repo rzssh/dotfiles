@@ -12,7 +12,6 @@ result-*
 home/files/.dblab.yaml
 config/gh/hosts.yml
 config/fish/fish_variables
-config/fish/conf.d/env.fish
 config/ai/profiles/
 config/btop/
 config/ghostty/themes/matugen

@@ -1,10 +1,12 @@
 return {
   "nvimtools/hydra.nvim",
+  dependencies = { "herdr-splits.nvim" },
   event = "VeryLazy",
   keys = {
     { "<leader>wr", desc = "Resize" },
   },
   config = function()
+    local splits = require("herdr-splits")
     require("hydra")({
       name = "Resize",
       mode = "n",
@@ -14,14 +16,10 @@ return {
         hint = { type = "statusline" },
       },
       heads = {
-        { "<Left>", "5<C-w><" },
-        { "<Right>", "5<C-w>>" },
-        { "<Down>", "5<C-w>-" },
-        { "<Up>", "5<C-w>+" },
-        -- { "h", "5<C-w><" },
-        -- { "l", "5<C-w>>" },
-        -- { "j", "5<C-w>-" },
-        -- { "k", "5<C-w>+" },
+        { "<Left>", splits.resize_left },
+        { "<Right>", splits.resize_right },
+        { "<Down>", splits.resize_down },
+        { "<Up>", splits.resize_up },
         { "=", "<C-w>=", { desc = "equal" } },
         { "q", nil, { exit = true } },
       },

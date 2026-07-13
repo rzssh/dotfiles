@@ -1,0 +1,101 @@
+onboarding = false
+new_cwd = "~/projects"
+prompt_new_tab_name = false
+
+[ui]
+show_agent_labels_on_pane_borders = true
+agent_panel_scope = "all"
+
+[ui.sound]
+enabled = false
+
+[ui.toast]
+delivery = "herdr"
+
+[keys]
+focus_pane_left  = ""
+focus_pane_right = ""
+focus_pane_up    = ""
+focus_pane_down  = ""
+swap_pane_left   = "alt+shift+left"
+swap_pane_right  = "alt+shift+right"
+swap_pane_up     = "alt+shift+up"
+swap_pane_down   = "alt+shift+down"
+next_agent         = "alt+]"
+previous_agent     = "alt+["
+focus_agent        = "prefix+1..9"
+switch_tab         = "alt+1..9"
+zoom               = ["prefix+z", "alt+z"]
+previous_workspace = "alt+shift+["
+next_workspace     = "alt+shift+]"
+switch_workspace   = "alt+shift+1..9"
+
+[[keys.command]]
+key = "alt+left"
+type = "plugin_action"
+command = "herdr-splits.nav-left"
+description = "navigate left"
+
+[[keys.command]]
+key = "alt+right"
+type = "plugin_action"
+command = "herdr-splits.nav-right"
+description = "navigate right"
+
+[[keys.command]]
+key = "alt+up"
+type = "plugin_action"
+command = "herdr-splits.nav-up"
+description = "navigate up"
+
+[[keys.command]]
+key = "alt+down"
+type = "plugin_action"
+command = "herdr-splits.nav-down"
+description = "navigate down"
+
+[[keys.command]]
+key = "prefix+a"
+type = "shell"
+command = "herdr-jj-workspace workspace"
+description = "new jj workspace"
+
+[[keys.command]]
+key = "prefix+shift+a"
+type = "shell"
+command = "herdr-jj-workspace tab"
+description = "new jj workspace tab"
+
+[[keys.command]]
+key = "prefix+d"
+type = "shell"
+command = "herdr-jj-workspace remove"
+description = "remove jj workspace"
+
+[advanced]
+scrollback_limit_bytes = 200000000
+
+[experimental]
+kitty_graphics = true
+
+[theme]
+name = "terminal"
+auto_switch = false
+
+[theme.custom]
+accent = "#99cbff"
+panel_bg = "reset"
+surface0 = "reset"
+surface1 = "#192028"
+surface_dim = "#0d141b"
+overlay0 = "#404750"
+overlay1 = "#8a919b"
+text = "reset"
+subtext0 = "#c0c7d2"
+mauve = "#c2c2f9"
+green = "#00e38d"
+yellow = "#d7ca00"
+red = "#ffb1c0"
+blue = "#a3c9ff"
+teal = "#00daf5"
+peach = "#b9c6ea"

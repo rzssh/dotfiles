@@ -14,7 +14,6 @@ starship init fish | source
 zoxide init --cmd cd fish | source
 fx --comp fish | source
 
-
 set -U fish_greeting
 
 set -gx SUDO_EDITOR nvim

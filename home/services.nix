@@ -17,6 +17,8 @@ let
   };
 in
 {
+  systemd.user.settings.Manager.DefaultTimeoutStopSec = "5s";
+
   systemd.user.services = {
     agentmemory = {
       Unit.Description = "agentmemory local memory server";

@@ -8,6 +8,7 @@ in
   imports = [
     inputs.dms.homeModules.dank-material-shell
     inputs.nix-index-database.homeModules.nix-index
+    inputs.sops-nix.homeManagerModules.sops
     ./nvim-treesitter.nix
     ./theming.nix
     ./services.nix
@@ -51,6 +52,13 @@ in
 
   programs.git.enable = true;
 
+  sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+  sops.secrets."ai-profiles/personal" = {
+    sopsFile = ../secrets/ai-profiles/personal.env;
+    format = "dotenv";
+    path = "${config.home.homeDirectory}/.local/share/ai/profiles/personal/env";
+  };
+
   programs.nix-index-database.comma.enable = true;
 
   programs.direnv = {
@@ -78,6 +86,8 @@ in
     "sesh".source = link "config/sesh";
     "gh".source = link "config/gh";
     "gh-dash".source = link "config/gh-dash";
+    "herdr/config.toml".source = link "config/herdr/config.toml";
+    "herdr/plugins/config/herdr-splits/herdr-splits.conf".source = link "config/herdr/herdr-splits.conf";
     "opencode".source = link "config/opencode";
     "ai".source = link "config/ai";
     "starship.toml".source = link "config/starship.toml";
@@ -130,6 +140,7 @@ in
     ".npmrc".source = link "home/files/.npmrc";
     ".rgignore".source = link "home/files/.rgignore";
     ".gitignore_global".source = link "home/files/.gitignore_global";
+    ".gitattributes_global".source = link "home/files/.gitattributes_global";
     ".dblab.yaml".source = link "home/files/.dblab.yaml";
     ".claude/CLAUDE.md".source = link "home/files/claude/CLAUDE.md";
     ".claude/settings.json".source = link "home/files/claude/settings.json";

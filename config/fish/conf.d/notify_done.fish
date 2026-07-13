@@ -1,7 +1,4 @@
-# Desktop notification when a long command finishes while the terminal is unfocused.
-# Reproduces the ghostty/tmux "command done" notif that herdr swallows (it eats OSC 9/777).
-# Tune the threshold (ms):
-set -q notify_done_threshold; or set -g notify_done_threshold 15000
+set -q notify_done_threshold; or set -g notify_done_threshold 10000
 
 function __notify_done --on-event fish_postexec
     set -l last_status $status

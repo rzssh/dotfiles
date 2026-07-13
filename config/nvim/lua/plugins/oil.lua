@@ -40,16 +40,6 @@ return {
           vim.fn.setreg(vim.v.register, get_path_under_cursor(true))
         end,
       },
-      ["<C-h>"] = {
-        callback = function()
-          return require("herdr-splits").move_cursor_left()
-        end,
-      },
-      ["<C-l>"] = {
-        callback = function()
-          return require("herdr-splits").move_cursor_right()
-        end,
-      },
     },
   },
   keys = {

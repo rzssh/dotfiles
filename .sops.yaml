@@ -1,0 +1,7 @@
+keys:
+  - &razen age1ta44mma6m9q4q62pwqju5qe9e70ldmwguacj665kdtvfu9kmv35qt3gman
+creation_rules:
+  - path_regex: secrets/.*\.(env|yaml|json)$
+    key_groups:
+      - age:
+          - *razen

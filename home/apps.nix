@@ -51,8 +51,13 @@ in
     gh-dash
     delta
     difftastic
+    mergiraf
     lazydocker
     dblab
+
+    # secrets
+    age
+    sops
 
     # languages & build
     gcc
@@ -95,7 +100,7 @@ in
     # ai
     localPkgs.agentmemory
     localPkgs.pi-coding-agent
-    inputs.fleetpit.packages.${pkgs.system}.default
+    inputs.fleetpit.packages.${pkgs.stdenv.hostPlatform.system}.default
     (llamaPkgs.llama-cpp.override { cudaSupport = true; })
     opencode
     inputs.hermes-agent.packages.x86_64-linux.default
