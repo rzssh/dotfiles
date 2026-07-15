@@ -35,7 +35,7 @@ html:not(.style-scope)
   --yt-spec-commerce-filled-hover: var(--ctp-accent) !important;
   --yt-spec-menu-background: var(--ctp-base) !important;
 
-  --disabled-text-color: var(--ctp-surface0) !important;
+  --disabled-text-color: var(--ctp-subtext0) !important;
 
   --ytmusic-scrollbar-width: 0px !important;
   --ytd-scrollbar-width: 0px !important;

@@ -18,5 +18,5 @@ background = {{colors.background.default.hex}}
 foreground = {{colors.on_surface.default.hex}}
 cursor-color = {{colors.primary.default.hex}}
 cursor-text = {{colors.background.default.hex}}
-selection-background = {{colors.surface.default.hex | lighten: 10.0}}
-selection-foreground = {{colors.on_surface.default.hex}}
+selection-background = {{colors.primary_container.default.hex}}
+selection-foreground = {{colors.on_primary_container.default.hex}}

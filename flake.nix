@@ -10,7 +10,8 @@
     };
 
     herdr = {
-      url = "github:ogulcancelik/herdr";
+      url = "github:ogulcancelik/herdr"; # master
+      # url = "github:ogulcancelik/herdr/v0.7.4"; # release
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

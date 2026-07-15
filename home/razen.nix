@@ -87,8 +87,8 @@ in
     "gh".source = link "config/gh";
     "gh-dash".source = link "config/gh-dash";
     "herdr/config.toml".source = link "config/herdr/config.toml";
+    "herdr/plugins/focus-notify".source = link "config/herdr/plugins/focus-notify";
     "opencode".source = link "config/opencode";
-    "ai".source = link "config/ai";
     "starship.toml".source = link "config/starship.toml";
     "matugen".source = link "config/matugen";
     "DankMaterialShell".source = link "config/DankMaterialShell";

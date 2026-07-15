@@ -17,11 +17,12 @@ return {
         local bg = cs.matugen_data.special.background
         local fg = cs.matugen_data.special.foreground
         local c = cs.matugen_data.colors
+        local m = cs.matugen_data.material or {}
         vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
         return {
           normal = {
             a = { bg = c.color4, fg = bg, gui = "bold" },
-            b = { bg = c.color8, fg = fg },
+            b = { bg = m.primary_container or c.color0, fg = m.on_primary_container or fg },
             c = { bg = "None", fg = fg },
           },
           insert = { a = { bg = c.color2, fg = bg, gui = "bold" } },

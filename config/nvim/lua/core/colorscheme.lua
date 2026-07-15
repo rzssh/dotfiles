@@ -164,6 +164,8 @@ local function apply_matugen(variant)
   local pri = m.primary or accent
   local sec = m.secondary or c.color6
   local ter = m.tertiary or c.color5
+  local selection_bg = m.primary_container or c.color0
+  local selection_fg = m.on_primary_container or fg
 
   local syn
   if variant == "rich" then
@@ -179,7 +181,7 @@ local function apply_matugen(variant)
   hi(0, "NormalFloat", { fg = fg, bg = "NONE" })
   hi(0, "FloatBorder", { fg = c.color8, bg = "NONE" })
   hi(0, "CursorLine", { bg = subtle })
-  hi(0, "Visual", { bg = c.color8 })
+  hi(0, "Visual", { fg = selection_fg, bg = selection_bg })
   hi(0, "LineNr", { fg = c.color8 })
   hi(0, "CursorLineNr", { fg = accent, bold = true })
   hi(0, "Search", { fg = bg, bg = c.color3 })
@@ -196,7 +198,7 @@ local function apply_matugen(variant)
   hi(0, "PreProc", { fg = syn.typ })
   hi(0, "Operator", { fg = syn.op })
   hi(0, "Pmenu", { fg = fg, bg = c.color0 })
-  hi(0, "PmenuSel", { fg = fg, bg = c.color8, bold = true })
+  hi(0, "PmenuSel", { fg = selection_fg, bg = selection_bg, bold = true })
   hi(0, "PmenuSbar", { bg = c.color0 })
   hi(0, "PmenuThumb", { bg = c.color8 })
 
@@ -289,7 +291,7 @@ local function apply_matugen(variant)
   hi(0, "EndOfBuffer", { fg = bg })
   hi(0, "ColorColumn", { bg = subtle })
   hi(0, "CursorColumn", { bg = subtle })
-  hi(0, "QuickFixLine", { bg = c.color8, bold = true })
+  hi(0, "QuickFixLine", { fg = selection_fg, bg = selection_bg, bold = true })
   hi(0, "Underlined", { underline = true })
   hi(0, "Error", { fg = c.color1 })
   hi(0, "Todo", { fg = bg, bg = c.color3, bold = true })
@@ -315,7 +317,7 @@ local function apply_matugen(variant)
 
   hi(0, "BlinkCmpMenu", { fg = fg, bg = c.color0 })
   hi(0, "BlinkCmpMenuBorder", { fg = c.color8, bg = "NONE" })
-  hi(0, "BlinkCmpMenuSelection", { bg = c.color8, bold = true })
+  hi(0, "BlinkCmpMenuSelection", { fg = selection_fg, bg = selection_bg, bold = true })
   hi(0, "BlinkCmpLabelMatch", { fg = accent, bold = true })
   hi(0, "BlinkCmpLabelDetail", { fg = c.color8 })
   hi(0, "BlinkCmpLabelDescription", { fg = c.color8 })
@@ -355,7 +357,7 @@ local function apply_matugen(variant)
 
   hi(0, "AerialLine", { bg = subtle })
   hi(0, "DropBarMenuCurrentContext", { bg = subtle })
-  hi(0, "DropBarMenuHoverEntry", { bg = c.color8 })
+  hi(0, "DropBarMenuHoverEntry", { fg = selection_fg, bg = selection_bg })
 
   hi(0, "OilDir", { fg = accent, bold = true })
   hi(0, "OilFile", { fg = fg })
