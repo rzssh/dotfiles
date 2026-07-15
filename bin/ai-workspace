@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    printf 'usage: ai-workspace [profile] [cwd]\n'
+    exit 0
+fi
+
+profile=${1:-${AI_DEFAULT_PROFILE:-personal}}
+cwd=${2:-$PWD}
+
+if [[ ! -d $cwd ]]; then
+    printf 'ai-workspace: directory not found: %s\n' "$cwd" >&2
+    exit 2
+fi
+
+ai-run "$profile" -- true
+exec herdr workspace create --cwd "$cwd" --env "AI_PROFILE=$profile" --focus

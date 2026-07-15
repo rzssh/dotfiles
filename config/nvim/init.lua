@@ -35,5 +35,3 @@ require("notes").setup({
   dir = "~/notes",
   float_file = "inbox.md",
 })
-
-require("herdr").setup()

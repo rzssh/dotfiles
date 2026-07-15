@@ -54,7 +54,8 @@ hl.config({
         layout = "dwindle",
     },
     input = {
-        kb_layout  = "us",
+        kb_layout  = "us,ru,ua",
+        kb_options = "grp:win_space_toggle",
         repeat_rate  = 40,
         repeat_delay = 300,
         follow_mouse = 1,
@@ -198,7 +199,6 @@ hl.bind("Z", function()
 end, { release = true, ignore_mods = true, non_consuming = true, transparent = true })
 
 hl.bind(mainMod .. " + ALT + S", hl.dsp.exec_cmd("hyprwhspr record toggle"))
-hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_ru_translit.sh"))
 
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("dms screenshot region"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("dms screenshot full"))

@@ -155,23 +155,6 @@
         "type": "github"
       }
     },
-    "fleetpit": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1783874652,
-        "narHash": "sha256-rKiNrJ0ErGwVn57QkYapVTPV5qa6kV57pL0h90K8oTs=",
-        "path": "/home/razen/projects/fleetpit",
-        "type": "path"
-      },
-      "original": {
-        "path": "/home/razen/projects/fleetpit",
-        "type": "path"
-      }
-    },
     "gitignore": {
       "inputs": {
         "nixpkgs": [
@@ -211,6 +194,27 @@
       "original": {
         "owner": "oxcl",
         "repo": "nix-flake-helium-browser",
+        "type": "github"
+      }
+    },
+    "herdr": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1784079774,
+        "narHash": "sha256-ZBLO/HbZYN5sFjA4cIW1/6CH6NxBIaYgEC+lURQgPBk=",
+        "owner": "ogulcancelik",
+        "repo": "herdr",
+        "rev": "a0678a38b9426b011f66e1b88ff7aaa9bf877104",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ogulcancelik",
+        "repo": "herdr",
         "type": "github"
       }
     },
@@ -285,7 +289,7 @@
           "nixpkgs"
         ],
         "pre-commit": "pre-commit",
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay_2"
       },
       "locked": {
         "lastModified": 1782141370,
@@ -575,8 +579,8 @@
     "root": {
       "inputs": {
         "dms": "dms",
-        "fleetpit": "fleetpit",
         "helium": "helium",
+        "herdr": "herdr",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",
         "lanzaboote": "lanzaboote",
@@ -590,6 +594,27 @@
       }
     },
     "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "herdr",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783577481,
+        "narHash": "sha256-EWMxOWrJ031f8f/lrcEmhTRs4npw1/5N3Hcjin846c8=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "4cdea398dc491b082dccdce0fad1ed0b75fa3394",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_2": {
       "inputs": {
         "nixpkgs": [
           "lanzaboote",

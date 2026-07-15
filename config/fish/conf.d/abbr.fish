@@ -11,7 +11,6 @@ abbr -a ccr "claude --dangerously-skip-permissions --resume"
 abbr -a cx "codex --dangerously-bypass-approvals-and-sandbox"
 abbr -a cxr "codex --dangerously-bypass-approvals-and-sandbox resume"
 abbr -a oc opencode
-abbr -a fp fleetpit
 abbr -a td tuxedo
 abbr -a tda "tuxedo add"
 abbr -a tdl "tuxedo list"

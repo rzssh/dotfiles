@@ -1,12 +1,12 @@
 return {
   "nvimtools/hydra.nvim",
-  dependencies = { "herdr-splits.nvim" },
+  dependencies = { "herdr.nvim" },
   event = "VeryLazy",
   keys = {
     { "<leader>wr", desc = "Resize" },
   },
   config = function()
-    local splits = require("herdr-splits")
+    local splits = require("herdr")
     require("hydra")({
       name = "Resize",
       mode = "n",

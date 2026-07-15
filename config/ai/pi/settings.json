@@ -1,0 +1,13 @@
+{
+  "defaultProvider": "opencode-go",
+  "defaultModel": "glm-5.2",
+  "defaultThinkingLevel": "high",
+  "defaultProjectTrust": "ask",
+  "enableInstallTelemetry": false,
+  "enabledModels": [
+    "opencode-go/glm-5.2",
+    "opencode-go/deepseek-v4-flash"
+  ],
+  "lastChangelogVersion": "0.80.3",
+  "theme": "dark"
+}

@@ -10,6 +10,9 @@ let
     system = "x86_64-linux";
     config.allowUnfree = true;
   };
+  herdr = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [ ../patches/herdr/current-workspace-agent-panel.patch ];
+  });
 in
 {
   home.packages = with pkgs; [
@@ -23,8 +26,10 @@ in
     zoxide
     sesh
     fzf
+    jq
     just
     tuxedo
+    herdr
 
     # cli utils
     eza
@@ -100,7 +105,6 @@ in
     # ai
     localPkgs.agentmemory
     localPkgs.pi-coding-agent
-    inputs.fleetpit.packages.${pkgs.stdenv.hostPlatform.system}.default
     (llamaPkgs.llama-cpp.override { cudaSupport = true; })
     opencode
     inputs.hermes-agent.packages.x86_64-linux.default

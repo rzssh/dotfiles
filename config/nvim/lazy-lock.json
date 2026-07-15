@@ -12,6 +12,7 @@
   "flash.nvim": { "branch": "main", "commit": "b6346946d10d07998efee029fb0f7a593806d0cd" },
   "friendly-snippets": { "branch": "main", "commit": "6cd7280adead7f586db6fccbd15d2cac7e2188b9" },
   "grug-far.nvim": { "branch": "main", "commit": "c69859c1d5427ab5fc7ed12380ab521b4e336691" },
+  "herdr.nvim": { "branch": "main", "commit": "147891c446aa2fa08b73529052765cffe3623a3e" },
   "hunk.nvim": { "branch": "master", "commit": "c8a8e7b6973576f63e5bf39aa8338d7f37f4dc53" },
   "hydra.nvim": { "branch": "main", "commit": "8c4a9f621ec7cdc30411a1f3b6d5eebb12b469dc" },
   "img-clip.nvim": { "branch": "main", "commit": "b6ddfb97b5600d99afe3452d707444afda658aca" },

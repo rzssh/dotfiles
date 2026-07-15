@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ ${1:-} =~ ^[1-9]$ ]] || exit 2
+
+workspace_id=$("$HERDR_BIN_PATH" workspace list | jq -r --argjson number "$1" '.result.workspaces[] | select(.number == $number) | .workspace_id')
+[[ -n "$workspace_id" && "$workspace_id" != "$HERDR_ACTIVE_WORKSPACE_ID" ]] || exit 0
+
+tab=$("$HERDR_BIN_PATH" tab get "$HERDR_ACTIVE_TAB_ID")
+layout=$("$HERDR_BIN_PATH" pane layout --pane "$HERDR_ACTIVE_PANE_ID")
+label=$(jq -r '.result.tab.label' <<<"$tab")
+focused_pane=$(jq -r '.result.layout.focused_pane_id' <<<"$layout")
+split=$(jq -r '.result.layout.splits[0].direction // "right"' <<<"$layout")
+zoomed=$(jq -r '.result.layout.zoomed' <<<"$layout")
+mapfile -t panes < <(jq -r '.result.layout.panes[].pane_id' <<<"$layout")
+
+[[ ${#panes[@]} -gt 0 ]] || exit 1
+
+if [[ $zoomed == true ]]; then
+  "$HERDR_BIN_PATH" pane zoom --pane "$focused_pane" --off >/dev/null
+fi
+
+focus=(--no-focus)
+if [[ ${panes[0]} == "$focused_pane" ]]; then
+  focus=(--focus)
+fi
+
+move=$("$HERDR_BIN_PATH" pane move "${panes[0]}" --new-tab --workspace "$workspace_id" --label "$label" "${focus[@]}")
+jq -e '.result.move_result.changed == true' >/dev/null <<<"$move"
+target_tab=$(jq -r '.result.move_result.created_tab.tab_id' <<<"$move")
+target_pane=$(jq -r '.result.move_result.pane.pane_id' <<<"$move")
+focused_target_pane=$target_pane
+
+for ((i = ${#panes[@]} - 1; i >= 1; i--)); do
+  ratio=$(jq -n "$i / ($i + 1)")
+  focus=(--no-focus)
+  if [[ ${panes[i]} == "$focused_pane" ]]; then
+    focus=(--focus)
+  fi
+  move=$("$HERDR_BIN_PATH" pane move "${panes[i]}" --tab "$target_tab" --target-pane "$target_pane" --split "$split" --ratio "$ratio" "${focus[@]}")
+  jq -e '.result.move_result.changed == true' >/dev/null <<<"$move"
+  if [[ ${panes[i]} == "$focused_pane" ]]; then
+    focused_target_pane=$(jq -r '.result.move_result.pane.pane_id' <<<"$move")
+  fi
+done
+
+"$HERDR_BIN_PATH" tab focus "$target_tab" >/dev/null
+if [[ $zoomed == true ]]; then
+  "$HERDR_BIN_PATH" pane zoom --pane "$focused_target_pane" --on >/dev/null
+fi

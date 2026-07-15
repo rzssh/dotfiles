@@ -4,7 +4,7 @@ prompt_new_tab_name = false
 
 [ui]
 show_agent_labels_on_pane_borders = true
-agent_panel_scope = "all"
+agent_panel_scope = "current"
 
 [ui.sound]
 enabled = false
@@ -23,7 +23,7 @@ swap_pane_up     = "alt+shift+up"
 swap_pane_down   = "alt+shift+down"
 next_agent         = "alt+]"
 previous_agent     = "alt+["
-focus_agent        = "prefix+1..9"
+focus_agent        = "ctrl+1..9"
 switch_tab         = "alt+1..9"
 zoom               = ["prefix+z", "alt+z"]
 previous_workspace = "alt+shift+["
@@ -31,28 +31,98 @@ next_workspace     = "alt+shift+]"
 switch_workspace   = "alt+shift+1..9"
 
 [[keys.command]]
+key = "prefix+1"
+type = "shell"
+command = "herdr-move-tab-workspace 1"
+description = "move tab to workspace 1"
+
+[[keys.command]]
+key = "prefix+2"
+type = "shell"
+command = "herdr-move-tab-workspace 2"
+description = "move tab to workspace 2"
+
+[[keys.command]]
+key = "prefix+3"
+type = "shell"
+command = "herdr-move-tab-workspace 3"
+description = "move tab to workspace 3"
+
+[[keys.command]]
+key = "prefix+4"
+type = "shell"
+command = "herdr-move-tab-workspace 4"
+description = "move tab to workspace 4"
+
+[[keys.command]]
+key = "prefix+5"
+type = "shell"
+command = "herdr-move-tab-workspace 5"
+description = "move tab to workspace 5"
+
+[[keys.command]]
+key = "prefix+6"
+type = "shell"
+command = "herdr-move-tab-workspace 6"
+description = "move tab to workspace 6"
+
+[[keys.command]]
+key = "prefix+7"
+type = "shell"
+command = "herdr-move-tab-workspace 7"
+description = "move tab to workspace 7"
+
+[[keys.command]]
+key = "prefix+8"
+type = "shell"
+command = "herdr-move-tab-workspace 8"
+description = "move tab to workspace 8"
+
+[[keys.command]]
+key = "prefix+9"
+type = "shell"
+command = "herdr-move-tab-workspace 9"
+description = "move tab to workspace 9"
+
+[[keys.command]]
 key = "alt+left"
 type = "plugin_action"
-command = "herdr-splits.nav-left"
+command = "herdr-nvim.nav-left"
 description = "navigate left"
 
 [[keys.command]]
 key = "alt+right"
 type = "plugin_action"
-command = "herdr-splits.nav-right"
+command = "herdr-nvim.nav-right"
 description = "navigate right"
 
 [[keys.command]]
 key = "alt+up"
 type = "plugin_action"
-command = "herdr-splits.nav-up"
+command = "herdr-nvim.nav-up"
 description = "navigate up"
 
 [[keys.command]]
 key = "alt+down"
 type = "plugin_action"
-command = "herdr-splits.nav-down"
+command = "herdr-nvim.nav-down"
 description = "navigate down"
+
+[[keys.command]]
+key = "prefix+alt+r"
+type = "popup"
+command = 'printf "Agent name: "; IFS= read -r name; [ -z "$name" ] || "$HERDR_BIN_PATH" agent rename "$HERDR_ACTIVE_PANE_ID" "$name"'
+description = "rename agent"
+width = 48
+height = 3
+
+[[keys.command]]
+key = "prefix+alt+p"
+type = "popup"
+command = "ai-workspace-picker"
+description = "new profiled workspace"
+width = "60%"
+height = 12
 
 [[keys.command]]
 key = "prefix+a"

@@ -87,7 +87,6 @@ in
     "gh".source = link "config/gh";
     "gh-dash".source = link "config/gh-dash";
     "herdr/config.toml".source = link "config/herdr/config.toml";
-    "herdr/plugins/config/herdr-splits/herdr-splits.conf".source = link "config/herdr/herdr-splits.conf";
     "opencode".source = link "config/opencode";
     "ai".source = link "config/ai";
     "starship.toml".source = link "config/starship.toml";
@@ -150,17 +149,23 @@ in
     ".codex/AGENTS.md".source = link "home/files/codex/AGENTS.md";
     ".codex/config.toml".source = link "home/files/codex/config.toml";
     ".codex/skills".source = link "home/files/codex/skills";
+    ".agents/skills".source = link ".agents/skills";
+    ".pi/agent/AGENTS.md".source = link "home/files/codex/AGENTS.md";
+    ".pi/agent/settings.json".source = link "config/ai/pi/settings.json";
     ".hermes/config.yaml".source = link "config/hermes/config.yaml";
     ".agentmemory/.env".text = ''
       AGENTMEMORY_URL=http://127.0.0.1:3111
       AGENTMEMORY_ALLOW_AGENT_SDK=false
       AGENTMEMORY_AUTO_COMPRESS=false
     '';
-    ".local/share/ai/profiles".source = link "config/ai/profiles";
+    ".local/bin/ai-run".source = link "bin/ai-run";
+    ".local/bin/ai-workspace".source = link "bin/ai-workspace";
+    ".local/bin/ai-workspace-picker".source = link "bin/ai-workspace-picker";
     ".local/bin/wallpaper-state".source = link "bin/wallpaper-state";
     ".local/bin/ns".source = link "bin/ns";
     ".local/bin/tmux-layout-picker".source = link "bin/tmux-layout-picker";
     ".local/bin/herdr-jj-workspace".source = link "bin/herdr-jj-workspace";
+    ".local/bin/herdr-move-tab-workspace".source = link "bin/herdr-move-tab-workspace";
     ".local/bin/theme-terminals".source = link "bin/theme/terminals";
     ".local/bin/theme-gtk".source = link "bin/theme/gtk";
     ".local/bin/theme-hyprland".source = link "bin/theme/hyprland";

@@ -1,0 +1,212 @@
+diff --git a/src/app/mod.rs b/src/app/mod.rs
+index a77f253..f040ac3 100644
+--- a/src/app/mod.rs
++++ b/src/app/mod.rs
+@@ -605,6 +605,7 @@ impl App {
+             sidebar_collapsed: false,
+             sidebar_collapsed_mode: config.ui.sidebar_collapsed_mode,
+             sidebar_section_split,
++            agent_panel_scope: config.ui.agent_panel_scope,
+             agent_panel_sort,
+             sidebar_agents: config.ui.sidebar.agents.clone(),
+             sidebar_spaces: config.ui.sidebar.spaces.clone(),
+@@ -1419,6 +1420,7 @@ impl App {
+                 self.state.show_agent_labels_on_pane_borders =
+                     config.ui.show_agent_labels_on_pane_borders;
+                 self.state.hide_tab_bar_when_single_tab = config.ui.hide_tab_bar_when_single_tab;
++                self.state.agent_panel_scope = config.ui.agent_panel_scope;
+                 self.state.agent_panel_sort =
+                     agent_panel_sort_from_config(config.ui.agent_panel_sort);
+                 self.state.sidebar_agents = config.ui.sidebar.agents.clone();
+@@ -2372,6 +2374,20 @@ mod tests {
+         assert_eq!(app.state.agent_panel_sort, state::AgentPanelSort::Priority);
+     }
+ 
++    #[test]
++    fn startup_uses_configured_agent_panel_scope() {
++        let mut config = Config::default();
++        config.ui.agent_panel_scope = crate::config::AgentPanelScopeConfig::Current;
++        let (_api_tx, api_rx) = tokio::sync::mpsc::unbounded_channel();
++
++        let app = App::new(&config, true, None, api_rx, crate::api::EventHub::default());
++
++        assert_eq!(
++            app.state.agent_panel_scope,
++            crate::config::AgentPanelScopeConfig::Current
++        );
++    }
++
+     #[test]
+     fn startup_uses_redraw_on_focus_gained_config() {
+         let mut config = Config::default();
+@@ -2615,6 +2631,10 @@ mod tests {
+             crate::config::ToastDelivery::Herdr
+         );
+         assert_eq!(app.state.agent_panel_sort, state::AgentPanelSort::Priority);
++        assert_eq!(
++            app.state.agent_panel_scope,
++            crate::config::AgentPanelScopeConfig::Current
++        );
+         assert!(!app.state.redraw_on_focus_gained);
+         assert!(!app.state.copy_on_select);
+         assert!(app.state.selection.is_none());
+diff --git a/src/app/state.rs b/src/app/state.rs
+index d821407..76d95f3 100644
+--- a/src/app/state.rs
++++ b/src/app/state.rs
+@@ -1447,6 +1447,7 @@ pub struct AppState {
+     pub sidebar_collapsed_mode: crate::config::SidebarCollapsedModeConfig,
+     /// Ratio of sidebar height allocated to the workspaces section.
+     pub sidebar_section_split: f32,
++    pub agent_panel_scope: crate::config::AgentPanelScopeConfig,
+     pub agent_panel_sort: AgentPanelSort,
+     pub sidebar_agents: crate::config::AgentsSidebarConfig,
+     pub sidebar_spaces: crate::config::SpacesSidebarConfig,
+@@ -1822,6 +1823,7 @@ impl AppState {
+             sidebar_collapsed: false,
+             sidebar_collapsed_mode: crate::config::SidebarCollapsedModeConfig::Compact,
+             sidebar_section_split: 0.5,
++            agent_panel_scope: crate::config::AgentPanelScopeConfig::All,
+             agent_panel_sort: AgentPanelSort::Spaces,
+             sidebar_agents: crate::config::AgentsSidebarConfig::default(),
+             sidebar_spaces: crate::config::SpacesSidebarConfig::default(),
+diff --git a/src/config.rs b/src/config.rs
+index b9a476e..c640bc4 100644
+--- a/src/config.rs
++++ b/src/config.rs
+@@ -19,10 +19,10 @@ pub use self::{
+         IndexedKeybind, Keybinds, LiveKeybindConfig,
+     },
+     model::{
+-        validated_sidebar_bounds, AgentPanelSortConfig, Config, ConfigReloadReport,
+-        ConfigReloadStatus, HostCursorModeConfig, NewTerminalCwdConfig, ShellModeConfig,
+-        SidebarCollapsedModeConfig, ToastClipboardPosition, ToastConfig, ToastDelivery,
+-        ToastHerdrPosition, UpdateChannelConfig, MAX_TOAST_DELAY_SECONDS,
++        validated_sidebar_bounds, AgentPanelScopeConfig, AgentPanelSortConfig, Config,
++        ConfigReloadReport, ConfigReloadStatus, HostCursorModeConfig, NewTerminalCwdConfig,
++        ShellModeConfig, SidebarCollapsedModeConfig, ToastClipboardPosition, ToastConfig,
++        ToastDelivery, ToastHerdrPosition, UpdateChannelConfig, MAX_TOAST_DELAY_SECONDS,
+     },
+     sidebar::{
+         AgentSidebarToken, AgentsSidebarConfig, SidebarConfig, SpaceSidebarToken,
+diff --git a/src/config/model.rs b/src/config/model.rs
+index 60dd247..105e8c3 100644
+--- a/src/config/model.rs
++++ b/src/config/model.rs
+@@ -88,6 +88,14 @@ pub enum ToastClipboardPosition {
+     BottomRight,
+ }
+ 
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
++#[serde(rename_all = "lowercase")]
++pub enum AgentPanelScopeConfig {
++    #[default]
++    All,
++    Current,
++}
++
+ #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
+ #[serde(rename_all = "lowercase")]
+ pub enum AgentPanelSortConfig {
+@@ -808,6 +816,7 @@ pub struct UiConfig {
+     pub show_agent_labels_on_pane_borders: bool,
+     /// Hide the tab row when the workspace has one tab. Default: false.
+     pub hide_tab_bar_when_single_tab: bool,
++    pub agent_panel_scope: AgentPanelScopeConfig,
+     /// Agent sidebar ordering. Saved values are "spaces" or "priority". Default: "spaces".
+     pub agent_panel_sort: AgentPanelSortConfig,
+     /// Expanded sidebar row composition.
+@@ -1004,6 +1013,7 @@ impl Default for UiConfig {
+             pane_gaps: true,
+             show_agent_labels_on_pane_borders: false,
+             hide_tab_bar_when_single_tab: false,
++            agent_panel_scope: AgentPanelScopeConfig::All,
+             agent_panel_sort: AgentPanelSortConfig::Spaces,
+             sidebar: SidebarConfig::default(),
+             accent: "cyan".into(),
+@@ -1200,7 +1210,11 @@ resume_agents_on_restore = false
+     }
+ 
+     #[test]
+-    fn agent_panel_sort_config_parses_alias_and_defaults() {
++    fn agent_panel_config_parses_and_defaults() {
++        assert_eq!(
++            Config::default().ui.agent_panel_scope,
++            AgentPanelScopeConfig::All
++        );
+         assert_eq!(
+             Config::default().ui.agent_panel_sort,
+             AgentPanelSortConfig::Spaces
+@@ -1225,6 +1239,7 @@ agent_panel_sort = "workspaces"
+ agent_panel_scope = "current"
+ "#;
+         let config: Config = toml::from_str(toml).unwrap();
++        assert_eq!(config.ui.agent_panel_scope, AgentPanelScopeConfig::Current);
+         assert_eq!(config.ui.agent_panel_sort, AgentPanelSortConfig::Spaces);
+     }
+ 
+diff --git a/src/ui/sidebar.rs b/src/ui/sidebar.rs
+index ebe7d0a..50f2fc6 100644
+--- a/src/ui/sidebar.rs
++++ b/src/ui/sidebar.rs
+@@ -123,10 +123,24 @@ fn agent_panel_entries_with_runtimes(
+         }
+     };
+ 
++    let workspace_scope = if matches!(
++        app.agent_panel_scope,
++        crate::config::AgentPanelScopeConfig::Current
++    ) {
++        if matches!(app.mode, Mode::Navigate) {
++            Some(app.selected)
++        } else {
++            app.active
++        }
++    } else {
++        None
++    };
++
+     let mut entries: Vec<_> = app
+         .workspaces
+         .iter()
+         .enumerate()
++        .filter(|(ws_idx, _)| workspace_scope.is_none_or(|current| *ws_idx == current))
+         .flat_map(|(ws_idx, ws)| {
+             let multi_tab = ws.tabs.len() > 1;
+             let workspace_label = ws.display_name_from(&app.terminals, terminal_runtimes);
+@@ -1769,6 +1783,35 @@ mod tests {
+         assert_eq!(labels, ["four", "two", "one", "three"]);
+     }
+ 
++    #[test]
++    fn current_agent_panel_scope_uses_active_or_selected_workspace() {
++        let mut app = crate::app::state::AppState::test_new();
++        app.workspaces = vec![Workspace::test_new("one"), Workspace::test_new("two")];
++        app.ensure_test_terminals();
++        for workspace in &app.workspaces {
++            let pane = workspace.tabs[0].root_pane;
++            let terminal_id = workspace.tabs[0].panes[&pane].attached_terminal_id.clone();
++            app.terminals.get_mut(&terminal_id).unwrap().detected_agent = Some(Agent::Claude);
++        }
++        app.agent_panel_scope = crate::config::AgentPanelScopeConfig::Current;
++        app.active = Some(1);
++        app.selected = 1;
++
++        let labels = agent_panel_entries(&app)
++            .into_iter()
++            .map(|entry| entry.primary_label)
++            .collect::<Vec<_>>();
++        assert_eq!(labels, ["two"]);
++
++        app.mode = Mode::Navigate;
++        app.selected = 0;
++        let labels = agent_panel_entries(&app)
++            .into_iter()
++            .map(|entry| entry.primary_label)
++            .collect::<Vec<_>>();
++        assert_eq!(labels, ["one"]);
++    }
++
+     #[test]
+     fn collapsed_sidebar_numbers_grouped_agents_by_list_position() {
+         let mut app = crate::app::state::AppState::test_new();

@@ -19,4 +19,6 @@ config/yazi/flavors/matugen.yazi/
 config/mango/dms/
 config/mango/matugen.conf
 *.sock
+__pycache__/
+*.py[cod]
 config/DankMaterialShell/*

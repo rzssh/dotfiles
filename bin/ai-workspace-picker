@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+
+PROFILE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def fail(message):
+    print(f"ai-workspace-picker: {message}", file=sys.stderr)
+    raise SystemExit(2)
+
+
+def source_cwd():
+    pane = os.environ.get("HERDR_ACTIVE_PANE_ID") or os.environ.get("HERDR_PANE_ID")
+    if not pane:
+        return os.getcwd()
+    herdr = os.environ.get("HERDR_BIN_PATH", "herdr")
+    result = subprocess.run(
+        [herdr, "pane", "get", pane], capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        return os.getcwd()
+    try:
+        info = json.loads(result.stdout)["result"]["pane"]
+    except (KeyError, TypeError, json.JSONDecodeError):
+        return os.getcwd()
+    return info.get("foreground_cwd") or info.get("cwd") or os.getcwd()
+
+
+def profile_names():
+    home = Path(os.environ.get("HOME", "~")).expanduser()
+    data = Path(os.environ.get("XDG_DATA_HOME", home / ".local" / "share"))
+    root = Path(os.environ.get("AI_PROFILES_DIR", data / "ai" / "profiles")).expanduser()
+    if not root.is_dir():
+        fail(f"profile directory not found: {root}")
+    names = [
+        path.name
+        for path in root.iterdir()
+        if path.is_dir() and PROFILE_RE.fullmatch(path.name)
+    ]
+    if not names:
+        fail("no profiles found")
+    current = os.environ.get("AI_PROFILE") or os.environ.get(
+        "AI_DEFAULT_PROFILE", "personal"
+    )
+    return sorted(names, key=lambda name: (name != current, name.casefold())), current
+
+
+def main():
+    names, current = profile_names()
+    cwd = source_cwd()
+    try:
+        picker = subprocess.run(
+            [
+                "fzf",
+                "--border=none",
+                "--no-multi",
+                "--no-preview",
+                "--prompt=profile> ",
+                f"--header=current: {current}  cwd: {cwd}",
+            ],
+            input="\n".join(names) + "\n",
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError:
+        fail("fzf not found")
+    if picker.returncode != 0:
+        return
+    profile = picker.stdout.strip()
+    if profile not in names:
+        fail("invalid selection")
+    raise SystemExit(subprocess.run(["ai-workspace", profile, cwd]).returncode)
+
+
+if __name__ == "__main__":
+    main()

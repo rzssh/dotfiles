@@ -9,6 +9,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    herdr = {
+      url = "github:ogulcancelik/herdr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -41,11 +46,6 @@
     };
 
     hermes-agent.url = "github:NousResearch/hermes-agent";
-
-    fleetpit = {
-      url = "path:/home/razen/projects/fleetpit";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
