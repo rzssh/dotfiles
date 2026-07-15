@@ -15,4 +15,8 @@ if [[ ! -d $cwd ]]; then
 fi
 
 ai-run "$profile" -- true
-exec herdr workspace create --cwd "$cwd" --env "AI_PROFILE=$profile" --focus
+args=(workspace create --cwd "$cwd" --env "AI_PROFILE=$profile")
+if [[ $profile != ${AI_DEFAULT_PROFILE:-personal} ]]; then
+    args+=(--label "$(basename -- "$cwd") [$profile]")
+fi
+exec herdr "${args[@]}" --focus

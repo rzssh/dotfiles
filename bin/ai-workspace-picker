@@ -38,21 +38,33 @@ def profile_names():
     root = Path(os.environ.get("AI_PROFILES_DIR", data / "ai" / "profiles")).expanduser()
     if not root.is_dir():
         fail(f"profile directory not found: {root}")
+    default = os.environ.get("AI_DEFAULT_PROFILE", "personal")
     names = [
         path.name
         for path in root.iterdir()
-        if path.is_dir() and PROFILE_RE.fullmatch(path.name)
+        if path.is_dir()
+        and path.name != default
+        and PROFILE_RE.fullmatch(path.name)
     ]
-    if not names:
-        fail("no profiles found")
-    current = os.environ.get("AI_PROFILE") or os.environ.get(
-        "AI_DEFAULT_PROFILE", "personal"
-    )
+    current = os.environ.get("AI_PROFILE") or default
     return sorted(names, key=lambda name: (name != current, name.casefold())), current
 
 
 def main():
     names, current = profile_names()
+    if not names:
+        herdr = os.environ.get("HERDR_BIN_PATH", "herdr")
+        subprocess.run(
+            [
+                herdr,
+                "notification",
+                "show",
+                "No alternate AI profiles",
+                "--body",
+                "Add ~/.local/share/ai/profiles/<name>/env (directory 0700, file 0600)",
+            ]
+        )
+        return
     cwd = source_cwd()
     try:
         picker = subprocess.run(

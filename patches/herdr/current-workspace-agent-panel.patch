@@ -1,12 +1,12 @@
 diff --git a/src/app/mod.rs b/src/app/mod.rs
-index a77f253..f040ac3 100644
+index 6ea8474..8a0bf07 100644
 --- a/src/app/mod.rs
 +++ b/src/app/mod.rs
 @@ -607,0 +608 @@ impl App {
 +            agent_panel_scope: config.ui.agent_panel_scope,
-@@ -1421,0 +1423 @@ impl App {
+@@ -1422,0 +1424 @@ impl App {
 +                self.state.agent_panel_scope = config.ui.agent_panel_scope;
-@@ -2374,0 +2377,14 @@ mod tests {
+@@ -2375,0 +2378,14 @@ mod tests {
 +    #[test]
 +    fn startup_uses_configured_agent_panel_scope() {
 +        let mut config = Config::default();
@@ -21,7 +21,7 @@ index a77f253..f040ac3 100644
 +        );
 +    }
 +
-@@ -2617,0 +2634,4 @@ mod tests {
+@@ -2618,0 +2635,4 @@ mod tests {
 +        assert_eq!(
 +            app.state.agent_panel_scope,
 +            crate::config::AgentPanelScopeConfig::Current

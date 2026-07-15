@@ -39,13 +39,16 @@ trust_level = "trusted"
 [projects."/home/razen/projects/herdr.nvim"]
 trust_level = "trusted"
 
+[projects."/home/razen/projects/ai"]
+trust_level = "trusted"
+
 [tui.model_availability_nux]
 "gpt-5.5" = 4
 "gpt-5.6-sol" = 4
 
 [marketplaces.ponytail]
-last_updated = "2026-07-10T13:41:42Z"
-last_revision = "14a0d79548d4de8fc2de95c1b94bb0de63a739d3"
+last_updated = "2026-07-15T23:21:00Z"
+last_revision = "16f29800fd2681bdf24f3eb4ccffe38be3baec6b"
 source_type = "git"
 source = "https://github.com/DietrichGebert/ponytail.git"
 
