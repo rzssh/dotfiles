@@ -1,5 +1,8 @@
+local dir = vim.fn.expand("~/projects/herdr.nvim")
+
 return {
   "r4zendev/herdr.nvim",
+  dir = vim.uv.fs_stat(dir) and dir or nil,
   event = "VeryLazy",
   opts = {
     agent_workspace_only = true,

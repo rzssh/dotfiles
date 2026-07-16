@@ -1,13 +1,129 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+profile_re='^[A-Za-z0-9][A-Za-z0-9._-]*$'
+workspace_re='^[A-Za-z0-9:_-]+$'
+
+socket_path() {
+    if [[ -n ${HERDR_SOCKET_PATH:-} ]]; then
+        printf '%s\n' "$HERDR_SOCKET_PATH"
+        return
+    fi
+    local socket
+    socket=$(herdr status server 2>/dev/null | sed -n 's/^socket: //p')
+    if [[ -n $socket ]]; then
+        printf '%s\n' "$socket"
+        return
+    fi
+    printf '%s/herdr/herdr.sock\n' "${XDG_CONFIG_HOME:-$HOME/.config}"
+}
+
+binding_directory() {
+    local session
+    session=$(printf '%s' "$(socket_path)" | sha256sum | cut -d' ' -f1)
+    printf '%s/.local/state/ai/workspaces/%s\n' "$HOME" "$session"
+}
+
+binding_path() {
+    printf '%s/%s\n' "$(binding_directory)" "$1"
+}
+
+clean_profile_environment() {
+    local clean_env=(env -i)
+    local key
+    for key in HOME PATH LANG LC_ALL TERM XDG_CONFIG_HOME XDG_RUNTIME_DIR HERDR_CONFIG_PATH HERDR_SESSION HERDR_SOCKET_PATH; do
+        if [[ -v $key ]]; then
+            clean_env+=("$key=${!key}")
+        fi
+    done
+    "${clean_env[@]}" "$@"
+}
+
+cleanup_bindings() {
+    local directory
+    local active
+    directory=$(binding_directory)
+    [[ -d $directory ]] || return 0
+    active=$(clean_profile_environment herdr workspace list 2>/dev/null | jq -er '.result.workspaces[].workspace_id' 2>/dev/null) || return 0
+    local binding
+    for binding in "$directory"/*; do
+        [[ -f $binding ]] || continue
+        if ! grep -Fxq -- "$(basename -- "$binding")" <<< "$active"; then
+            rm -f -- "$binding"
+        fi
+    done
+}
+
+current_profile() {
+    cleanup_bindings
+    if [[ -n ${AI_PROFILE:-} ]]; then
+        printf '%s\n' "$AI_PROFILE"
+        return
+    fi
+    if [[ -n ${HERDR_WORKSPACE_ID:-} && $HERDR_WORKSPACE_ID =~ $workspace_re ]]; then
+        local binding
+        local bound
+        binding=$(binding_path "$HERDR_WORKSPACE_ID")
+        if [[ -r $binding ]]; then
+            IFS= read -r bound < "$binding"
+            if [[ $bound =~ $profile_re ]]; then
+                printf '%s\n' "$bound"
+                return
+            fi
+        fi
+    fi
+    printf '%s\n' "${AI_DEFAULT_PROFILE:-personal}"
+}
+
+bind_profile() {
+    local workspace_id=$1
+    local profile=$2
+    local binding
+    local directory
+    local temporary
+    binding=$(binding_path "$workspace_id")
+    directory=$(dirname -- "$binding")
+    umask 077
+    mkdir -p -- "$directory"
+    chmod 700 -- "$HOME/.local/state/ai" "$HOME/.local/state/ai/workspaces" "$directory"
+    temporary=$(mktemp "$directory/.binding.XXXXXX")
+    printf '%s\n' "$profile" > "$temporary"
+    mv -f -- "$temporary" "$binding"
+}
+
+if [[ ${1:-} == --current-profile ]]; then
+    current_profile
+    exit 0
+fi
+
+if [[ ${1:-} == --bind-profile ]]; then
+    workspace_id=${2:-}
+    profile=${3:-}
+    if [[ ! $workspace_id =~ $workspace_re ]]; then
+        printf 'ai-workspace: invalid workspace ID: %s\n' "$workspace_id" >&2
+        exit 2
+    fi
+    if [[ ! $profile =~ $profile_re ]]; then
+        printf 'ai-workspace: invalid profile: %s\n' "$profile" >&2
+        exit 2
+    fi
+    ai-run "$profile" -- true
+    bind_profile "$workspace_id" "$profile"
+    exit 0
+fi
+
 if [[ ${1:-} == -h || ${1:-} == --help ]]; then
     printf 'usage: ai-workspace [profile] [cwd]\n'
     exit 0
 fi
 
-profile=${1:-${AI_DEFAULT_PROFILE:-personal}}
+profile=${1:-${AI_PROFILE:-${AI_DEFAULT_PROFILE:-personal}}}
 cwd=${2:-$PWD}
+
+if [[ ! $profile =~ $profile_re ]]; then
+    printf 'ai-workspace: invalid profile: %s\n' "$profile" >&2
+    exit 2
+fi
 
 if [[ ! -d $cwd ]]; then
     printf 'ai-workspace: directory not found: %s\n' "$cwd" >&2
@@ -19,4 +135,10 @@ args=(workspace create --cwd "$cwd" --env "AI_PROFILE=$profile")
 if [[ $profile != ${AI_DEFAULT_PROFILE:-personal} ]]; then
     args+=(--label "$(basename -- "$cwd") [$profile]")
 fi
-exec herdr "${args[@]}" --focus
+output=$(clean_profile_environment herdr "${args[@]}" --focus)
+printf '%s\n' "$output"
+workspace_id=$(jq -er '.result.workspace.workspace_id' <<< "$output") || {
+    printf 'ai-workspace: Herdr response missing workspace ID\n' >&2
+    exit 2
+}
+bind_profile "$workspace_id" "$profile"

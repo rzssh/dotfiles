@@ -3,8 +3,12 @@
   "defaultModel": "glm-5.2",
   "defaultThinkingLevel": "high",
   "defaultProjectTrust": "ask",
+  "enableSkillCommands": true,
   "enableInstallTelemetry": false,
+  "hideThinkingBlock": true,
+  "quietStartup": true,
   "enabledModels": [
+    "openai-codex/*",
     "opencode-go/glm-5.2",
     "opencode-go/deepseek-v4-flash"
   ],

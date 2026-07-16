@@ -1,0 +1,226 @@
+diff --git a/README.md b/README.md
+index 91d32ef..10e658c 100644
+--- a/README.md
++++ b/README.md
+@@ -51,6 +51,11 @@ Just like the `bisect` mode, a left, right and middle click can be made by press
+ ### Click mode
+ 
+ The `click` mode simply triggers a click in the middle of the selection area.
++Set `click_count` to `2` or `3` for double or triple clicks:
++
++```sh
++wl-kbptr -o modes=floating,click -o mode_floating.source=detect -o click_count=2
++```
+ 
+ ## Drag flag
+ 
+diff --git a/config.example b/config.example
+index 7f1a39b..af4650a 100644
+--- a/config.example
++++ b/config.example
+@@ -7,6 +7,7 @@
+ home_row_keys=
+ modes=tile,bisect
+ cancellation_status_code=0
++click_count=1
+ 
+ [mode_tile]
+ label_color=#fffd
+@@ -59,4 +60,4 @@ button=left
+ start_marker_color=#fd0d
+ start_marker_size=8
+ # Shapes: circle, caret, rectangle
+-start_marker_shape=circle
+\ No newline at end of file
++start_marker_shape=circle
+diff --git a/meson.build b/meson.build
+index 979df4d..9b651bd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -88,6 +88,19 @@ label_test_exec = executable(
+ 
+ test('test_label', label_test_exec)
+ 
++config_test_exec = executable(
++  'test_config',
++  [
++    'src/test_config.c',
++    'src/config.c',
++    'src/utils.c',
++    protos_src,
++  ],
++  dependencies: dependencies,
++)
++
++test('test_config', config_test_exec)
++
+ install_data(
+   'share/wl-kbptr.desktop',
+   rename: 'wl-kbptr.desktop',
+diff --git a/src/config.c b/src/config.c
+index 50d8a41..ef801f8 100644
+--- a/src/config.c
++++ b/src/config.c
+@@ -298,6 +298,21 @@ static int parse_click(void *dest, char *value) {
+     return 0;
+ }
+ 
++static int parse_click_count(void *dest, char *value) {
++    char *end;
++
++    errno        = 0;
++    long decoded = strtol(value, &end, 10);
++    if (errno || value[0] == '\0' || end[0] != '\0' || decoded < 1 ||
++        decoded > 3) {
++        LOG_ERR("Click count should be 1, 2 or 3.");
++        return 1;
++    }
++
++    *((uint8_t *)dest) = (uint8_t)decoded;
++    return 0;
++}
++
+ static int parse_drag_marker_shape(void *dest, char *value) {
+     enum drag_marker_shape *out = dest;
+     if (strcmp(value, "circle") == 0) {
+@@ -383,7 +398,8 @@ static struct section_def section_defs[] = {
+         general,
+         G_FIELD(home_row_keys, "", parse_home_row_keys, free_home_row_keys),
+         G_FIELD(modes, "tile,bisect", parse_str, free_str),
+-        G_FIELD(cancellation_status_code, "0", parse_uint8, noop)
++        G_FIELD(cancellation_status_code, "0", parse_uint8, noop),
++        G_FIELD(click_count, "1", parse_click_count, noop)
+     ),
+     SECTION(
+         mode_tile, MT_FIELD(label_color, "#fffd", parse_color, noop),
+diff --git a/src/config.h b/src/config.h
+index fafabd8..0c948e9 100644
+--- a/src/config.h
++++ b/src/config.h
+@@ -11,6 +11,7 @@ struct general_config {
+     char  **home_row_keys;
+     char   *modes;
+     uint8_t cancellation_status_code;
++    uint8_t click_count;
+ };
+ 
+ struct relative_font_size {
+diff --git a/src/main.c b/src/main.c
+index 955e9c3..194305c 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -612,7 +612,7 @@ static struct output *find_output_by_name(struct state *state, char *name) {
+ }
+ 
+ static void print_result(struct state *state) {
+-    char click;
++    char click = 'n';
+     switch (state->click) {
+     case CLICK_LEFT_BTN:
+         click = 'l';
+@@ -627,7 +627,7 @@ static void print_result(struct state *state) {
+         click = 'd';
+         break;
+     case CLICK_NONE:
+-        click = 'n';
++        break;
+     }
+ 
+     printf(
+diff --git a/src/test_config.c b/src/test_config.c
+new file mode 100644
+index 0000000..b5e1f2d
+--- /dev/null
++++ b/src/test_config.c
+@@ -0,0 +1,53 @@
++#include "src/config.h"
++#include "src/log.h"
++
++int main() {
++    struct config config;
++    config_set_default(&config);
++
++    if (config.general.click_count != 1) {
++        LOG_ERR(
++            "Expected default click count 1, got %d.",
++            config.general.click_count
++        );
++        return 1;
++    }
++
++    struct config_loader loader;
++    config_loader_init(&loader, &config);
++
++    char double_click[] = "click_count=2";
++    if (config_loader_load_cli_param(&loader, double_click) ||
++        config.general.click_count != 2) {
++        LOG_ERR("Could not set double click.");
++        return 2;
++    }
++
++    char triple_click[] = "click_count=3";
++    if (config_loader_load_cli_param(&loader, triple_click) ||
++        config.general.click_count != 3) {
++        LOG_ERR("Could not set triple click.");
++        return 3;
++    }
++
++    char zero_click[] = "click_count=0";
++    if (!config_loader_load_cli_param(&loader, zero_click)) {
++        LOG_ERR("Accepted zero click count.");
++        return 4;
++    }
++
++    char excessive_click[] = "click_count=4";
++    if (!config_loader_load_cli_param(&loader, excessive_click)) {
++        LOG_ERR("Accepted excessive click count.");
++        return 5;
++    }
++
++    char invalid_click[] = "click_count=no";
++    if (!config_loader_load_cli_param(&loader, invalid_click)) {
++        LOG_ERR("Accepted invalid click count.");
++        return 6;
++    }
++
++    config_free_values(&config);
++    return 0;
++}
+diff --git a/src/utils_wayland.c b/src/utils_wayland.c
+index ec8784b..e0bcf06 100644
+--- a/src/utils_wayland.c
++++ b/src/utils_wayland.c
+@@ -93,20 +93,22 @@ void move_pointer(
+     zwlr_virtual_pointer_v1_frame(virt_pointer);
+     wl_display_roundtrip(state->wl_display);
+ 
+-    if (state->click != CLICK_NONE) {
++    if (click != CLICK_NONE) {
+         int btn = 271 + click;
+ 
+-        zwlr_virtual_pointer_v1_button(
+-            virt_pointer, 0, btn, WL_POINTER_BUTTON_STATE_PRESSED
+-        );
+-        zwlr_virtual_pointer_v1_frame(virt_pointer);
+-        wl_display_roundtrip(state->wl_display);
++        for (uint8_t i = 0; i < state->config.general.click_count; i++) {
++            zwlr_virtual_pointer_v1_button(
++                virt_pointer, 0, btn, WL_POINTER_BUTTON_STATE_PRESSED
++            );
++            zwlr_virtual_pointer_v1_frame(virt_pointer);
++            wl_display_roundtrip(state->wl_display);
+ 
+-        zwlr_virtual_pointer_v1_button(
+-            virt_pointer, 0, btn, WL_POINTER_BUTTON_STATE_RELEASED
+-        );
+-        zwlr_virtual_pointer_v1_frame(virt_pointer);
+-        wl_display_roundtrip(state->wl_display);
++            zwlr_virtual_pointer_v1_button(
++                virt_pointer, 0, btn, WL_POINTER_BUTTON_STATE_RELEASED
++            );
++            zwlr_virtual_pointer_v1_frame(virt_pointer);
++            wl_display_roundtrip(state->wl_display);
++        }
+     }
+ 
+     zwlr_virtual_pointer_v1_destroy(virt_pointer);

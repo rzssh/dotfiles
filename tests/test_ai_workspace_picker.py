@@ -26,7 +26,7 @@ class AiWorkspacePickerTest(unittest.TestCase):
             (self.profiles / profile).mkdir()
         self.executable(
             "herdr",
-            '#!/usr/bin/env python3\nimport json, os, pathlib, sys\nif sys.argv[1:3] == ["notification", "show"]:\n pathlib.Path(os.environ["HERDR_LOG"]).write_text(json.dumps(sys.argv[1:]))\nelse:\n print(json.dumps({"result": {"pane": {"foreground_cwd": os.environ["PICKER_CWD"]}}}))\n',
+            '#!/usr/bin/env python3\nimport json, os, pathlib, sys\nif sys.argv[1:3] == ["notification", "show"]:\n pathlib.Path(os.environ["HERDR_LOG"]).write_text(json.dumps(sys.argv[1:]))\nelse:\n print(json.dumps({"result": {"pane": {"foreground_cwd": os.environ["PICKER_CWD"], "workspace_id": "w1"}}}))\n',
         )
         self.executable(
             "fzf",
@@ -34,7 +34,7 @@ class AiWorkspacePickerTest(unittest.TestCase):
         )
         self.executable(
             "ai-workspace",
-            '#!/usr/bin/env python3\nimport json, os, pathlib, sys\npathlib.Path(os.environ["WORKSPACE_LOG"]).write_text(json.dumps(sys.argv[1:]))\n',
+            '#!/usr/bin/env python3\nimport json, os, pathlib, sys\nif sys.argv[1:] == ["--current-profile"]:\n assert "AI_PROFILE" not in os.environ\n assert os.environ["HERDR_WORKSPACE_ID"] == "w1"\n print("job-one")\nelse:\n pathlib.Path(os.environ["WORKSPACE_LOG"]).write_text(json.dumps(sys.argv[1:]))\n',
         )
 
     def tearDown(self):
@@ -45,10 +45,10 @@ class AiWorkspacePickerTest(unittest.TestCase):
         path.write_text(body)
         path.chmod(0o755)
 
-    def invoke(self, choice="job-two"):
+    def invoke(self, choice="job-two", current="job-one"):
         env = {
             "AI_DEFAULT_PROFILE": "personal",
-            "AI_PROFILE": "job-one",
+            "AI_PROFILE": current,
             "AI_PROFILES_DIR": str(self.profiles),
             "FZF_CHOICE": choice,
             "FZF_INPUT": str(self.input),
@@ -68,8 +68,9 @@ class AiWorkspacePickerTest(unittest.TestCase):
         result = self.invoke()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(self.log.read_text()), ["job-two", str(self.cwd)])
-        self.assertEqual(self.input.read_text().splitlines()[0], "job-one")
-        self.assertNotIn("personal", self.input.read_text().splitlines())
+        self.assertEqual(
+            self.input.read_text().splitlines(), ["job-one", "job-two", "personal"]
+        )
 
     def test_cancel_does_not_create_workspace(self):
         result = self.invoke("")
@@ -82,10 +83,10 @@ class AiWorkspacePickerTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertNotIn("bad profile", self.input.read_text())
 
-    def test_notifies_when_only_default_profile_exists(self):
-        for profile in ("job-one", "job-two"):
+    def test_notifies_when_no_profiles_exist(self):
+        for profile in ("personal", "job-one", "job-two"):
             (self.profiles / profile).rmdir()
-        result = self.invoke()
+        result = self.invoke(current="personal")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(self.input.exists())
         self.assertFalse(self.log.exists())
@@ -94,7 +95,7 @@ class AiWorkspacePickerTest(unittest.TestCase):
             [
                 "notification",
                 "show",
-                "No alternate AI profiles",
+                "No AI profiles",
                 "--body",
                 "Add ~/.local/share/ai/profiles/<name>/env (directory 0700, file 0600)",
             ],

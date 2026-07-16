@@ -3,6 +3,16 @@
 let
   dots = "/home/razen/projects/dotfiles";
   link = p: config.lib.file.mkOutOfStoreSymlink "${dots}/${p}";
+  aiProfileFiles = lib.filterAttrs
+    (name: type: type == "regular" && lib.hasSuffix ".env" name)
+    (builtins.readDir ../secrets/ai-profiles);
+  aiProfileSecrets = lib.mapAttrs'
+    (file: _: let profile = lib.removeSuffix ".env" file; in lib.nameValuePair "ai-profiles/${profile}" {
+      sopsFile = ../secrets/ai-profiles + "/${file}";
+      format = "dotenv";
+      path = "${config.home.homeDirectory}/.local/share/ai/profiles/${profile}/env";
+    })
+    aiProfileFiles;
 in
 {
   imports = [
@@ -41,6 +51,17 @@ in
     done
   '';
 
+  home.activation.piSettings = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    settings="$HOME/.pi/agent/settings.json"
+    source="${dots}/config/ai/pi/settings.json"
+    if [ -L "$settings" ] && [ "$(${pkgs.coreutils}/bin/readlink -f "$settings")" = "$source" ]; then
+      ${pkgs.coreutils}/bin/rm "$settings"
+    fi
+    if [ ! -e "$settings" ]; then
+      ${pkgs.coreutils}/bin/install -Dm600 "$source" "$settings"
+    fi
+  '';
+
   programs.dank-material-shell = {
     enable = true;
     systemd.enable = true;
@@ -52,12 +73,14 @@ in
 
   programs.git.enable = true;
 
-  sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-  sops.secrets."ai-profiles/personal" = {
-    sopsFile = ../secrets/ai-profiles/personal.env;
-    format = "dotenv";
-    path = "${config.home.homeDirectory}/.local/share/ai/profiles/personal/env";
+  programs.fish = {
+    enable = true;
+    generateCompletions = false;
+    shellInit = "source ${dots}/config/fish/config.fish";
   };
+
+  sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+  sops.secrets = aiProfileSecrets;
 
   programs.nix-index-database.comma.enable = true;
 
@@ -75,7 +98,10 @@ in
 
   xdg.configFile = {
     "nvim".source = link "config/nvim";
-    "fish".source = link "config/fish";
+    "fish/completions".source = link "config/fish/completions";
+    "fish/conf.d".source = link "config/fish/conf.d";
+    "fish/functions".source = link "config/fish/functions";
+    "fish/fish_variables".source = link "config/fish/fish_variables";
     "ghostty".source = link "config/ghostty";
     "tmux".source = link "config/tmux";
     "yazi".source = link "config/yazi";
@@ -151,7 +177,9 @@ in
     ".codex/skills".source = link "home/files/codex/skills";
     ".agents/skills".source = link ".agents/skills";
     ".pi/agent/AGENTS.md".source = link "home/files/codex/AGENTS.md";
-    ".pi/agent/settings.json".source = link "config/ai/pi/settings.json";
+    ".pi/agent/APPEND_SYSTEM.md".source = link "home/files/pi/APPEND_SYSTEM.md";
+    ".pi/agent/extensions/workspace-sandbox.ts".source = link "home/files/pi/extensions/workspace-sandbox.ts";
+    ".pi/agent/settings.defaults.json".source = link "config/ai/pi/settings.json";
     ".hermes/config.yaml".source = link "config/hermes/config.yaml";
     ".agentmemory/.env".text = ''
       AGENTMEMORY_URL=http://127.0.0.1:3111

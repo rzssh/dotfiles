@@ -6,6 +6,18 @@ prompt_new_tab_name = false
 show_agent_labels_on_pane_borders = true
 agent_panel_scope = "current"
 
+[ui.sidebar.spaces]
+rows = [
+  ["state_icon", "workspace"],
+  ["$vcs_ref", "git_status"],
+]
+
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", "workspace", "agent"],
+  ["tab"],
+]
+
 [ui.sound]
 enabled = false
 
@@ -123,6 +135,14 @@ command = "ai-workspace-picker"
 description = "new profiled workspace"
 width = "60%"
 height = 12
+
+[[keys.command]]
+key = "prefix+t"
+type = "popup"
+command = "tuxedo"
+description = "tasks"
+width = "90%"
+height = "85%"
 
 [[keys.command]]
 key = "prefix+a"

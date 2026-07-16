@@ -122,6 +122,7 @@ in
     satty
     localPkgs.hyprwhspr
     localPkgs.qmk-hid-host
+    localPkgs.wl-kbptr
     xdg-utils
 
     # system & hardware
@@ -148,6 +149,7 @@ in
     # gui apps
     vesktop
     telegram-desktop
+    slack
     obsidian
     inputs.zen-browser.packages.x86_64-linux.default
     inputs.helium.packages.x86_64-linux.default

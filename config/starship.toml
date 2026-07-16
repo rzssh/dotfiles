@@ -2,7 +2,7 @@
 palette = "matugen"
 
 # Minimal single-line format for small tmux panes
-format = "$directory$git_branch$git_status$nodejs$bun$rust$golang$python$lua$zig$time\n$character"
+format = "${env_var.AI_PROFILE}$directory$git_branch$git_status$nodejs$bun$rust$golang$python$lua$zig$time\n$character"
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
@@ -66,6 +66,10 @@ crust = "black"
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
 vimcmd_symbol = "[❮](subtext1)"
+
+[env_var.AI_PROFILE]
+format = '[$env_value]($style) '
+style = "yellow"
 
 [directory]
 style = "bold blue"

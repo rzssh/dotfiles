@@ -156,6 +156,28 @@ hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + CTRL + G", hl.dsp.group.toggle())
 
+local hintBase = "wl-kbptr -o mode_floating.source=detect"
+local function hintAction(command)
+    return function()
+        hl.dispatch(hl.dsp.submap("reset"))
+        hl.dispatch(hl.dsp.exec_cmd(command))
+    end
+end
+
+hl.bind(mainMod .. " + G", hl.dsp.submap("pointer"), { description = "Pointer hints" })
+hl.define_submap("pointer", function()
+    hl.bind("C", hintAction(hintBase .. " -o modes=floating,click"))
+    hl.bind("2", hintAction(hintBase .. " -o modes=floating,click -o click_count=2"))
+    hl.bind("3", hintAction(hintBase .. " -o modes=floating,click -o click_count=3"))
+    hl.bind("R", hintAction(hintBase .. " -o modes=floating,click -o mode_click.button=right"))
+    hl.bind("M", hintAction(hintBase .. " -o modes=floating,click -o mode_click.button=middle"))
+    hl.bind("H", hintAction(hintBase .. " -o modes=floating"))
+    hl.bind("G", hintAction(hintBase .. " -o modes=floating,click --drag"))
+    hl.bind("P", hintAction("wl-kbptr -o modes=tile,bisect,click"))
+    hl.bind("escape", hl.dsp.submap("reset"))
+    hl.bind("catchall", hl.dsp.submap("reset"))
+end)
+
 hl.bind(mainMod .. " + ALT + SHIFT + M", hl.dsp.exec_cmd([[fish -c "wallpaper toggle"]]))
 hl.bind(mainMod .. " + ALT + SHIFT + R", hl.dsp.exec_cmd([[fish -c "wallpaper random"]]))
 hl.bind(mainMod .. " + ALT + SHIFT + P", hl.dsp.exec_cmd([[fish -c "wallpaper undo"]]))

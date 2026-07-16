@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import os
 import subprocess
 import sys
 
@@ -12,16 +13,18 @@ def notify(message):
     run("herdr", "notification", "show", "jj workspace", "--body", message, "--sound", "none")
 
 
-def focused_cwd():
+def focused_context():
     r = run("herdr", "pane", "list")
     if r.returncode != 0:
-        return ""
+        return "", ""
     try:
         panes = json.loads(r.stdout)["result"]["panes"]
     except Exception:
-        return ""
+        return "", ""
     focused = next((pane for pane in panes if pane.get("focused")), None)
-    return (focused or panes[0]).get("foreground_cwd") or (focused or panes[0]).get("cwd") or ""
+    pane = focused or panes[0]
+    cwd = pane.get("foreground_cwd") or pane.get("cwd") or ""
+    return cwd, pane.get("workspace_id") or ""
 
 
 def jj_root(cwd):
@@ -29,7 +32,22 @@ def jj_root(cwd):
     return r.stdout.strip() if r.returncode == 0 else ""
 
 
-def open_workspace(mode, repo):
+def workspace_profile(workspace):
+    env = os.environ.copy()
+    env.pop("AI_PROFILE", None)
+    env.pop("AI_PROFILE_LOADED", None)
+    if workspace:
+        env["HERDR_WORKSPACE_ID"] = workspace
+    result = subprocess.run(
+        ["ai-workspace", "--current-profile"],
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def open_workspace(mode, repo, profile):
     subprocess.run(
         [
             "herdr",
@@ -44,6 +62,8 @@ def open_workspace(mode, repo):
             f"JJ_REPO={repo}",
             "--env",
             f"JJ_OPEN={mode}",
+            "--env",
+            f"AI_PROFILE={profile}",
             "--focus",
         ]
     )
@@ -51,7 +71,7 @@ def open_workspace(mode, repo):
 
 def main():
     action = sys.argv[1] if len(sys.argv) > 1 else "workspace"
-    cwd = focused_cwd()
+    cwd, workspace = focused_context()
     repo = jj_root(cwd) if cwd else ""
     if not repo:
         notify(f"{cwd or 'current pane'} is not inside a jj repo")
@@ -59,7 +79,11 @@ def main():
     if action == "remove":
         subprocess.run(["herdr", "plugin", "action", "invoke", "nathanflurry.jj-workspace.remove"])
     else:
-        open_workspace(action, repo)
+        profile = workspace_profile(workspace)
+        if not profile:
+            notify("could not resolve AI profile")
+            return
+        open_workspace(action, repo, profile)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,8 @@ from pathlib import Path
 PROFILE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 KEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 SAFE_KEYS = {
+    "AI_DEFAULT_PROFILE",
+    "AI_PROFILES_DIR",
     "COLORTERM",
     "DBUS_SESSION_BUS_ADDRESS",
     "DISPLAY",
@@ -43,15 +45,27 @@ SAFE_KEYS = {
 }
 SAFE_PREFIXES = ("HERDR_", "LC_", "NIX_")
 RESERVED_KEYS = SAFE_KEYS | {
-    "AI_DEFAULT_PROFILE",
     "AI_PROFILE",
-    "AI_PROFILES_DIR",
+    "AI_PROFILE_LOADED",
     "CLAUDE_CONFIG_DIR",
     "CODEX_HOME",
     "GH_CONFIG_DIR",
     "GIT_CONFIG_GLOBAL",
     "OPENCODE_CONFIG_DIR",
     "PI_CODING_AGENT_DIR",
+}
+PROFILE_RUNTIME_KEYS = {
+    "AI_PROFILE",
+    "AI_PROFILE_LOADED",
+    "CLAUDE_CONFIG_DIR",
+    "CODEX_HOME",
+    "GH_CONFIG_DIR",
+    "GIT_CONFIG_GLOBAL",
+    "OPENCODE_CONFIG_DIR",
+    "PI_CODING_AGENT_DIR",
+    "XDG_CACHE_HOME",
+    "XDG_DATA_HOME",
+    "XDG_STATE_HOME",
 }
 
 
@@ -161,18 +175,81 @@ def link_shared_pi(home, directory):
     source = home / ".pi" / "agent"
     if directory == source:
         return
-    for relative in ("AGENTS.md", "settings.json", "extensions/herdr-agent-state.ts"):
+    for relative in (
+        "AGENTS.md",
+        "APPEND_SYSTEM.md",
+        "extensions/herdr-agent-state.ts",
+        "extensions/workspace-sandbox.ts",
+    ):
         target = directory / relative
         shared = source / relative
         if not target.exists() and not target.is_symlink() and shared.exists():
             target.symlink_to(shared)
 
+    target = directory / "settings.json"
+    defaults = source / "settings.defaults.json"
+    if not defaults.exists():
+        defaults = source / "settings.json"
+    if target.is_symlink():
+        try:
+            shared = target.resolve(strict=True)
+        except OSError:
+            return
+        shared_settings = source / "settings.json"
+        if shared not in {shared_settings.resolve(), defaults.resolve()}:
+            return
+        target.unlink()
+    if not target.exists() and defaults.is_file():
+        target.write_bytes(defaults.read_bytes())
+        target.chmod(0o600)
+
+
+def profile_root(home):
+    return Path(
+        os.environ.get("AI_PROFILES_DIR", home / ".local" / "share" / "ai" / "profiles")
+    ).expanduser()
+
+
+def env_keys(path):
+    try:
+        lines = path.read_text().splitlines()
+    except (OSError, UnicodeError):
+        return set()
+    keys = set()
+    for raw in lines:
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        line = line.removeprefix("export ").lstrip()
+        if "=" not in line:
+            continue
+        key = line.split("=", 1)[0].strip()
+        if KEY_RE.fullmatch(key):
+            keys.add(key)
+    return keys
+
+
+def print_profile_keys(home):
+    root = profile_root(home)
+    keys = set(PROFILE_RUNTIME_KEYS)
+    if not root.is_dir():
+        print("\n".join(sorted(keys)))
+        return
+    for directory in root.iterdir():
+        if not directory.is_dir() or not PROFILE_RE.fullmatch(directory.name):
+            continue
+        path = directory / "env"
+        keys.update(env_keys(path))
+    print("\n".join(sorted(keys)))
+
 
 def main():
-    profile, command = arguments()
     home = Path(os.environ.get("HOME", "~")).expanduser()
-    data = Path(os.environ.get("XDG_DATA_HOME", home / ".local" / "share"))
-    root = Path(os.environ.get("AI_PROFILES_DIR", data / "ai" / "profiles")).expanduser()
+    if sys.argv[1:] == ["--profile-keys"]:
+        print_profile_keys(home)
+        return
+    profile, command = arguments()
+    root = profile_root(home)
     directory = root / profile
     check_directory(directory)
     profile_env = load(directory / "env")
