@@ -1,0 +1,35 @@
+diff --git a/src/mode_floating.c b/src/mode_floating.c
+--- a/src/mode_floating.c
++++ b/src/mode_floating.c
+@@ -204,13 +204,28 @@ void floating_mode_render(
+             cairo_set_line_width(cairo, 1);
+             cairo_stroke(cairo);
+ 
+-            cairo_set_font_size(
+-                cairo, compute_relative_font_size(&config->label_font_size, a.h)
+-            );
++            double font_size =
++                compute_relative_font_size(&config->label_font_size, a.h);
++            cairo_set_font_size(cairo, font_size);
++
+             cairo_text_extents_t te_all;
+             label_selection_str(curr_label, label_selected_str);
+             cairo_text_extents(cairo, label_selected_str, &te_all);
+ 
++            double available_width  = max(1, a.w - 2);
++            double available_height = max(1, a.h - 2);
++            double scale            = 1;
++            if (te_all.x_advance > available_width) {
++                scale = available_width / te_all.x_advance;
++            }
++            if (te_all.height * scale > available_height) {
++                scale = available_height / te_all.height;
++            }
++            if (scale < 1) {
++                cairo_set_font_size(cairo, font_size * scale);
++                cairo_text_extents(cairo, label_selected_str, &te_all);
++            }
++
+             label_selection_str_split(
+                 curr_label, label_selected_str, label_unselected_str,
+                 ms->label_selection->next

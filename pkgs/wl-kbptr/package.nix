@@ -13,7 +13,10 @@ wl-kbptr.overrideAttrs (old: {
     hash = "sha256-2H1hBa3ryLNGxZHBtscASCOgn25WVORF0uglFey6QiY=";
   };
 
-  patches = (old.patches or [ ]) ++ [ ./multi-click.patch ];
+  patches = (old.patches or [ ]) ++ [
+    ./multi-click.patch
+    ./fit-labels.patch
+  ];
 
   doCheck = true;
 })

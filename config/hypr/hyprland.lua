@@ -156,13 +156,37 @@ hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + CTRL + G", hl.dsp.group.toggle())
 
-local hintBase = "wl-kbptr -o mode_floating.source=detect"
+local hintKeys = "-o home_row_keys=nrtshaeigyv -o mode_floating.label_symbols=shtaregyniwfdo -o mode_tile.label_symbols=shtaregyniwfdo"
+local hintBase = table.concat({
+    "wl-kbptr",
+    hintKeys,
+    "-o mode_floating.source=detect",
+    "-o mode_floating.label_color=#ffff",
+    "-o mode_floating.label_select_color=#ff0f",
+    "-o mode_floating.selectable_bg_color=#000c",
+    "-o mode_floating.selectable_border_color=#0fff",
+    "-o 'mode_floating.label_font_size=16 60% 100'"
+}, " ")
 local function hintAction(command)
     return function()
         hl.dispatch(hl.dsp.submap("reset"))
         hl.dispatch(hl.dsp.exec_cmd(command))
     end
 end
+
+local hintNotification
+hl.on("keybinds.submap", function(name)
+    if hintNotification ~= nil and hintNotification:is_alive() then
+        hintNotification:dismiss()
+    end
+    hintNotification = nil
+    if name == "pointer" then
+        hintNotification = hl.notification.create({
+            text = "Pointer mode\nC click · 2 double · 3 triple · R right · M middle · H hover · G drag · P precise · Esc cancel",
+            timeout = 60000
+        })
+    end
+end)
 
 hl.bind(mainMod .. " + G", hl.dsp.submap("pointer"), { description = "Pointer hints" })
 hl.define_submap("pointer", function()
@@ -173,7 +197,7 @@ hl.define_submap("pointer", function()
     hl.bind("M", hintAction(hintBase .. " -o modes=floating,click -o mode_click.button=middle"))
     hl.bind("H", hintAction(hintBase .. " -o modes=floating"))
     hl.bind("G", hintAction(hintBase .. " -o modes=floating,click --drag"))
-    hl.bind("P", hintAction("wl-kbptr -o modes=tile,bisect,click"))
+    hl.bind("P", hintAction("wl-kbptr " .. hintKeys .. " -o modes=tile,bisect,click"))
     hl.bind("escape", hl.dsp.submap("reset"))
     hl.bind("catchall", hl.dsp.submap("reset"))
 end)
