@@ -52,7 +52,7 @@
   ];
 
   buildInputs = lib.optionals cudaSupport [
-    cudaPackages.cccl
+    (cudaPackages.cccl or cudaPackages.cuda_cccl)
     cudaPackages.cuda_cudart
     cudaPackages.libcublas
   ];

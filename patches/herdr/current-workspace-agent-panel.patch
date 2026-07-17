@@ -93,8 +93,8 @@ index ebe7d0a..50f2fc6 100644
 +
 @@ -129,0 +143 @@ fn agent_panel_entries_with_runtimes(
 +        .filter(|(ws_idx, _)| workspace_scope.is_none_or(|current| *ws_idx == current))
-@@ -1771,0 +1786,29 @@ mod tests {
-+    #[test]
+@@ -1811,4 +1825,33 @@ mod tests {
+     #[test]
 +    fn current_agent_panel_scope_uses_active_or_selected_workspace() {
 +        let mut app = crate::app::state::AppState::test_new();
 +        app.workspaces = vec![Workspace::test_new("one"), Workspace::test_new("two")];
@@ -123,3 +123,7 @@ index ebe7d0a..50f2fc6 100644
 +        assert_eq!(labels, ["one"]);
 +    }
 +
++    #[test]
+     fn oversized_space_layout_is_clipped_to_the_section_body() {
+         let mut app = crate::app::state::AppState::test_new();
+         app.workspaces = vec![Workspace::test_new("one"), Workspace::test_new("two")];

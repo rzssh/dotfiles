@@ -22,6 +22,7 @@ let
     system = "x86_64-linux";
     config.allowUnfree = true;
   };
+  hyprwhspr = llamaPkgs.callPackage ../pkgs/hyprwhspr/package.nix { };
   herdr = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [ ../patches/herdr/current-workspace-agent-panel.patch ];
   });
@@ -158,7 +159,7 @@ SQL
     hyprpicker
     matugen
     satty
-    localPkgs.hyprwhspr
+    hyprwhspr
     localPkgs.qmk-hid-host
     localPkgs.wl-kbptr
     xdg-utils
