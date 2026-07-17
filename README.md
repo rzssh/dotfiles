@@ -9,12 +9,12 @@
 | Shell      | DankMaterialShell                                              |
 | Terminal   | Ghostty + herdr + fish                                         |
 | Editor     | Neovim                                                         |
-| Keyboard   | [Custom 34 keys alt layout](https://github.com/r4zendev/keebs) |
+| Keyboard   | [Custom 34 keys alt layout](https://github.com/rzssh/keebs) |
 
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/r4zendev/dotfiles/nixos/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rzssh/dotfiles/nixos/install.sh | bash
 ```
 
 ```sh

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="git@github.com:r4zendev/dotfiles.git"
+REPO="git@github.com:rzssh/dotfiles.git"
 DIR="$HOME/projects/dotfiles"
 HOST="${1:-razen}"
 

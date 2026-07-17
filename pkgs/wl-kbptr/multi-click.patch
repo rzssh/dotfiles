@@ -127,6 +127,19 @@ index 955e9c3..194305c 100644
      }
  
      printf(
+diff --git a/src/mode_bisect.c b/src/mode_bisect.c
+index 02a9d74..cb31d32 100644
+--- a/src/mode_bisect.c
++++ b/src/mode_bisect.c
+@@ -462,1 +462,8 @@ static bool bisect_mode_key(
++    case XKB_KEY_2:
++    case XKB_KEY_3:
++        state->click = CLICK_LEFT_BTN;
++        state->config.general.click_count = keysym == XKB_KEY_2 ? 2 : 3;
++        enter_next_mode(state, ms->areas[ms->current]);
++        return false;
++
+     default:
 diff --git a/src/test_config.c b/src/test_config.c
 new file mode 100644
 index 0000000..b5e1f2d

@@ -20,7 +20,7 @@ rustPlatform.buildRustPackage {
   version = "0-unstable-2026-06-21";
 
   src = fetchFromGitHub {
-    owner = "r4zendev";
+    owner = "rzssh";
     repo = "qmk-hid-host";
     rev = "9e61e04e62be73edccc3610c0b35e2d4dc1d379a";
     hash = "sha256-5eI6MbymgtTmNd/d+W/3qjmlsTLmwzfYG7sAFkTKK7k=";
