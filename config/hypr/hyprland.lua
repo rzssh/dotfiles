@@ -157,7 +157,7 @@ hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + CTRL + G", hl.dsp.group.toggle())
 
 local hintKeys = "-o mode_floating.label_symbols=shtaregyniwfdoblcuxmkvqpjz -o mode_tile.label_symbols=shtaregyniwfdoblcuxmkvqpjz"
-local bisectKeys = "-o home_row_keys=nrtshaeicrm -o mode_click.prompt=1"
+local bisectKeys = "-o home_row_keys=ntsghaeicrm"
 local hintBase = table.concat({
     "wl-kbptr",
     hintKeys,
@@ -198,7 +198,7 @@ hl.define_submap("pointer", function()
     hl.bind("M", hintAction(hintBase .. " -o modes=floating,click -o mode_click.button=middle"))
     hl.bind("H", hintAction(hintBase .. " -o modes=floating"))
     hl.bind("G", hintAction(hintBase .. " -o modes=floating,click --drag"))
-    hl.bind("P", hintAction("wl-kbptr " .. hintKeys .. " " .. bisectKeys .. " -o modes=tile,bisect,click"))
+    hl.bind("P", hintAction("wl-kbptr " .. hintKeys .. " " .. bisectKeys .. " -o modes=tile,bisect"))
     hl.bind("escape", hl.dsp.submap("reset"))
     hl.bind("catchall", hl.dsp.submap("reset"))
 end)

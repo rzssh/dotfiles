@@ -15,7 +15,6 @@ wl-kbptr.overrideAttrs (old: {
 
   patches = (old.patches or [ ]) ++ [
     ./multi-click.patch
-    ./click-prompt.patch
     ./fit-labels.patch
   ];
 
