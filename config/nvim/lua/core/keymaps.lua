@@ -1,6 +1,12 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+require("utils").retire_keys({
+  ["H"] = "<S-Left>",
+  ["J"] = "<S-Down>",
+  ["L"] = "<S-Right>",
+})
+
 require("utils").mirror_keys({
   ["<C-h>"] = "<C-Left>",
   ["<C-j>"] = "<C-Down>",

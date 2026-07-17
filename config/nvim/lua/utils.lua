@@ -1,5 +1,13 @@
 local M = {}
 
+-- unpatched originals, stashed once, for callers that need to set a keymap
+-- WITHOUT it being auto-mirrored (see mirror_keys below).
+M.raw = {
+  set = vim.keymap.set,
+  set_keymap = vim.api.nvim_set_keymap,
+  buf_set_keymap = vim.api.nvim_buf_set_keymap,
+}
+
 M.mirror_keys = function(aliases)
   local function replace_lhs(lhs)
     if type(lhs) ~= "string" or vim.startswith(lhs, "<Plug>") then return end
@@ -30,6 +38,15 @@ M.mirror_keys = function(aliases)
         args[fn.lhs_pos] = new_lhs
         orig(unpack(args))
       end
+    end
+  end
+end
+
+M.retire_keys = function(aliases)
+  for from, to in pairs(aliases) do
+    for _, mode in ipairs({ "n", "x" }) do
+      pcall(vim.keymap.set, mode, to, from, { noremap = true, silent = true })
+      pcall(vim.keymap.set, mode, from, "<Nop>", { noremap = true, silent = true })
     end
   end
 end
