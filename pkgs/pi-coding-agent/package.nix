@@ -8,13 +8,13 @@
 }:
 
 let
-  version = "0.80.3";
+  version = "0.80.10";
   srcWithLock = runCommand "pi-coding-agent-src-with-lock" { } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
         url = "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-${version}.tgz";
-        hash = "sha256-FVxYABNMuN9sR62z6rVkFej6d0bgscumaHE0E3xFHZA=";
+        hash = "sha256-nydxcRuNTruNWeMXcCarQXv8bK8NQpaljedBtB5NnBw=";
       }
     } -C $out --strip-components=1
     rm -f $out/npm-shrinkwrap.json
@@ -27,7 +27,7 @@ buildNpmPackage {
   src = srcWithLock;
 
   npmDepsFetcherVersion = 2;
-  npmDepsHash = "sha256-mCu0S8IBNlP1l3EuWRi0StxcmYIBS1SskyYQ41vARgw=";
+  npmDepsHash = "sha256-6VjZ1KDtFF657PjKLNJc54Jv6tJVxRSVmTEFnngixQc=";
   makeCacheWritable = true;
 
   dontNpmBuild = true;

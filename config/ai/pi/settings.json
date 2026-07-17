@@ -10,8 +10,10 @@
   "enabledModels": [
     "openai-codex/*",
     "opencode-go/glm-5.2",
-    "opencode-go/deepseek-v4-flash"
+    "opencode-go/deepseek-v4-flash",
+    "opencode-go/kimi-k3",
+    "opencode-go/grok-4.5"
   ],
-  "lastChangelogVersion": "0.80.3",
+  "lastChangelogVersion": "0.80.10",
   "theme": "dark"
 }

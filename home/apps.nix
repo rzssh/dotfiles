@@ -1,7 +1,19 @@
-{ pkgs, inputs, ... }:
+{ pkgs, inputs, lib, ... }:
 
 let
   localPkgs = import ../pkgs { inherit pkgs; };
+  vimiumId = "{d7742d87-e61d-4b78-b8a1-b469842139fa}";
+  vimiumSettings = {
+    linkHintCharacters = "shtaregyniwfdo";
+    ignoreKeyboardLayout = true;
+  };
+  vimiumSettingsJson = builtins.toJSON vimiumSettings;
+  zen = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+    extraPolicies.ExtensionSettings.${vimiumId} = {
+      install_url = "https://addons.mozilla.org/firefox/downloads/latest/vimium-ff/latest.xpi";
+      installation_mode = "normal_installed";
+    };
+  };
   bambuPkgs = import inputs.nixpkgs-bambu {
     system = "x86_64-linux";
     config.allowUnfree = true;
@@ -13,8 +25,34 @@ let
   herdr = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [ ../patches/herdr/current-workspace-agent-panel.patch ];
   });
+  vesktop =
+    if pkgs.vesktop.version == "1.6.5" then
+      (pkgs.vesktop.override { electron_40 = pkgs.electron_41-bin; }).overrideAttrs {
+        preBuild = ''
+          cp -r ${pkgs.electron_41-bin.dist} electron-dist
+          chmod -R u+w electron-dist
+        '';
+      }
+    else
+      throw "Recheck Vesktop Electron workaround in home/apps.nix";
 in
 {
+  home.activation.vimiumSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    for db in "$HOME"/.zen/*/storage-sync-v2.sqlite "$HOME"/.config/zen/*/storage-sync-v2.sqlite; do
+      [ -f "$db" ] || continue
+      ${pkgs.sqlite}/bin/sqlite3 "$db" <<'SQL'
+.timeout 5000
+INSERT INTO storage_sync_data (ext_id, data, sync_change_counter)
+VALUES ('${vimiumId}', '${vimiumSettingsJson}', 1)
+ON CONFLICT (ext_id) DO UPDATE SET
+  data = json_patch(COALESCE(storage_sync_data.data, '{}'), '${vimiumSettingsJson}'),
+  sync_change_counter = storage_sync_data.sync_change_counter + 1
+WHERE json_extract(storage_sync_data.data, '$.linkHintCharacters') IS NOT '${vimiumSettings.linkHintCharacters}'
+   OR json_extract(storage_sync_data.data, '$.ignoreKeyboardLayout') IS NOT 1;
+SQL
+    done
+  '';
+
   home.packages = with pkgs; [
     # shell & terminal
     ghostty
@@ -151,7 +189,7 @@ in
     telegram-desktop
     slack
     obsidian
-    inputs.zen-browser.packages.x86_64-linux.default
+    zen
     inputs.helium.packages.x86_64-linux.default
     pear-desktop
     libreoffice-qt6-fresh
@@ -160,7 +198,7 @@ in
 
     # cad & 3d printing
     blender
-    freecad
+    bambuPkgs.freecad
     kicad
     openscad-unstable
     bambuPkgs.bambu-studio

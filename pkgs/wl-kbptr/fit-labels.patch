@@ -1,35 +1,49 @@
 diff --git a/src/mode_floating.c b/src/mode_floating.c
 --- a/src/mode_floating.c
 +++ b/src/mode_floating.c
-@@ -204,13 +204,28 @@ void floating_mode_render(
-             cairo_set_line_width(cairo, 1);
-             cairo_stroke(cairo);
- 
--            cairo_set_font_size(
--                cairo, compute_relative_font_size(&config->label_font_size, a.h)
--            );
-+            double font_size =
-+                compute_relative_font_size(&config->label_font_size, a.h);
-+            cairo_set_font_size(cairo, font_size);
+@@ -197,10 +196,0 @@ void floating_mode_render(
+-            cairo_set_source_u32(cairo, config->selectable_bg_color);
+-            cairo_rectangle(cairo, a.x, a.y, a.w, a.h);
+-            cairo_fill(cairo);
+-
+-            cairo_set_operator(cairo, CAIRO_OPERATOR_SOURCE);
+-            cairo_set_source_u32(cairo, config->selectable_border_color);
+-            cairo_rectangle(cairo, a.x + .5, a.y + .5, a.w - 1, a.h - 1);
+-            cairo_set_line_width(cairo, 1);
+-            cairo_stroke(cairo);
+-
+@@ -213,0 +204,23 @@ void floating_mode_render(
++            struct rect label = {
++                .x = a.x,
++                .y = a.y,
++                .w = max(a.w, (int)te_all.width + 6),
++                .h = max(a.h, (int)te_all.height + 6),
++            };
++            label.x += (a.w - label.w) / 2;
++            label.y += (a.h - label.h) / 2;
++            label.x = max(0, min(label.x, state->surface_width - label.w));
++            label.y = max(0, min(label.y, state->surface_height - label.h));
 +
-             cairo_text_extents_t te_all;
-             label_selection_str(curr_label, label_selected_str);
-             cairo_text_extents(cairo, label_selected_str, &te_all);
- 
-+            double available_width  = max(1, a.w - 2);
-+            double available_height = max(1, a.h - 2);
-+            double scale            = 1;
-+            if (te_all.x_advance > available_width) {
-+                scale = available_width / te_all.x_advance;
-+            }
-+            if (te_all.height * scale > available_height) {
-+                scale = available_height / te_all.height;
-+            }
-+            if (scale < 1) {
-+                cairo_set_font_size(cairo, font_size * scale);
-+                cairo_text_extents(cairo, label_selected_str, &te_all);
-+            }
++            cairo_set_source_u32(cairo, config->selectable_bg_color);
++            cairo_rectangle(cairo, label.x, label.y, label.w, label.h);
++            cairo_fill(cairo);
 +
-             label_selection_str_split(
-                 curr_label, label_selected_str, label_unselected_str,
-                 ms->label_selection->next
++            cairo_set_operator(cairo, CAIRO_OPERATOR_SOURCE);
++            cairo_set_source_u32(cairo, config->selectable_border_color);
++            cairo_rectangle(
++                cairo, label.x + .5, label.y + .5, label.w - 1, label.h - 1
++            );
++            cairo_set_line_width(cairo, 1);
++            cairo_stroke(cairo);
++
+@@ -219,4 +231,0 @@ void floating_mode_render(
+-            cairo_text_extents_t te_selected, te_unselected;
+-            cairo_text_extents(cairo, label_selected_str, &te_selected);
+-            cairo_text_extents(cairo, label_unselected_str, &te_unselected);
+-
+@@ -225,3 +234,2 @@ void floating_mode_render(
+-                a.x +
+-                    (a.w - te_selected.x_advance - te_unselected.x_advance) / 2,
+-                a.y + (int)((a.h + te_all.height) / 2)
++                label.x + (label.w - te_all.width) / 2 - te_all.x_bearing,
++                label.y + (label.h - te_all.height) / 2 - te_all.y_bearing

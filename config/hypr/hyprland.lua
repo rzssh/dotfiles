@@ -156,7 +156,8 @@ hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + CTRL + G", hl.dsp.group.toggle())
 
-local hintKeys = "-o home_row_keys=nrtshaeigyv -o mode_floating.label_symbols=shtaregyniwfdo -o mode_tile.label_symbols=shtaregyniwfdo"
+local hintKeys = "-o mode_floating.label_symbols=shtaregyniwfdoblcuxmkvqpjz -o mode_tile.label_symbols=shtaregyniwfdoblcuxmkvqpjz"
+local bisectKeys = "-o home_row_keys=nrtshaeicrm -o mode_click.prompt=1"
 local hintBase = table.concat({
     "wl-kbptr",
     hintKeys,
@@ -182,7 +183,7 @@ hl.on("keybinds.submap", function(name)
     hintNotification = nil
     if name == "pointer" then
         hintNotification = hl.notification.create({
-            text = "Pointer mode\nC click · 2 double · 3 triple · R right · M middle · H hover · G drag · P precise · Esc cancel",
+            text = "Pointer mode\nC click · 2 double · 3 triple · R right · M middle · H hover · G drag · P bisect · Esc cancel",
             timeout = 60000
         })
     end
@@ -197,7 +198,7 @@ hl.define_submap("pointer", function()
     hl.bind("M", hintAction(hintBase .. " -o modes=floating,click -o mode_click.button=middle"))
     hl.bind("H", hintAction(hintBase .. " -o modes=floating"))
     hl.bind("G", hintAction(hintBase .. " -o modes=floating,click --drag"))
-    hl.bind("P", hintAction("wl-kbptr " .. hintKeys .. " -o modes=tile,bisect,click"))
+    hl.bind("P", hintAction("wl-kbptr " .. hintKeys .. " " .. bisectKeys .. " -o modes=tile,bisect,click"))
     hl.bind("escape", hl.dsp.submap("reset"))
     hl.bind("catchall", hl.dsp.submap("reset"))
 end)
