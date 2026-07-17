@@ -97,6 +97,24 @@ command = "herdr-move-tab-workspace 9"
 description = "move tab to workspace 9"
 
 [[keys.command]]
+key = "alt+v"
+type = "shell"
+command = "herdr pane split --current --direction right --focus"
+description = "split pane vertically"
+
+[[keys.command]]
+key = "alt+h"
+type = "shell"
+command = "herdr pane split --current --direction down --focus"
+description = "split pane horizontally"
+
+[[keys.command]]
+key = "alt+shift+x"
+type = "shell"
+command = "herdr pane close $HERDR_ACTIVE_PANE_ID"
+description = "close pane"
+
+[[keys.command]]
 key = "alt+left"
 type = "plugin_action"
 command = "herdr-nvim.nav-left"
