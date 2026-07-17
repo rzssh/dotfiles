@@ -1,12 +1,7 @@
 { config, pkgs, inputs, ... }:
 
 let
-  localPkgs = import ../pkgs { inherit pkgs; };
-  llamaPkgs = import inputs.nixpkgs-llamacpp {
-    system = "x86_64-linux";
-    config.allowUnfree = true;
-  };
-  hyprwhspr = llamaPkgs.callPackage ../pkgs/hyprwhspr/package.nix { };
+  localPkgs = import ../pkgs { inherit pkgs inputs; };
   graphical = desc: exec: {
     Unit = {
       Description = desc;
@@ -39,7 +34,7 @@ in
       Install.WantedBy = [ "default.target" ];
     };
     polkit-kde-agent = graphical "KDE polkit authentication agent" "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1";
-    hyprwhspr = graphical "hyprwhspr speech-to-text daemon" "${hyprwhspr}/bin/hyprwhspr";
+    hyprwhspr = graphical "hyprwhspr speech-to-text daemon" "${localPkgs.hyprwhspr}/bin/hyprwhspr";
     qmk-hid-host = graphical "QMK/ZMK raw HID status widget host" "${localPkgs.qmk-hid-host}/bin/qmk-hid-host -c ${config.xdg.configHome}/qmk-hid-host/config.json";
     wl-clip-persist = graphical "Keep clipboard contents after the source window closes" "${pkgs.wl-clip-persist}/bin/wl-clip-persist --clipboard regular --all-mime-type-regex '(?i)^(?!(?:image|audio|video|font|model)/).+'";
     solaar = graphical "Logitech device manager" "${pkgs.solaar}/bin/solaar --window=hide";

@@ -16,8 +16,7 @@ config/ai/profiles/
 config/btop/
 config/ghostty/themes/matugen
 config/yazi/flavors/matugen.yazi/
-config/mango/dms/
-config/mango/matugen.conf
+config/jj/repos/
 *.sock
 __pycache__/
 *.py[cod]

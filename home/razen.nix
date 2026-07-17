@@ -103,13 +103,11 @@ in
     "fish/functions".source = link "config/fish/functions";
     "fish/fish_variables".source = link "config/fish/fish_variables";
     "ghostty".source = link "config/ghostty";
-    "tmux".source = link "config/tmux";
     "yazi".source = link "config/yazi";
     "btop".source = link "config/btop";
     "lazydocker".source = link "config/lazydocker";
     "lazygit".source = link "config/lazygit";
     "jj".source = link "config/jj";
-    "sesh".source = link "config/sesh";
     "gh".source = link "config/gh";
     "gh-dash".source = link "config/gh-dash";
     "herdr/config.toml".source = link "config/herdr/config.toml";
@@ -118,7 +116,6 @@ in
     "starship.toml".source = link "config/starship.toml";
     "matugen".source = link "config/matugen";
     "DankMaterialShell".source = link "config/DankMaterialShell";
-    "mango".source = link "config/mango";
     "qmk-hid-host/config.json".text = builtins.toJSON {
       devices = [
         {
@@ -170,11 +167,9 @@ in
     ".claude/CLAUDE.md".source = link "home/files/claude/CLAUDE.md";
     ".claude/settings.json".source = link "home/files/claude/settings.json";
     ".claude/output-styles".source = link "home/files/claude/output-styles";
-    ".claude/skills".source = link "home/files/claude/skills";
     ".config/caveman/config.json".source = link "home/files/caveman/config.json";
     ".codex/AGENTS.md".source = link "home/files/codex/AGENTS.md";
     ".codex/config.toml".source = link "home/files/codex/config.toml";
-    ".codex/skills".source = link "home/files/codex/skills";
     ".agents/skills".source = link ".agents/skills";
     ".pi/agent/AGENTS.md".source = link "home/files/codex/AGENTS.md";
     ".pi/agent/APPEND_SYSTEM.md".source = link "home/files/pi/APPEND_SYSTEM.md";
@@ -191,7 +186,6 @@ in
     ".local/bin/ai-workspace-picker".source = link "bin/ai-workspace-picker";
     ".local/bin/wallpaper-state".source = link "bin/wallpaper-state";
     ".local/bin/ns".source = link "bin/ns";
-    ".local/bin/tmux-layout-picker".source = link "bin/tmux-layout-picker";
     ".local/bin/herdr-jj-workspace".source = link "bin/herdr-jj-workspace";
     ".local/bin/herdr-move-tab-workspace".source = link "bin/herdr-move-tab-workspace";
     ".local/bin/theme-terminals".source = link "bin/theme/terminals";
@@ -205,7 +199,5 @@ in
     ".local/bin/theme-vesktop".source = link "bin/theme/vesktop";
     ".local/share/kio/servicemenus/admin-folder.desktop".source = link "home/files/kio/admin-folder.desktop";
     ".local/share/kio/servicemenus/print.desktop".source = link "home/files/kio/print.desktop";
-    ".local/share/tmux-plugins/resurrect".source = "${pkgs.tmuxPlugins.resurrect}/share/tmux-plugins/resurrect";
-    ".local/share/tmux-plugins/continuum".source = "${pkgs.tmuxPlugins.continuum}/share/tmux-plugins/continuum";
   };
 }

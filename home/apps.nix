@@ -1,7 +1,7 @@
 { pkgs, inputs, lib, ... }:
 
 let
-  localPkgs = import ../pkgs { inherit pkgs; };
+  localPkgs = import ../pkgs { inherit pkgs inputs; };
   vimiumId = "{d7742d87-e61d-4b78-b8a1-b469842139fa}";
   vimiumSettings = {
     linkHintCharacters = "shtaregyniwfdo";
@@ -18,11 +18,6 @@ let
     system = "x86_64-linux";
     config.allowUnfree = true;
   };
-  llamaPkgs = import inputs.nixpkgs-llamacpp {
-    system = "x86_64-linux";
-    config.allowUnfree = true;
-  };
-  hyprwhspr = llamaPkgs.callPackage ../pkgs/hyprwhspr/package.nix { };
   herdr = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [ ../patches/herdr/current-workspace-agent-panel.patch ];
   });
@@ -57,13 +52,11 @@ SQL
   home.packages = with pkgs; [
     # shell & terminal
     ghostty
-    tmux
     helix
     yazi
     starship
     fishPlugins.autopair
     zoxide
-    sesh
     fzf
     jq
     just
@@ -144,7 +137,7 @@ SQL
     # ai
     localPkgs.agentmemory
     localPkgs.pi-coding-agent
-    (llamaPkgs.llama-cpp.override { cudaSupport = true; })
+    localPkgs.llama-cpp-cuda
     opencode
     inputs.hermes-agent.packages.x86_64-linux.default
 
@@ -159,7 +152,7 @@ SQL
     hyprpicker
     matugen
     satty
-    hyprwhspr
+    localPkgs.hyprwhspr
     localPkgs.qmk-hid-host
     localPkgs.wl-kbptr
     xdg-utils
@@ -186,6 +179,7 @@ SQL
     qt6.qtimageformats
 
     # gui apps
+    thunderbird
     vesktop
     telegram-desktop
     slack

@@ -59,10 +59,10 @@ source_type = "git"
 source = "https://github.com/JuliusBrussee/caveman.git"
 
 [plugins."ponytail@ponytail"]
-enabled = false
+enabled = true
 
 [plugins."caveman@caveman"]
-enabled = false
+enabled = true
 
 [notice]
 hide_rate_limit_model_nudge = true

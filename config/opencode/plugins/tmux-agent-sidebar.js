@@ -1,1 +1,0 @@
-/nix/store/pbzspbw1cf08hrbp3p55l8caqk2xyh0r-home-manager-files/.config/opencode/plugins/tmux-agent-sidebar.js

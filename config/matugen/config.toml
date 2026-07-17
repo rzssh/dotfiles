@@ -17,11 +17,6 @@ input_path = "/home/razen/.config/matugen/templates/colors.json"
 output_path = "/home/razen/.cache/matugen/colors.json"
 post_hook = "/home/razen/.local/bin/theme-terminals || true; /home/razen/.local/bin/theme-hyprland || true; /home/razen/.local/bin/theme-vesktop || true; sh -c '/home/razen/.local/bin/theme-telegram >/dev/null 2>&1 & /home/razen/.local/bin/theme-icons >/dev/null 2>&1 &'"
 
-[templates.tmux]
-input_path = "/home/razen/.config/matugen/templates/tmux-colors.conf"
-output_path = "/home/razen/.cache/matugen/tmux-colors.conf"
-post_hook = "tmux source-file /home/razen/.cache/matugen/tmux-colors.conf 2>/dev/null || true"
-
 [templates.herdr]
 input_path = "/home/razen/.config/matugen/templates/herdr.toml"
 output_path = "/home/razen/.cache/matugen/herdr-theme.toml"
@@ -50,11 +45,6 @@ post_hook = "/home/razen/.local/bin/theme-kde matugen 2>/dev/null || true"
 input_path = "/home/razen/.config/matugen/templates/ghostty"
 output_path = "/home/razen/.config/ghostty/themes/matugen"
 post_hook = "pkill -SIGUSR2 ghostty 2>/dev/null || true"
-
-[templates.mango]
-input_path = "/home/razen/.config/matugen/templates/mango.conf"
-output_path = "/home/razen/.cache/matugen/mango.conf"
-post_hook = "test -n \"$MANGO_INSTANCE_SIGNATURE\" && mmsg dispatch reload_config 2>/dev/null || true"
 
 [templates.yazi]
 input_path = "/home/razen/.config/matugen/templates/yazi.toml"

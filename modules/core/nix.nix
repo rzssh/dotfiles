@@ -14,7 +14,6 @@
   ];
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [ "pnpm-10.29.2" ];
 
   programs.nix-ld.enable = true;
 

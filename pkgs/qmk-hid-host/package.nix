@@ -49,7 +49,7 @@ rustPlatform.buildRustPackage {
 
   meta = {
     description = "Host daemon for QMK/ZMK raw HID status widgets";
-    homepage = "https://github.com/zzeneg/qmk-hid-host";
+    homepage = "https://github.com/rzssh/qmk-hid-host";
     license = lib.licenses.mit;
     mainProgram = "qmk-hid-host";
   };
