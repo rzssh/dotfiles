@@ -15,12 +15,14 @@ M.plugin = {
     local mini_diff = require("mini.diff")
     local mini_move = require("mini.move")
     local mini_jump = require("mini.jump")
+    local mini_jump2d = require("mini.jump2d")
 
     mini_align.setup()
     mini_surround.setup({ n_lines = 9999 })
     mini_splitjoin.setup()
     mini_cursorword.setup()
     mini_jump.setup()
+    mini_jump2d.setup({ labels = "shtaregyniwfdoblcuxmkvqpjz" })
 
     mini_diff.setup({
       view = { style = "sign" },

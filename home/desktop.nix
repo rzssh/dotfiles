@@ -66,7 +66,7 @@
 
   xdg.desktopEntries.claude-code-url-handler = {
     name = "Claude Code URL Handler";
-    exec = "claude --handle-uri %u";
+    exec = "/home/razen/.local/share/ai/bin/claude --handle-uri %u";
     noDisplay = true;
     mimeType = [ "x-scheme-handler/claude-cli" ];
   };

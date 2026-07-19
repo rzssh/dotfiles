@@ -25,7 +25,6 @@ set -x PNPM_HOME "$HOME/.local/share/pnpm"
 
 fish_add_path $PNPM_HOME $PNPM_HOME/bin
 fish_add_path "$HOME/.bun/bin"
-fish_add_path "$HOME/.local/bin"
 
 if test -f ~/.cache/matugen/colors.fish
     source ~/.cache/matugen/colors.fish

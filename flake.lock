@@ -47,6 +47,43 @@
         "type": "github"
       }
     },
+    "dank-calendar": {
+      "inputs": {
+        "dank-qml-common": "dank-qml-common",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784127511,
+        "narHash": "sha256-YbEVHaJ+7G5XjPpAtBRe+2snlvbEvWr9X+4zHDsYIAE=",
+        "owner": "AvengeMedia",
+        "repo": "dankcalendar",
+        "rev": "1af50b3b6db80a488a151790e2d280149aa24d18",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dankcalendar",
+        "type": "github"
+      }
+    },
+    "dank-qml-common": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784074596,
+        "narHash": "sha256-/rCqHgC39mHvBDxb/dZLWCQ3W4ev94y3/1KtCRSPDp8=",
+        "owner": "AvengeMedia",
+        "repo": "dank-qml-common",
+        "rev": "b50afcf549f7e9c8f07c85b7f3fbba867701650d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dank-qml-common",
+        "type": "github"
+      }
+    },
     "dms": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -65,6 +102,23 @@
       "original": {
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
+        "type": "github"
+      }
+    },
+    "dms-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1780332225,
+        "narHash": "sha256-QkQPqP7Wmo5DLRyKNSY5NuOau4LSaSfz3DYdHDLxluA=",
+        "owner": "AvengeMedia",
+        "repo": "dms-plugins",
+        "rev": "f4583449f12920e0a2f16808b00a860c27f0173d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dms-plugins",
+        "rev": "f4583449f12920e0a2f16808b00a860c27f0173d",
         "type": "github"
       }
     },
@@ -465,6 +519,39 @@
         "type": "github"
       }
     },
+    "openspec": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784311944,
+        "narHash": "sha256-iunvJ/wXts2i4bWCbsXRaVaZ5XJTBHRYBgq7MqhCm88=",
+        "owner": "Fission-AI",
+        "repo": "OpenSpec",
+        "rev": "15ef3bcf3139384da9266c06239733e6658d6b7e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Fission-AI",
+        "repo": "OpenSpec",
+        "type": "github"
+      }
+    },
+    "pi-coding-agent-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 499162500,
+        "narHash": "sha256-8ZbZztB+Q3UREIB8nDDqJns5+TVl+rppYtboLJN7B5o=",
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.80.10.tgz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.80.10.tgz"
+      }
+    },
     "pre-commit": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -540,7 +627,9 @@
     },
     "root": {
       "inputs": {
+        "dank-calendar": "dank-calendar",
         "dms": "dms",
+        "dms-plugins": "dms-plugins",
         "helium": "helium",
         "herdr": "herdr",
         "hermes-agent": "hermes-agent",
@@ -551,6 +640,8 @@
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-bambu": "nixpkgs-bambu",
         "nixpkgs-llamacpp": "nixpkgs-llamacpp",
+        "openspec": "openspec",
+        "pi-coding-agent-src": "pi-coding-agent-src",
         "sops-nix": "sops-nix",
         "zen-browser": "zen-browser"
       }

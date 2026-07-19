@@ -8,6 +8,10 @@ return {
     copilot = { status = { enabled = false } },
     cli = {
       picker = "snacks",
+      tools = {
+        claude = { cmd = { "/home/razen/.local/share/ai/bin/claude" } },
+        opencode = { cmd = { "/home/razen/.local/share/ai/bin/opencode" } },
+      },
       mux = {
         backend = "tmux",
         enabled = true,

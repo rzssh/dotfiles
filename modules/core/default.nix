@@ -1,5 +1,6 @@
 {
   imports = [
+    ./agents.nix
     ./boot.nix
     ./network.nix
     ./users.nix

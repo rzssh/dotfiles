@@ -56,10 +56,6 @@ cleanup_bindings() {
 
 current_profile() {
     cleanup_bindings
-    if [[ -n ${AI_PROFILE:-} ]]; then
-        printf '%s\n' "$AI_PROFILE"
-        return
-    fi
     if [[ -n ${HERDR_WORKSPACE_ID:-} && $HERDR_WORKSPACE_ID =~ $workspace_re ]]; then
         local binding
         local bound
@@ -72,12 +68,17 @@ current_profile() {
             fi
         fi
     fi
+    if [[ -n ${AI_PROFILE:-} ]]; then
+        printf '%s\n' "$AI_PROFILE"
+        return
+    fi
     printf '%s\n' "${AI_DEFAULT_PROFILE:-personal}"
 }
 
 bind_profile() {
     local workspace_id=$1
     local profile=$2
+    local cwd=$3
     local binding
     local directory
     local temporary
@@ -86,9 +87,47 @@ bind_profile() {
     umask 077
     mkdir -p -- "$directory"
     chmod 700 -- "$HOME/.local/state/ai" "$HOME/.local/state/ai/workspaces" "$directory"
+    if [[ -e $binding ]]; then
+        local bound_profile
+        local bound_cwd
+        bound_profile=$(sed -n '1p' "$binding")
+        bound_cwd=$(sed -n '2p' "$binding")
+        if [[ $bound_profile == "$profile" ]]; then
+            if [[ -z $bound_cwd ]]; then
+                temporary=$(mktemp "$directory/.binding.XXXXXX")
+                printf '%s\n%s\n' "$profile" "$cwd" > "$temporary"
+                mv -fT -- "$temporary" "$binding"
+            fi
+            return
+        fi
+        printf 'ai-workspace: workspace %s already bound to %s\n' "$workspace_id" "$bound_profile" >&2
+        return 2
+    fi
     temporary=$(mktemp "$directory/.binding.XXXXXX")
-    printf '%s\n' "$profile" > "$temporary"
-    mv -f -- "$temporary" "$binding"
+    printf '%s\n%s\n' "$profile" "$cwd" > "$temporary"
+    if ! ln -- "$temporary" "$binding" 2>/dev/null; then
+        rm -f -- "$temporary"
+        bind_profile "$workspace_id" "$profile" "$cwd"
+        return
+    fi
+    rm -f -- "$temporary"
+}
+
+find_workspace() {
+    local profile=$1
+    local cwd=$2
+    local directory
+    directory=$(binding_directory)
+    [[ -d $directory ]] || return 1
+    local binding
+    for binding in "$directory"/*; do
+        [[ -f $binding ]] || continue
+        if [[ $(sed -n '1p' "$binding") == "$profile" && $(sed -n '2p' "$binding") == "$cwd" ]]; then
+            basename -- "$binding"
+            return
+        fi
+    done
+    return 1
 }
 
 if [[ ${1:-} == --current-profile ]]; then
@@ -107,8 +146,14 @@ if [[ ${1:-} == --bind-profile ]]; then
         printf 'ai-workspace: invalid profile: %s\n' "$profile" >&2
         exit 2
     fi
-    ai-run "$profile" -- true
-    bind_profile "$workspace_id" "$profile"
+    cwd=${4:-$PWD}
+    if [[ ! -d $cwd ]]; then
+        printf 'ai-workspace: directory not found: %s\n' "$cwd" >&2
+        exit 2
+    fi
+    cwd=$(realpath -- "$cwd")
+    ai-run --check "$profile"
+    bind_profile "$workspace_id" "$profile" "$cwd"
     exit 0
 fi
 
@@ -130,9 +175,15 @@ if [[ ! -d $cwd ]]; then
     exit 2
 fi
 
-ai-run "$profile" -- true
+cwd=$(realpath -- "$cwd")
+ai-run --check "$profile"
+cleanup_bindings
+if workspace_id=$(find_workspace "$profile" "$cwd"); then
+    clean_profile_environment herdr workspace focus "$workspace_id"
+    exit 0
+fi
 args=(workspace create --cwd "$cwd" --env "AI_PROFILE=$profile")
-if [[ $profile != ${AI_DEFAULT_PROFILE:-personal} ]]; then
+if [[ $profile != "${AI_DEFAULT_PROFILE:-personal}" ]]; then
     args+=(--label "$(basename -- "$cwd") [$profile]")
 fi
 output=$(clean_profile_environment herdr "${args[@]}" --focus)
@@ -141,4 +192,4 @@ workspace_id=$(jq -er '.result.workspace.workspace_id' <<< "$output") || {
     printf 'ai-workspace: Herdr response missing workspace ID\n' >&2
     exit 2
 }
-bind_profile "$workspace_id" "$profile"
+bind_profile "$workspace_id" "$profile" "$cwd"

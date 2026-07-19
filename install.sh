@@ -15,7 +15,7 @@ fi
 cd "$DIR"
 
 if [ ! -f "hosts/$HOST/hardware-configuration.nix" ] || [ "${REGEN_HW:-0}" = "1" ]; then
-  sudo nixos-generate-config --show-hardware-config > "hosts/$HOST/hardware-configuration.nix"
+  sudo nixos-generate-config --show-hardware-config | tee "hosts/$HOST/hardware-configuration.nix" >/dev/null
 fi
 
 sudo nixos-rebuild boot --flake "$DIR#$HOST" --accept-flake-config

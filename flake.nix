@@ -10,13 +10,22 @@
     };
 
     herdr = {
-      url = "github:ogulcancelik/herdr"; # master
-      # url = "github:ogulcancelik/herdr/v0.7.4"; # release
+      url = "github:ogulcancelik/herdr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    dms-plugins = {
+      url = "github:AvengeMedia/dms-plugins/f4583449f12920e0a2f16808b00a860c27f0173d";
+      flake = false;
+    };
+
+    dank-calendar = {
+      url = "github:AvengeMedia/dankcalendar";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -47,6 +56,16 @@
     };
 
     hermes-agent.url = "github:NousResearch/hermes-agent";
+
+    pi-coding-agent-src = {
+      url = "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.80.10.tgz";
+      flake = false;
+    };
+
+    openspec = {
+      url = "github:Fission-AI/OpenSpec";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -81,6 +100,7 @@
         specialArgs = { inherit inputs vars; };
         modules = [
           ./hosts/razen
+          inputs.sops-nix.nixosModules.sops
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;

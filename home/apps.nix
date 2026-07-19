@@ -18,9 +18,6 @@ let
     system = "x86_64-linux";
     config.allowUnfree = true;
   };
-  herdr = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
-    patches = (old.patches or [ ]) ++ [ ../patches/herdr/current-workspace-agent-panel.patch ];
-  });
   vesktop =
     if pkgs.vesktop.version == "1.6.5" then
       (pkgs.vesktop.override { electron_40 = pkgs.electron_41-bin; }).overrideAttrs {
@@ -61,7 +58,6 @@ SQL
     jq
     just
     tuxedo
-    herdr
 
     # cli utils
     eza
@@ -133,13 +129,6 @@ SQL
     zls
     gopls
     vscode-js-debug
-
-    # ai
-    localPkgs.agentmemory
-    localPkgs.pi-coding-agent
-    localPkgs.llama-cpp-cuda
-    opencode
-    inputs.hermes-agent.packages.x86_64-linux.default
 
     # wayland & desktop utils
     playerctl

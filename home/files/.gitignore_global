@@ -1,11 +1,6 @@
 .DS_Store
-.rgignore
-node_modules
-dist
-.aider*
-.lazy.lua
-.claude
-Session.vim
-.mcp.json
-.mise.toml
-.typos.toml
+*~
+*.swp
+*.swo
+__pycache__/
+*.py[cod]

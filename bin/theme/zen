@@ -18,11 +18,9 @@ apply_to_profile() {
     cp -f "$cache_dir/userContent.css" "$profile/chrome/userContent.css"
 }
 
-found=0
 for zen_root in "${XDG_CONFIG_HOME:-$HOME/.config}/zen" "$HOME/.zen"; do
     ini="$zen_root/profiles.ini"
     [ -f "$ini" ] || continue
-    found=1
     while IFS= read -r rel; do
         apply_to_profile "$zen_root/$rel"
     done < <(awk -F= '/^IsRelative=1/{rel=1} /^Path=/{path=$2} /^\[/{if (rel && path) print path; rel=0; path=""} END{if (rel && path) print path}' "$ini")
