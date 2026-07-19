@@ -179,13 +179,11 @@ cwd=$(realpath -- "$cwd")
 ai-run --check "$profile"
 cleanup_bindings
 if workspace_id=$(find_workspace "$profile" "$cwd"); then
+    clean_profile_environment herdr workspace report-metadata "$workspace_id" --source ai-workspace --token "profile=[$profile]"
     clean_profile_environment herdr workspace focus "$workspace_id"
     exit 0
 fi
 args=(workspace create --cwd "$cwd" --env "AI_PROFILE=$profile")
-if [[ $profile != "${AI_DEFAULT_PROFILE:-personal}" ]]; then
-    args+=(--label "$(basename -- "$cwd") [$profile]")
-fi
 output=$(clean_profile_environment herdr "${args[@]}" --focus)
 printf '%s\n' "$output"
 workspace_id=$(jq -er '.result.workspace.workspace_id' <<< "$output") || {
@@ -193,3 +191,4 @@ workspace_id=$(jq -er '.result.workspace.workspace_id' <<< "$output") || {
     exit 2
 }
 bind_profile "$workspace_id" "$profile" "$cwd"
+clean_profile_environment herdr workspace report-metadata "$workspace_id" --source ai-workspace --token "profile=[$profile]"

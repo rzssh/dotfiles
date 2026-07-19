@@ -1,7 +1,6 @@
 require("core.keymaps")
 require("core.options")
 require("core.autocmd")
-require("core.marks")
 require("core.search")
 require("core.colorscheme")
 require("core.macros")

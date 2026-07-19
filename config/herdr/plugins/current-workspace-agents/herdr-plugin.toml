@@ -1,0 +1,9 @@
+id = "razen.current-workspace-agents"
+name = "Current Workspace Agents"
+version = "0.1.0"
+min_herdr_version = "0.7.4"
+description = "Show only agents in the currently presented Herdr workspace."
+platforms = ["linux"]
+
+[[startup]]
+command = ["python3", "apply.py"]

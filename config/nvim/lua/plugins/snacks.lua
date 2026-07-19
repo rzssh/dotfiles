@@ -221,7 +221,7 @@ M.plugin = {
     -- NOTE: Files
     { "<leader><leader>", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
     { "<leader>.", function() Snacks.picker.files({ cwd = vim.fn.expand("%:p:h") }) end, desc = "Find in directory" },
-    { "<leader>e=", function() Snacks.explorer() end, desc = "File Explorer (Snacks)" },
+    { "<leader>e", function() Snacks.explorer() end, desc = "File Explorer (Snacks)" },
     { "<C-b>", function() Snacks.picker.buffers() end, desc = "Find Buffer" },
     { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Find Buffer" },
     { "<leader>ff", function() Snacks.picker.recent() end, desc = "Find Recent Files" },
@@ -234,7 +234,6 @@ M.plugin = {
     { "<leader>,", function() Snacks.picker.grep() end, desc = "Grep", mode = { "n" } },
     { "<leader>/", function() Snacks.picker.grep({ cwd = vim.fn.expand("%:p:h") }) end, desc = "Grep in directory" },
     { "<leader>,", function() Snacks.picker.grep_word() end, desc = "Grep", mode = { "x" } },
-    { "<leader>sb", function() Snacks.picker.buffers() end, desc = "Open Buffers" },
     { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers" },
 
     -- NOTE: Git
@@ -401,34 +400,7 @@ M.plugin = {
       end
     end
 
-    -- AI completion toggle
-    vim.g.llama_enabled = true
-
-    local is_llama_enabled = vim.g.llama_enabled == nil or vim.g.llama_enabled
-
-    vim.g.enable_ai_completion = true
     vim.schedule(function()
-      Snacks.toggle({
-        name = "AI Completion",
-        get = function()
-          return vim.g.enable_ai_completion
-        end,
-        set = function(state)
-          vim.g.enable_ai_completion = state
-
-          if is_llama_enabled then
-            vim.cmd("silent! Llama" .. (state and "Enable" or "Disable"))
-            vim.g.llama_enabled = state
-          end
-
-          local ct_ok, cursortab = pcall(require, "cursortab")
-          local daemon_ok, daemon = pcall(require, "cursortab.daemon")
-          if ct_ok and daemon_ok and daemon.is_enabled() ~= state then
-            cursortab.toggle()
-          end
-        end,
-      }):map("<leader>a-")
-
       vim.g.statuscolumn_show_signs = true
       Snacks.toggle({
         name = "Statuscolumn Signs",
@@ -439,45 +411,9 @@ M.plugin = {
           vim.g.statuscolumn_show_signs = state
         end,
       }):map("<leader>us")
-
-      Snacks.picker.actions.git_branch_del = M.git_branch_del
     end)
   end,
 }
-
--- https://github.com/folke/snacks.nvim/blob/main/lua/snacks/picker/actions.lua#L392
-function M.git_branch_del(picker, item)
-  if not (item and item.branch) then
-    Snacks.notify.warn("No branch or commit found", { title = "Snacks Picker" })
-  end
-
-  local branch = item.branch
-  Snacks.picker.util.cmd({ "git", "rev-parse", "--abbrev-ref", "HEAD" }, function(data)
-    -- Check if we are on the same branch
-    if data[1]:match(branch) ~= nil then
-      Snacks.notify.error("Cannot delete the current branch.", { title = "Snacks Picker" })
-      return
-    end
-
-    Snacks.picker.select(
-      { "Yes", "No" },
-      { prompt = ("Delete branch %q?"):format(branch) },
-      function(_, idx)
-        if idx == 1 then
-          -- Proceed with deletion
-          -- NOTE: Modified only here to force delete the branch using the -D flag.
-          Snacks.picker.util.cmd({ "git", "branch", "-D", branch }, function()
-            Snacks.notify("Deleted Branch `" .. branch .. "`", { title = "Snacks Picker" })
-            vim.cmd.checktime()
-            picker.list:set_selected()
-            picker.list:set_target()
-            picker:find()
-          end, { cwd = picker:cwd() })
-        end
-      end
-    )
-  end, { cwd = picker:cwd() })
-end
 
 function M.grep_git_files()
   local files = {}

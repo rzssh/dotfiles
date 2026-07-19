@@ -51,6 +51,7 @@ return {
       c = { "clang_format" },
       cpp = { "clang_format" },
       go = { "gofmt" },
+      odin = { "odinfmt" },
       rust = { "rustfmt" },
       zig = { "zigfmt" },
     },

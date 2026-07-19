@@ -2,9 +2,36 @@ local map = vim.keymap.set
 
 local M = {}
 
+local function save_session()
+  local sessions = require("mini.sessions")
+  if vim.v.this_session ~= "" then
+    sessions.write()
+    return
+  end
+  vim.ui.input(
+    { prompt = "Session name: ", default = vim.fs.basename(vim.fn.getcwd()) },
+    function(name)
+      name = name and vim.trim(name)
+      if name and name ~= "" then
+        sessions.write(name)
+      end
+    end
+  )
+end
+
 M.plugin = {
   "nvim-mini/mini.nvim",
   event = "LazyFile",
+  keys = {
+    { "<leader>qs", save_session, desc = "Save session" },
+    {
+      "<leader>qS",
+      function()
+        require("mini.sessions").select("read")
+      end,
+      desc = "Select session",
+    },
+  },
   config = function()
     local mini_align = require("mini.align")
     local mini_bracketed = require("mini.bracketed")
@@ -16,6 +43,7 @@ M.plugin = {
     local mini_move = require("mini.move")
     local mini_jump = require("mini.jump")
     local mini_jump2d = require("mini.jump2d")
+    local mini_sessions = require("mini.sessions")
 
     mini_align.setup()
     mini_surround.setup({ n_lines = 9999 })
@@ -23,6 +51,7 @@ M.plugin = {
     mini_cursorword.setup()
     mini_jump.setup()
     mini_jump2d.setup({ labels = "shtaregyniwfdoblcuxmkvqpjz" })
+    mini_sessions.setup()
 
     mini_diff.setup({
       view = { style = "sign" },

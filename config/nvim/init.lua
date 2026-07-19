@@ -24,14 +24,8 @@ Event.mappings["User LazyFile"] = Event.mappings.LazyFile
 
 require("lazy").setup({
   { import = "plugins" },
-  { import = "plugins.themes" },
 }, {
   checker = { enabled = true, notify = false },
   change_detection = { notify = false },
   defaults = { lazy = true },
-})
-
-require("notes").setup({
-  dir = "~/notes",
-  float_file = "inbox.md",
 })

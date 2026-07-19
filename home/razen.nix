@@ -141,6 +141,7 @@ in
   };
 
   programs.nix-index-database.comma.enable = true;
+  programs.nix-index.enableFishIntegration = false;
 
   programs.direnv = {
     enable = true;
@@ -168,6 +169,8 @@ in
     "jj/config.toml".source = link "config/jj/config.toml";
     "gh/config.yml".source = link "config/gh/config.yml";
     "gh-dash".source = link "config/gh-dash";
+    "herdr/plugins/current-workspace-agents".source =
+      link "config/herdr/plugins/current-workspace-agents";
     "herdr/plugins/focus-notify".source = link "config/herdr/plugins/focus-notify";
     "starship.toml".source = link "config/starship.toml";
     "matugen".source = link "config/matugen";

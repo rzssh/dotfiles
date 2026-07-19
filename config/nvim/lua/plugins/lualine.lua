@@ -1,9 +1,6 @@
 return {
   "nvim-lualine/lualine.nvim",
   event = "LazyFile",
-  dependencies = {
-    "nvim-mini/mini.nvim",
-  },
   config = function()
     local function get_theme()
       for key in pairs(package.loaded) do
@@ -60,8 +57,7 @@ return {
         theme = get_theme(),
       },
       sections = {
-        lualine_c = {
-        },
+        lualine_c = {},
         lualine_x = (function()
           local components = {
             { "overseer" },
@@ -75,40 +71,19 @@ return {
             table.insert(components, 1, require("ecolog.integrations.statusline").lualine())
           end
 
-          local noice_ok, noice = pcall(require, "noice")
-          if noice_ok then
-            table.insert(components, 1, {
-              noice.api.status.mode.get,
-              cond = noice.api.status.mode.has,
-              color = { fg = "#ff6b6b" },
-            })
-          else
-            table.insert(components, 1, {
-              function()
-                return "recording @" .. vim.fn.reg_recording()
-              end,
-              cond = function()
-                return vim.fn.reg_recording() ~= ""
-              end,
-              color = { fg = "#ff6b6b" },
-            })
-          end
+          table.insert(components, 1, {
+            function()
+              return "recording @" .. vim.fn.reg_recording()
+            end,
+            cond = function()
+              return vim.fn.reg_recording() ~= ""
+            end,
+            color = { fg = "#ff6b6b" },
+          })
 
           return components
         end)(),
       },
     })
-
-    if vim.env.TMUX then
-      vim.api.nvim_create_autocmd({ "FocusGained", "ColorScheme" }, {
-        callback = function()
-          vim.defer_fn(function()
-            vim.opt.laststatus = 0
-          end, 0)
-        end,
-      })
-
-      vim.o.laststatus = 0
-    end
   end,
 }

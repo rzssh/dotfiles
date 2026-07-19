@@ -1,7 +1,7 @@
 local servers = {
-  "vtsls",
+  -- "vtsls",
   -- "ts_ls",
-  -- "tsgo",
+  "tsgo",
   "biome",
   "eslint",
   "tailwindcss",
@@ -27,6 +27,7 @@ local servers = {
   "typos_lsp",
   "tinymist",
 
+  "ols",
   "zls",
   "gopls",
   "bashls",
@@ -39,6 +40,22 @@ return {
     event = "VeryLazy",
     dependencies = { "b0o/schemastore.nvim" },
     config = function()
+      local requested_workspace_diagnostics = {}
+
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("WorkspaceDiagnostics", { clear = true }),
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if not client or requested_workspace_diagnostics[client.id] then
+            return
+          end
+          if client:supports_method("workspace/diagnostic", args.buf) then
+            requested_workspace_diagnostics[client.id] = true
+            vim.lsp.buf.workspace_diagnostics({ client_id = client.id })
+          end
+        end,
+      })
+
       for _, name in ipairs(servers) do
         local cfg = vim.lsp.config[name]
         local cmd = cfg and cfg.cmd

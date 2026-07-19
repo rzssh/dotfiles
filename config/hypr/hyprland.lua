@@ -121,6 +121,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("1password"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("wayscriber --active"))
 hl.bind(mainMod .. " + CTRL + SHIFT + Q", hl.dsp.exec_cmd("systemctl poweroff"))
 
 hl.bind(mainMod .. " + R",       hl.dsp.exec_cmd("dms ipc call spotlight toggle"))

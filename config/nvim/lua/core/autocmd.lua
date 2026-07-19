@@ -22,10 +22,9 @@ autocmd("BufWritePost", {
   end,
 })
 
--- Kill daemons manually until core_d provides this functionality.
 autocmd("VimLeavePre", {
   callback = function()
-    vim.fn.jobstart("killall prettierd eslint_d", { detach = true })
+    vim.fn.jobstart({ "prettierd", "stop" }, { detach = true })
   end,
 })
 

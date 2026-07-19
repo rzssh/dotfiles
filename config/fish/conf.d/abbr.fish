@@ -1,6 +1,8 @@
 # These always run last and override whatever
 function fish_user_key_bindings
     bind ctrl-space 'commandline -i " "'
+    bind ctrl-o edit_command_buffer
+    bind f2 'bind --user | fzf --no-preview --border-label=" Fish Bindings " --header="ESC: close" >/dev/null; commandline -f repaint'
 end
 
 abbr -a b bun

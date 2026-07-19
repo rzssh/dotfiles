@@ -1,20 +1,21 @@
 onboarding = false
-new_cwd = "~/projects"
-prompt_new_tab_name = false
+
+[terminal]
+new_cwd = "follow"
 
 [ui]
+prompt_new_tab_name = false
 show_agent_labels_on_pane_borders = true
-agent_panel_scope = "current"
 
 [ui.sidebar.spaces]
 rows = [
-  ["state_icon", "workspace"],
+  ["state_icon", "$cwd", "$profile"],
   ["$vcs_ref", "git_status"],
 ]
 
 [ui.sidebar.agents]
 rows = [
-  ["state_icon", "workspace", "agent"],
+  ["state_icon", { token = "agent", fg = "#ffffff", bold = true, dim = false }],
   ["tab"],
 ]
 
@@ -35,9 +36,10 @@ swap_pane_up     = "alt+shift+up"
 swap_pane_down   = "alt+shift+down"
 next_agent         = "alt+]"
 previous_agent     = "alt+["
-focus_agent        = "ctrl+1..9"
+focus_agent        = "ctrl+shift+1..9"
 switch_tab         = "alt+1..9"
 zoom               = ["prefix+z", "alt+z"]
+toggle_sidebar     = "alt+e"
 previous_workspace = "alt+shift+["
 next_workspace     = "alt+shift+]"
 switch_workspace   = "alt+shift+1..9"
@@ -155,9 +157,9 @@ width = "60%"
 height = 12
 
 [[keys.command]]
-key = "prefix+t"
+key = "alt+t"
 type = "popup"
-command = "tuxedo"
+command = 'tuxedo "$HOME/notes/todo.txt"'
 description = "tasks"
 width = "90%"
 height = "85%"

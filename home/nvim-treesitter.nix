@@ -21,7 +21,7 @@ let
     paths = (with ts.grammarPlugins; [
       bash c cmake cpp css dockerfile fish gitignore go graphql haskell
       html javascript jsdoc json kdl lua markdown markdown_inline prisma
-      query rust supercollider svelte tmux tsx typescript vim yaml zig
+      odin query rust supercollider svelte tmux tsx typescript vim yaml zig
     ]) ++ [ ghosttyParser ];
   };
   tsQueries = pkgs.symlinkJoin {

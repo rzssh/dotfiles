@@ -29,11 +29,10 @@ return {
     },
     spec = {
       { "<leader>c", group = "LSP/Format", icon = { icon = "", color = "blue" }, mode = { "n", "v" } },
-      { "<leader>e", group = "Explorers", icon = { icon = "", color = "blue" } },
       { "<leader>f", group = "Files", icon = { icon = "󰈔", color = "blue" }, mode = { "n", "v" } },
-      { "<leader>g", group = "Git", icon = { icon = "󰊢", color = "orange" }, mode = { "n", "v" } },
+      { "<leader>g", group = "VCS", icon = { icon = "󰊢", color = "orange" }, mode = { "n", "v" } },
       { "<leader>H", group = "Herdr", icon = { icon = "󰁴", color = "green" }, mode = { "n", "v" } },
-      { "<leader>n", group = "Notes" },
+      { "<leader>j", group = "Jujutsu", icon = { icon = "󰊢", color = "orange" } },
       { "<leader>p", group = "Pick/Put", icon = { icon = "󰒉", color = "orange" } },
       { "<leader>t", group = "Toggles" },
       { "<leader>u", group = "Undotree/Toggles", icon = { icon = "←", color = "red" } },

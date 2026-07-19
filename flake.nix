@@ -83,6 +83,8 @@
       };
     in
     {
+      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
+
       templates = {
         node = shellTemplate "node";
         bun = shellTemplate "bun";

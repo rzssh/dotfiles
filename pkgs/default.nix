@@ -7,6 +7,7 @@ let
 in
 {
   babysitter = pkgs.callPackage ./babysitter/package.nix { };
+  figlet = pkgs.callPackage ./figlet/package.nix { };
   hyprwhspr = llamaPkgs.callPackage ./hyprwhspr/package.nix { };
   llama-cpp-cuda = llamaPkgs.llama-cpp.override { cudaSupport = true; };
   pi-coding-agent = pkgs.callPackage ./pi-coding-agent/package.nix {

@@ -8,7 +8,59 @@ let
     ignoreKeyboardLayout = true;
   };
   vimiumSettingsJson = builtins.toJSON vimiumSettings;
-  zen = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+  zenTabShortcuts = pkgs.writeText "zen-tab-shortcuts.js" ''
+    (() => {
+      document.addEventListener("command", event => {
+        const match = /^key_selectTab([1-8])$/.exec(event.target.id);
+        if (!match && event.target.id !== "key_selectLastTab") return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const tabs = gBrowser.visibleTabs.filter(
+          tab => !tab.pinned && !tab.hasAttribute("zen-glance-tab")
+        );
+        if (!tabs.length) return;
+        const index = match ? Number(match[1]) - 1 : tabs.length - 1;
+        gBrowser.selectedTab = tabs[Math.min(index, tabs.length - 1)];
+      }, true);
+    })();
+  '';
+  zenAutoConfig = pkgs.writeText "zen-tab-shortcuts.cfg" ''
+    //
+    (() => {
+      try {
+        const observerService = Components.classes["@mozilla.org/observer-service;1"]
+          .getService(Components.interfaces.nsIObserverService);
+        const scriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+          .getService(Components.interfaces.mozIJSSubScriptLoader);
+        observerService.addObserver({
+          observe(browserWindow) {
+            try {
+              scriptLoader.loadSubScript("file://${zenTabShortcuts}", browserWindow);
+            } catch (error) {
+              Components.utils.reportError(error);
+            }
+          }
+        }, "browser-delayed-startup-finished");
+      } catch (error) {
+        Components.utils.reportError(error);
+      }
+    })();
+  '';
+  zenAutoConfigPrefs = pkgs.writeText "zen-tab-shortcuts-autoconfig.js" ''
+    pref("general.config.filename", "zen-tab-shortcuts.cfg");
+    pref("general.config.obscure_value", 0);
+    pref("general.config.sandbox_enabled", false);
+  '';
+  zenUnwrapped = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.beta-unwrapped.overrideAttrs (old: {
+    postInstall = (old.postInstall or "") + ''
+      lib_dir="$out/lib/zen-bin-${old.version}"
+      chmod u+w "$lib_dir" "$lib_dir/defaults" "$lib_dir/defaults/pref"
+      install -Dm444 ${zenAutoConfigPrefs} "$lib_dir/defaults/pref/zen-tab-shortcuts-autoconfig.js"
+      install -Dm444 ${zenAutoConfig} "$lib_dir/zen-tab-shortcuts.cfg"
+    '';
+  });
+  zen = pkgs.wrapFirefox zenUnwrapped {
+    icon = "zen-browser";
     extraPolicies.ExtensionSettings.${vimiumId} = {
       install_url = "https://addons.mozilla.org/firefox/downloads/latest/vimium-ff/latest.xpi";
       installation_mode = "normal_installed";
@@ -28,6 +80,25 @@ let
       }
     else
       throw "Recheck Vesktop Electron workaround in home/apps.nix";
+  tuxedoLatest = pkgs.rustPlatform.buildRustPackage rec {
+    pname = "tuxedo";
+    version = "2026.7.1";
+    src = pkgs.fetchFromGitHub {
+      owner = "rzssh";
+      repo = "tuxedo";
+      rev = "01bb3e614d3670c4c3f1a792c904ed8dc858c569";
+      hash = "sha256-UFjcrUa2db96CbySC+yTxzeJPtMigZYjnF3mWEjrfmY=";
+    };
+    cargoLock.lockFile = "${src}/Cargo.lock";
+    nativeCheckInputs = [ pkgs.writableTmpDirAsHomeHook ];
+    postPatch = ''
+      substituteInPlace src/note.rs src/app/mutations.rs \
+        --replace-fail 'projects/tuxedo-tasks' 'task-details'
+      substituteInPlace src/main.rs \
+        --replace-fail 'open_path_in_editor(&path)?;' 'open_path_in_editor(&path)?;
+                        terminal.clear()?;'
+    '';
+  };
 in
 {
   home.activation.vimiumSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -57,7 +128,7 @@ SQL
     fzf
     jq
     just
-    tuxedo
+    tuxedoLatest
 
     # cli utils
     eza
@@ -66,6 +137,7 @@ SQL
     ripgrep
     fx
     tealdeer
+    localPkgs.figlet
     gdu
     gnupg
     unzip
@@ -103,6 +175,7 @@ SQL
     clippy
     rustfmt
     rust-analyzer
+    odin
     zig
     go
     typst
@@ -126,6 +199,7 @@ SQL
     typos-lsp
     tinymist
     bash-language-server
+    ols
     zls
     gopls
     vscode-js-debug
@@ -139,6 +213,7 @@ SQL
     wf-recorder
     slurp
     hyprpicker
+    wayscriber
     matugen
     satty
     localPkgs.hyprwhspr

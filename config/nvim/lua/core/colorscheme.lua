@@ -386,30 +386,6 @@ M.themes = {
       transparent_neotree()
     end,
   },
-  {
-    name = "Tokyo Night",
-    colorscheme = "tokyonight",
-    after = function()
-      transparent_winbar()
-      transparent_float()
-      transparent_neotree()
-    end,
-  },
-  {
-    name = "Everforest",
-    colorscheme = "everforest",
-    after = function()
-      transparent_winbar()
-      transparent_float()
-    end,
-  },
-  {
-    name = "Catppuccin",
-    colorscheme = "catppuccin-mocha",
-    after = function()
-      transparent_float()
-    end,
-  },
 }
 
 vim.g.THEME = vim.g.THEME or "System (matugen)"

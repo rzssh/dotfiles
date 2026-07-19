@@ -2,13 +2,13 @@
 
 ## Tooling
 
-| Layer      | Tooling                                                        |
-| ---------- | -------------------------------------------------------------- |
-| OS         | NixOS + CachyOS kernel                                         |
-| Compositor | Hyprland                                                       |
-| Shell      | DankMaterialShell                                              |
-| Terminal   | Ghostty + herdr + fish                                         |
-| Editor     | Neovim                                                         |
+| Layer      | Tooling                                                     |
+| ---------- | ----------------------------------------------------------- |
+| OS         | NixOS + CachyOS kernel                                      |
+| Compositor | Hyprland                                                    |
+| Shell      | DankMaterialShell                                           |
+| Terminal   | Ghostty + herdr + fish                                      |
+| Editor     | Neovim                                                      |
 | Keyboard   | [Custom 34 keys alt layout](https://github.com/rzssh/keebs) |
 
 ## Install

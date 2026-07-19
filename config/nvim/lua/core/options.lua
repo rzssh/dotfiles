@@ -40,6 +40,7 @@ opt.splitbelow = true
 opt.swapfile = false
 opt.undofile = true
 opt.autoread = true
+opt.exrc = true
 
 -- Handled by snacks.statuscolumn
 opt.signcolumn = "yes:1"

@@ -12,9 +12,7 @@ let
   aiRun = "${lib.getExe pkgs.python3} ${dots}/bin/ai-run";
   localPkgs = import ../pkgs { inherit pkgs inputs; };
   system = pkgs.stdenv.hostPlatform.system;
-  herdr = inputs.herdr.packages.${system}.default.overrideAttrs (old: {
-    patches = (old.patches or [ ]) ++ [ ../patches/herdr/current-workspace-agent-panel.patch ];
-  });
+  herdr = inputs.herdr.packages.${system}.default;
   hermes = pkgs.callPackage "${inputs.hermes-agent}/nix/hermes-agent.nix" {
     inherit (inputs.hermes-agent.inputs) uv2nix pyproject-nix pyproject-build-systems;
     npm-lockfile-fix = inputs.hermes-agent.inputs.npm-lockfile-fix.packages.${system}.default;
@@ -104,12 +102,24 @@ let
       (credentialArgs client)
       (homeArgs client)
     ];
+  releaseAgent = name: ''
+    release_agent() {
+      status=$?
+      trap - EXIT
+      if [ "''${HERDR_ENV:-}" = 1 ] && [ -n "''${HERDR_PANE_ID:-}" ] && [ -n "''${HERDR_SOCKET_PATH:-}" ]; then
+        ${herdr}/bin/herdr pane release-agent "''${HERDR_PANE_ID}" --source "herdr:${name}" --agent "${name}" --seq "$(${pkgs.coreutils}/bin/date +%s%N)" >/dev/null 2>&1 || true
+      fi
+      exit "$status"
+    }
+    trap release_agent EXIT
+  '';
   wrappers = lib.mapAttrs (
     name: client:
     pkgs.writeShellScript "ai-${name}" (
       if name == "claude" then
         ''
           profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
+          ${releaseAgent name}
           scrub=(--set CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1)
           for argument in "$@"; do
             if [ "$argument" = --dangerously-skip-permissions ]; then
@@ -117,12 +127,15 @@ let
               break
             fi
           done
-          exec ${aiRun} ${clientArgs client} "''${scrub[@]}" "$profile" -- ${client.executable} "$@"
+          ${aiRun} ${clientArgs client} "''${scrub[@]}" "$profile" -- ${client.executable} "$@"
         ''
       else
         ''
           profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
-          exec ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "$@"
+          ${lib.optionalString (name == "codex") (releaseAgent name)}
+          ${
+            lib.optionalString (name != "codex") "exec "
+          }${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "$@"
         ''
     )
   ) clients;
