@@ -1,11 +1,4 @@
 function __fzf_search_home --description "Search files from home directory with smart preview"
-    set -l copy_cmd
-    if test (uname) = Darwin
-        set copy_cmd "pbcopy"
-    else
-        set copy_cmd "wl-copy"
-    end
-
     # Smart preview script
     set -l preview_script 'bash -c \'
         if [ -d "{}" ]; then
@@ -29,7 +22,7 @@ function __fzf_search_home --description "Search files from home directory with 
             --bind "alt-f:change-prompt(📄  Files> )+reload(fd --type f --hidden --follow --exclude .git --exclude node_modules . ~)" \
             --bind "alt-d:change-prompt(📁  Dirs> )+reload(fd --type d --hidden --follow --exclude .git --exclude node_modules . ~)" \
             --bind "alt-a:change-prompt(🏠  Home> )+reload(fd --type f --type d --hidden --follow --exclude .git --exclude node_modules . ~)" \
-            --bind "ctrl-y:execute-silent(printf %s {} | $copy_cmd)"
+            --bind "ctrl-y:execute-silent(printf %s {} | wl-copy)"
     )
 
     if test -n "$selected"

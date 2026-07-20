@@ -1,7 +1,6 @@
 import { existsSync, realpathSync, statSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { destructiveReason } from "/home/razen/projects/dotfiles/agents/shared/destructive-command.js";
 
 function canonical(path: string): string {
 	let cursor = path;
@@ -95,15 +94,7 @@ export default async function profileProtection(pi: ExtensionAPI) {
 		...bashTool,
 		execute: async (id, params, signal, onUpdate) => bashTool.execute(id, params, signal, onUpdate),
 	});
-	pi.on("tool_call", async (event: any, ctx: any) => {
-		if (event.toolName === "bash") {
-			const reason = destructiveReason(event.input.command ?? "");
-			if (!reason) return undefined;
-			if (ctx.hasUI && (await ctx.ui.confirm("Destructive command", `${reason}\n\n${event.input.command}`))) {
-				return undefined;
-			}
-			return { block: true, reason: `Blocked ${reason}` };
-		}
+	pi.on("tool_call", async (event: any) => {
 		if (!["read", "write", "edit", "grep", "find", "ls"].includes(event.toolName)) return undefined;
 		const reason = guardPath(event.input.path ?? ".", cwd);
 		return reason ? { block: true, reason } : undefined;

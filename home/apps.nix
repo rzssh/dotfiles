@@ -86,8 +86,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "rzssh";
       repo = "tuxedo";
-      rev = "46d0ce47b2a22a4298f47dbcac0a4036d1bc80e4";
-      hash = "sha256-KQraBkSV8cOb+BenptuytszGChyPTIPkTXi6qpzqns8=";
+      rev = "e30e2702e88202217be346dff4263fecc20b34c2";
+      hash = "sha256-T8vN678XF2rfhfAvZzk6UpCfCS3aW6QNqpq6IIDd5Ak=";
     };
     cargoLock.lockFile = "${src}/Cargo.lock";
     nativeCheckInputs = [ pkgs.writableTmpDirAsHomeHook ];
@@ -122,6 +122,7 @@ SQL
     ghostty
     helix
     yazi
+    aerc
     starship
     fishPlugins.autopair
     zoxide
@@ -243,10 +244,12 @@ SQL
     qt6.qtimageformats
 
     # gui apps
-    thunderbird
+    mailspring
+    karere
     vesktop
     telegram-desktop
     slack
+    zoom-us
     obsidian
     zen
     inputs.helium.packages.x86_64-linux.default

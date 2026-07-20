@@ -18,19 +18,6 @@
       }
     }
   },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "/home/razen/projects/dotfiles/agents/shared/destructive-command.js",
-            "type": "command"
-          }
-        ],
-        "matcher": "Bash"
-      }
-    ]
-  },
   "permissions": {
     "defaultMode": "acceptEdits",
     "deny": [

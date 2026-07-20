@@ -4,6 +4,10 @@ Doubt, question, scrutinize, and verify everything I say.
 Use official docs or available documentation tools for library/API documentation, code generation, setup, or configuration steps without me having to explicitly ask.
 If you are not sure how to use a tool, look up current documentation online.
 Do not add comments to code unless I explicitly ask for them. Write self-explanatory code with zero comments by default.
+Load `capture-knowledge` only when I explicitly ask to preserve personal knowledge for later or request a knowledge sweep. Generic mentions of notes, findings, documentation, patterns, workflows, or decisions do not authorize a write. Never persist task discoveries automatically or put personal knowledge in implementation repos unless I explicitly ask.
+Never use reasoning below medium for coding agents or delegated workers.
+Never push to any remote or force-push any ref unless I explicitly request that specific push. Requests to commit, finish, ship, validate, or open a PR do not authorize pushing.
+Never delete files or directories in bulk unless I explicitly request deletion of that exact scope. Ask first otherwise; a general cleanup request is insufficient.
 
 ## Response style — always on
 
@@ -55,3 +59,4 @@ Work solo by default. Inspect repository and tests before deciding whether work 
 Use Babysitter only when I explicitly request it.
 When an independent bounded write unit exists and current process runs inside Herdr, load `delegate-work` before starting any writer.
 Never let concurrent writers share one working copy. One worker is default; two is maximum.
+Inside the FirstMate distro, its project-local `AGENTS.md` supersedes this delegation section. FirstMate owns dispatch, supervision, and isolated worktrees; never invoke `delegate-work`, `herdr-agent-comms`, or Babysitter inside its crew.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import fcntl
 import json
 import os
 import pathlib
@@ -11,9 +12,13 @@ TERMINAL_CLASS = os.environ.get("HERDR_TERMINAL_CLASS", "com.mitchellh.ghostty")
 TERMINAL_SELECTOR = os.environ.get("HERDR_WINDOW_SELECTOR", f"class:{TERMINAL_CLASS}")
 
 
-def run(*args, timeout=5):
+def run(
+    *args: str,
+    timeout: float | None = 5,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str] | None:
     try:
-        return subprocess.run(args, capture_output=True, text=True, timeout=timeout)
+        return subprocess.run(args, capture_output=True, text=True, timeout=timeout, env=env)
     except Exception:
         return None
 
@@ -42,6 +47,12 @@ def save_state(state):
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(state, separators=(",", ":")))
     tmp.replace(path)
+
+
+def lock_state():
+    lock = (state_dir() / "state.lock").open("a")
+    fcntl.flock(lock, fcntl.LOCK_EX)
+    return lock
 
 
 def event_data():
@@ -75,8 +86,24 @@ def basename(path):
     return clean.rsplit("/", 1)[-1] or clean or "agent"
 
 
+def hyprland_env():
+    r = run("hyprctl", "instances", "-j", timeout=2)
+    if not r or r.returncode != 0:
+        return None
+    try:
+        instance = max(json.loads(r.stdout), key=lambda item: item.get("time", 0))["instance"]
+    except Exception:
+        return None
+    env = os.environ.copy()
+    env["HYPRLAND_INSTANCE_SIGNATURE"] = instance
+    return env
+
+
 def active_terminal():
-    r = run("hyprctl", "activewindow", "-j", timeout=2)
+    env = hyprland_env()
+    if not env:
+        return False
+    r = run("hyprctl", "activewindow", "-j", timeout=2, env=env)
     if not r or r.returncode != 0:
         return False
     try:
@@ -90,12 +117,30 @@ def visible(pane):
 
 
 def focus_pane(pane_id):
-    run(herdr_bin(), "agent", "focus", pane_id)
-    run("hyprctl", "dispatch", f'hl.dsp.focus({{ window = "{TERMINAL_SELECTOR}" }})')
+    r = run(herdr_bin(), "agent", "focus", pane_id)
+    if not r or r.returncode != 0:
+        return
+    time.sleep(0.2)
+    env = hyprland_env()
+    if env:
+        run(
+            "hyprctl",
+            "dispatch",
+            f'hl.dsp.focus({{ window = "{TERMINAL_SELECTOR}" }})',
+            env=env,
+        )
 
 
 def wait_notification(title, pane_id):
-    r = run("notify-send", "-a", "herdr", "-e", "-t", "8000", "-A", "default=Open", title, timeout=30)
+    r = run(
+        "notify-send",
+        "-a",
+        "herdr",
+        "-A",
+        "default=Open",
+        title,
+        timeout=None,
+    )
     if r and (r.stdout or "").strip() == "default":
         focus_pane(pane_id)
 
@@ -122,28 +167,46 @@ def notify_for(pane_id, status):
 def handle_event():
     data = event_data()
     pane_id = data.get("pane_id") or os.environ.get("HERDR_PANE_ID")
+    event = os.environ.get("HERDR_PLUGIN_EVENT")
     status = data.get("agent_status") or data.get("status")
-    if not pane_id or not status:
+    if not pane_id:
         return
 
-    state = load_state()
-    pane_state = state.get(pane_id, {})
-    prev = pane_state.get("status")
-    kind = "done" if prev == "working" and status == "idle" else status
-    now = time.time()
-    last_key = f"last_{kind}"
-    pane_state["status"] = status
-    state[pane_id] = pane_state
-    save_state(state)
+    with lock_state():
+        state = load_state()
+        if event == "pane.closed":
+            if state.pop(pane_id, None) is not None:
+                save_state(state)
+            return
+        if not status:
+            return
 
-    if kind not in KINDS:
-        return
-    if now - float(pane_state.get(last_key, 0)) < 10:
-        return
+        pane_state = state.get(pane_id, {})
+        prev = pane_state.get("status")
+        kind = "done" if prev == "working" and status == "idle" else status
+        now = time.time()
+        last_key = f"last_{kind}"
+        should_notify = kind in KINDS and now - float(pane_state.get(last_key, 0)) >= 10
+        pane_state["status"] = status
+        if should_notify:
+            pane_state[last_key] = now
+        state[pane_id] = pane_state
+        save_state(state)
 
-    pane_state[last_key] = now
-    save_state(state)
-    notify_for(pane_id, kind)
+    if should_notify:
+        notify_for(pane_id, kind)
+
+
+def prune_state():
+    with lock_state():
+        current = panes()
+        if not current:
+            return
+        live = {pane.get("pane_id") for pane in current}
+        state = load_state()
+        pruned = {pane_id: value for pane_id, value in state.items() if pane_id in live}
+        if pruned != state:
+            save_state(pruned)
 
 
 def test():
@@ -159,6 +222,8 @@ def main():
         wait_notification(sys.argv[2], sys.argv[3])
     elif sys.argv[1:2] == ["--test"]:
         test()
+    elif sys.argv[1:2] == ["--prune"]:
+        prune_state()
     else:
         handle_event()
 

@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   xdg.mimeApps =
@@ -47,6 +47,8 @@
         "application/x-bittorrent" = "org.qbittorrent.qBittorrent.desktop";
         "x-scheme-handler/magnet" = "org.qbittorrent.qBittorrent.desktop";
         "x-scheme-handler/discord" = "vesktop.desktop";
+        "x-scheme-handler/mailto" = "mailspring.desktop";
+        "x-scheme-handler/mailspring" = "mailspring.desktop";
         "inode/directory" = "org.kde.dolphin.desktop";
         "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
       };
@@ -62,6 +64,39 @@
     exec = "ghostty --class=ghostty.nvim -e nvim %F";
     terminal = false;
     mimeType = [ "text/plain" "text/english" "text/x-makefile" "text/x-c++src" "text/x-csrc" "text/x-java" "text/x-tex" "application/x-shellscript" "text/x-c" "text/x-c++" ];
+  };
+
+  xdg.desktopEntries.mailspring = {
+    name = "Mailspring";
+    genericName = "Email Client";
+    exec = "${pkgs.mailspring}/bin/mailspring --password-store=gnome-libsecret %U";
+    icon = "mailspring";
+    terminal = false;
+    categories = [ "Network" "Email" ];
+    mimeType = [ "x-scheme-handler/mailto" "x-scheme-handler/mailspring" ];
+  };
+
+  xdg.desktopEntries.Zoom = {
+    name = "Zoom Workplace";
+    comment = "Zoom Video Conference";
+    exec = "env QT_QPA_PLATFORM=wayland ${pkgs.zoom-us}/bin/zoom %U";
+    icon = "Zoom";
+    terminal = false;
+    categories = [ "Network" ];
+    mimeType = [
+      "x-scheme-handler/zoommtg"
+      "x-scheme-handler/zoomus"
+      "x-scheme-handler/tel"
+      "x-scheme-handler/callto"
+      "x-scheme-handler/zoomphonecall"
+      "x-scheme-handler/zoomphonesms"
+      "x-scheme-handler/zoomcontactcentercall"
+      "application/x-zoom"
+    ];
+    settings = {
+      StartupWMClass = "zoom";
+      X-KDE-Protocols = "zoommtg;zoomus;tel;callto;zoomphonecall;zoomphonesms;zoomcontactcentercall;";
+    };
   };
 
   xdg.desktopEntries.claude-code-url-handler = {

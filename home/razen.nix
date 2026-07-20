@@ -130,8 +130,6 @@ in
     systemd.enable = true;
   };
 
-  systemd.user.services.dcal.Service.ExecStart = lib.mkForce "${lib.getExe config.programs.dank-calendar.package} daemon";
-
   programs.git.enable = true;
 
   programs.fish = {
@@ -217,7 +215,6 @@ in
   home.file = {
     ".gitconfig".source = link "home/files/.gitconfig";
     ".editorconfig".source = link "home/files/.editorconfig";
-    ".npmrc".source = link "home/files/.npmrc";
     ".rgignore".source = link "home/files/.rgignore";
     ".gitignore_global".source = link "home/files/.gitignore_global";
     ".gitattributes_global".source = link "home/files/.gitattributes_global";

@@ -1,9 +1,12 @@
 id = "razen.focus-notify"
 name = "Agent Events"
-version = "0.1.0"
+version = "0.1.3"
 min_herdr_version = "0.7.0"
 description = "Refresh workspace metadata and send clickable agent notifications."
 platforms = ["linux"]
+
+[[startup]]
+command = ["python3", "focus_notify.py", "--prune"]
 
 [[events]]
 on = "pane.agent_status_changed"
@@ -16,6 +19,10 @@ command = ["python3", "focus_notify.py"]
 [[events]]
 on = "pane.focused"
 command = ["ai-workspace", "--refresh-event"]
+
+[[events]]
+on = "pane.closed"
+command = ["python3", "focus_notify.py"]
 
 [[actions]]
 id = "test"

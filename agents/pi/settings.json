@@ -1,6 +1,8 @@
 {
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "high",
-  "defaultProjectTrust": "ask",
+  "defaultProjectTrust": "always",
   "enabledModels": [
     "openai-codex/*",
     "opencode-go/glm-5.2",

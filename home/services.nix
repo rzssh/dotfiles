@@ -21,6 +21,19 @@ in
 
   systemd.user.services = {
     polkit-kde-agent = graphical "KDE polkit authentication agent" "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1";
+    plasma-kactivitymanagerd = {
+      Unit = {
+        Description = "KDE activity manager";
+        Before = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.kdePackages.kactivitymanagerd}/libexec/kactivitymanagerd";
+        Restart = "on-failure";
+        RestartSec = 2;
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
     hyprwhspr = graphical "hyprwhspr speech-to-text daemon" "${localPkgs.hyprwhspr}/bin/hyprwhspr";
     qmk-hid-host = graphical "QMK/ZMK raw HID status widget host" "${localPkgs.qmk-hid-host}/bin/qmk-hid-host -c ${config.xdg.configHome}/qmk-hid-host/config.json";
     wl-clip-persist = graphical "Keep clipboard contents after the source window closes" "${pkgs.wl-clip-persist}/bin/wl-clip-persist --clipboard regular --all-mime-type-regex '(?i)^(?!(?:image|audio|video|font|model)/).+'";

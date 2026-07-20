@@ -13,6 +13,8 @@ let
   localPkgs = import ../pkgs { inherit pkgs inputs; };
   system = pkgs.stdenv.hostPlatform.system;
   herdr = inputs.herdr.packages.${system}.default;
+  treehouse = inputs.treehouse.packages.${system}.default;
+  crit = inputs.crit.packages.${system}.default;
   hermes = pkgs.callPackage "${inputs.hermes-agent}/nix/hermes-agent.nix" {
     inherit (inputs.hermes-agent.inputs) uv2nix pyproject-nix pyproject-build-systems;
     npm-lockfile-fix = inputs.hermes-agent.inputs.npm-lockfile-fix.packages.${system}.default;
@@ -129,16 +131,38 @@ let
       else if name == "claude" then
         ''
           profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
+          permission_args=(--dangerously-skip-permissions)
+          for arg in "$@"; do
+            if [ "$arg" = --dangerously-skip-permissions ]; then
+              permission_args=()
+              break
+            fi
+          done
+          exec ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "''${permission_args[@]}" "$@"
+        ''
+      else if name == "codex" then
+        ''
+          profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
+          permission_args=(--dangerously-bypass-approvals-and-sandbox)
+          for arg in "$@"; do
+            if [ "$arg" = --dangerously-bypass-approvals-and-sandbox ]; then
+              permission_args=()
+              break
+            fi
+          done
           ${releaseAgent name}
-          ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "$@"
+          ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "''${permission_args[@]}" "$@"
+        ''
+      else if name == "opencode" then
+        ''
+          profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
+          export OPENCODE_CONFIG_CONTENT='{"permission":{"*":"allow"}}'
+          exec ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "$@"
         ''
       else
         ''
           profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
-          ${lib.optionalString (name == "codex") (releaseAgent name)}
-          ${
-            lib.optionalString (name != "codex") "exec "
-          }${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "$@"
+          exec ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "$@"
         ''
     )
   ) clients;
@@ -158,18 +182,29 @@ in
     AI_DEFAULT_PROFILE = "personal";
     CAVEMAN_DEFAULT_MODE = "off";
     OPENSPEC_TELEMETRY = "0";
+    NO_MISTAKES_TELEMETRY = "0";
+    NO_MISTAKES_NO_UPDATE_CHECK = "1";
     PONYTAIL_DEFAULT_MODE = "off";
+    QUOTA_AXI_CODEX_BINARY = "${config.home.homeDirectory}/.local/bin/codex";
     SEARXNG_URL = "http://127.0.0.1:8888";
   };
 
   home.packages = [
     localPkgs.babysitter
+    localPkgs.chrome-devtools-axi
+    localPkgs.gh-axi
+    localPkgs.lavish-axi
     localPkgs.llama-cpp-cuda
+    localPkgs.no-mistakes
+    localPkgs.quota-axi
+    localPkgs.tasks-axi
+    crit
     openspec
     pkgs.opencode
     pkgs.socat
     hermes
     herdr
+    treehouse
   ];
 
   sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
@@ -180,6 +215,7 @@ in
     ".local/bin/pi".source = wrappers.pi;
     ".local/bin/ai-workspace".source = link "bin/ai-workspace";
     ".local/bin/ai-workspace-picker".source = link "bin/ai-workspace-picker";
+    ".local/bin/firstmate".source = link "bin/firstmate";
     ".claude/CLAUDE.md".source = link "agents/AGENTS.md";
     ".codex/AGENTS.md".source = link "agents/AGENTS.md";
     ".pi/agent/AGENTS.md".source = link "agents/AGENTS.md";
@@ -188,12 +224,12 @@ in
     ".config/opencode/AGENTS.md".source = link "agents/AGENTS.md";
     ".config/opencode/plugins/profile-protection.js".source =
       link "agents/opencode/plugins/profile-protection.js";
+    ".agents/skills/capture-knowledge".source = link "agents/skills/capture-knowledge";
     ".agents/skills/delegate-work".source = link "agents/skills/delegate-work";
     ".agents/skills/herdr-agent-comms".source = link "agents/skills/herdr-agent-comms";
-    ".agents/skills/herdr/SKILL.md".source = "${inputs.herdr}/SKILL.md";
     ".claude/skills/delegate-work".source = link "agents/skills/delegate-work";
     ".claude/skills/herdr-agent-comms".source = link "agents/skills/herdr-agent-comms";
-    ".claude/skills/herdr/SKILL.md".source = "${inputs.herdr}/SKILL.md";
+    ".claude/skills/capture-knowledge".source = link "agents/skills/capture-knowledge";
   };
 
   home.activation.agentProfiles = lib.hm.dag.entryAfter [ "linkGeneration" "sops-nix" ] ''
@@ -279,9 +315,9 @@ in
 
       if [ "$profile" != personal ]; then
         managed_link "${dots}/agents/AGENTS.md" "$claude/CLAUDE.md"
+        managed_link "${dots}/agents/skills/capture-knowledge" "$claude/skills/capture-knowledge"
         managed_link "${dots}/agents/skills/delegate-work" "$claude/skills/delegate-work"
         managed_link "${dots}/agents/skills/herdr-agent-comms" "$claude/skills/herdr-agent-comms"
-        managed_link "${inputs.herdr}/SKILL.md" "$claude/skills/herdr/SKILL.md"
         managed_link "${dots}/agents/AGENTS.md" "$codex/AGENTS.md"
         managed_link "${dots}/agents/AGENTS.md" "$pi/AGENTS.md"
         managed_link "${dots}/agents/pi/extensions/web.ts" "$pi/extensions/web.ts"
@@ -303,5 +339,29 @@ in
       ${aiRun} ${homeArgs clients.opencode} "$profile" -- ${herdr}/bin/herdr integration install opencode >/dev/null
       ${aiRun} ${homeArgs clients.hermes} "$profile" -- ${herdr}/bin/herdr integration install hermes >/dev/null
     done
+  '';
+
+  home.activation.noMistakesDaemon = lib.hm.dag.entryAfter [ "agentProfiles" ] ''
+    export NO_MISTAKES_TELEMETRY=0
+    export NO_MISTAKES_NO_UPDATE_CHECK=1
+    export PATH="$HOME/.local/share/ai/bin:$HOME/.local/bin:${
+      lib.makeBinPath [
+        localPkgs.chrome-devtools-axi
+        localPkgs.gh-axi
+        localPkgs.lavish-axi
+        localPkgs.no-mistakes
+        localPkgs.quota-axi
+        localPkgs.tasks-axi
+        pkgs.gh
+        pkgs.git
+        pkgs.nodejs_24
+        crit
+        herdr
+        treehouse
+      ]
+    }:/run/current-system/sw/bin:$HOME/.nix-profile/bin:$PATH"
+    if ! ${lib.getExe localPkgs.no-mistakes} daemon start >/dev/null; then
+      ${lib.getExe localPkgs.no-mistakes} daemon status >/dev/null
+    fi
   '';
 }

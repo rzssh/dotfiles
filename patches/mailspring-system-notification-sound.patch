@@ -1,0 +1,26 @@
+diff --git a/app/src/browser/notification-ipc.ts b/app/src/browser/notification-ipc.ts
+index c9efadc..486574d 100644
+--- a/app/src/browser/notification-ipc.ts
++++ b/app/src/browser/notification-ipc.ts
+@@ -111,7 +111,7 @@ const displayNotification = (
+     title: options.title,
+     body: options.subtitle || options.body,
+     icon: validatedIconPath ? nativeImage.createFromPath(validatedIconPath) : undefined,
+-    silent: true, // App handles sounds separately via SoundRegistry
++    silent: global.application.config.get('core.notifications.sounds') !== false,
+   };
+
+   // macOS-specific options
+diff --git a/app/src/config-schema.ts b/app/src/config-schema.ts
+index bdc8a07..2253e80 100644
+--- a/app/src/config-schema.ts
++++ b/app/src/config-schema.ts
+@@ -352,7 +352,7 @@ export const configSchema = {
+           },
+           sounds: {
+             type: 'boolean',
+-            default: true,
++            default: false,
+             title: localized('Play sound when receiving new mail'),
+           },
+           unsnoozeToTop: {

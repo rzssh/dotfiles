@@ -1,6 +1,14 @@
 { pkgs, vars, ... }:
 
 {
+  nixpkgs.overlays = [
+    (_: previous: {
+      mailspring = previous.mailspring.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ../../patches/mailspring-system-notification-sound.patch ];
+      });
+    })
+  ];
+
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;

@@ -14,6 +14,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    treehouse = {
+      url = "github:kunchenguid/treehouse/v2.0.1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    crit = {
+      url = "github:tomasz-tomczyk/crit/v0.18.1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs";

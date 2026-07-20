@@ -47,6 +47,27 @@
         "type": "github"
       }
     },
+    "crit": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784295983,
+        "narHash": "sha256-7mvSuODYWxAhrjKMPbSt8n5jBHoB8xoG+amIT9vS9n8=",
+        "owner": "tomasz-tomczyk",
+        "repo": "crit",
+        "rev": "ffa3b822fe6a1f6e5a38664765fbe472b4b4f861",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tomasz-tomczyk",
+        "ref": "v0.18.1",
+        "repo": "crit",
+        "type": "github"
+      }
+    },
     "dank-calendar": {
       "inputs": {
         "dank-qml-common": "dank-qml-common",
@@ -627,6 +648,7 @@
     },
     "root": {
       "inputs": {
+        "crit": "crit",
         "dank-calendar": "dank-calendar",
         "dms": "dms",
         "dms-plugins": "dms-plugins",
@@ -643,6 +665,7 @@
         "openspec": "openspec",
         "pi-coding-agent-src": "pi-coding-agent-src",
         "sops-nix": "sops-nix",
+        "treehouse": "treehouse",
         "zen-browser": "zen-browser"
       }
     },
@@ -705,6 +728,27 @@
       "original": {
         "owner": "Mic92",
         "repo": "sops-nix",
+        "type": "github"
+      }
+    },
+    "treehouse": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784499851,
+        "narHash": "sha256-X/zRvpjSyEJ8/rkP+2a3y2q4XBDco+2ERh+EGQ7xP4w=",
+        "owner": "kunchenguid",
+        "repo": "treehouse",
+        "rev": "5b8ecdec49034fe6861d63b8ea331490bb14c946",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kunchenguid",
+        "ref": "v2.0.1",
+        "repo": "treehouse",
         "type": "github"
       }
     },
