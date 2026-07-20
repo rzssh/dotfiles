@@ -1,13 +1,21 @@
 id = "razen.focus-notify"
-name = "Focus Notify"
+name = "Agent Events"
 version = "0.1.0"
 min_herdr_version = "0.7.0"
-description = "Clickable desktop notifications for Herdr agent status changes."
+description = "Refresh workspace metadata and send clickable agent notifications."
 platforms = ["linux"]
 
 [[events]]
 on = "pane.agent_status_changed"
+command = ["ai-workspace", "--refresh-event"]
+
+[[events]]
+on = "pane.agent_status_changed"
 command = ["python3", "focus_notify.py"]
+
+[[events]]
+on = "pane.focused"
+command = ["ai-workspace", "--refresh-event"]
 
 [[actions]]
 id = "test"

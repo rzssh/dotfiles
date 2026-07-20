@@ -53,6 +53,51 @@ workspace_path() {
     fi
 }
 
+default_push_remote() {
+    local cwd=$1
+    local branch=$2
+    local remote
+    local remotes=()
+    if command -v jj >/dev/null && jj -R "$cwd" root >/dev/null 2>&1; then
+        if remote=$(jj -R "$cwd" config get git.push 2>/dev/null) && [[ -n $remote ]]; then
+            printf '%s\n' "$remote"
+            return 0
+        fi
+    fi
+    for key in "branch.$branch.pushRemote" remote.pushDefault "branch.$branch.remote"; do
+        if remote=$(git -C "$cwd" config --get "$key" 2>/dev/null) && [[ -n $remote && $remote != . ]]; then
+            printf '%s\n' "$remote"
+            return 0
+        fi
+    done
+    mapfile -t remotes < <(git -C "$cwd" remote 2>/dev/null)
+    if (( ${#remotes[@]} == 1 )); then
+        printf '%s\n' "${remotes[0]}"
+    else
+        for remote in "${remotes[@]}"; do
+            if [[ $remote == origin ]]; then
+                printf 'origin\n'
+                return 0
+            fi
+        done
+        return 1
+    fi
+}
+
+ensure_git_upstream() {
+    local cwd=$1
+    local branch
+    local remote
+    branch=$(git -C "$cwd" branch --show-current 2>/dev/null) || return 0
+    [[ -n $branch ]] || return 0
+    git -C "$cwd" rev-parse --verify --quiet '@{upstream}' >/dev/null && return 0
+    if remote=$(default_push_remote "$cwd" "$branch") &&
+        git -C "$cwd" show-ref --verify --quiet "refs/remotes/$remote/$branch"; then
+        git -C "$cwd" branch --set-upstream-to="$remote/$branch" -- "$branch" >/dev/null 2>&1 || true
+    fi
+    return 0
+}
+
 set_profile() {
     local workspace_id=$1
     local profile=$2
@@ -70,28 +115,26 @@ set_profile() {
 vcs_state() {
     local output
     if command -v jj >/dev/null && output=$(jj -R "$1" diff --summary 2>/dev/null); then
-        if [[ -z $output ]]; then
-            printf 'clean\n'
-        else
+        if [[ -n $output ]]; then
             awk 'NF { changed++ } END { printf "~%d\n", changed }' <<< "$output"
         fi
     elif output=$(git -C "$1" status --porcelain=v1 --untracked-files=normal 2>/dev/null); then
-        if [[ -z $output ]]; then
-            printf 'clean\n'
-            return
-        fi
-        awk '
+        if [[ -n $output ]]; then
+            awk '
             substr($0, 1, 2) == "??" { untracked++; next }
+            substr($0, 1, 2) ~ /^(DD|AU|UD|UA|DU|AA|UU)$/ { conflicted++; next }
             substr($0, 1, 1) != " " { staged++ }
             substr($0, 2, 1) != " " { changed++ }
             END {
                 separator = ""
+                if (conflicted) { printf "!%d", conflicted; separator = " " }
                 if (staged) { printf "+%d", staged; separator = " " }
                 if (changed) { printf "%s~%d", separator, changed; separator = " " }
                 if (untracked) { printf "%s?%d", separator, untracked }
                 printf "\n"
             }
-        ' <<< "$output"
+            ' <<< "$output"
+        fi
     else
         return 1
     fi
@@ -112,17 +155,20 @@ refresh_metadata() {
     if [[ $label != "$desired" ]]; then
         clean_profile_environment herdr workspace rename "$workspace_id" "$desired" >/dev/null
     fi
+    ensure_git_upstream "$cwd"
+    local metadata=(--source ai-workspace --token "workspace_path=$path")
     if state=$(vcs_state "$cwd"); then
-        clean_profile_environment herdr workspace report-metadata "$workspace_id" \
-            --source ai-workspace \
-            --token "workspace_path=$path" \
-            --token "vcs_state=$state" >/dev/null
+        metadata+=(--clear-token no_vcs)
+        if [[ -n $state ]]; then
+            metadata+=(--token "vcs_state=$state")
+        else
+            metadata+=(--clear-token vcs_state)
+        fi
     else
-        clean_profile_environment herdr workspace report-metadata "$workspace_id" \
-            --source ai-workspace \
-            --token "workspace_path=$path" \
-            --clear-token vcs_state >/dev/null
+        metadata+=(--clear-token vcs_state --token "no_vcs=—")
     fi
+    clean_profile_environment herdr workspace report-metadata "$workspace_id" \
+        "${metadata[@]}" >/dev/null
 }
 
 find_workspace() {
@@ -180,6 +226,20 @@ if [[ ${1:-} == --refresh-metadata ]]; then
     fi
     cwd=$(resolve_cwd "${3:-$PWD}")
     refresh_metadata "$workspace_id" "$cwd"
+    exit 0
+fi
+
+if [[ ${1:-} == --refresh-event ]]; then
+    workspace_id=${HERDR_WORKSPACE_ID:-}
+    if [[ ! $workspace_id =~ $workspace_re ]]; then
+        exit 0
+    fi
+    context=${HERDR_PLUGIN_CONTEXT_JSON:-}
+    [[ -n $context ]] || exit 0
+    cwd=$(jq -er '.focused_pane_cwd // .workspace_cwd // empty' \
+        <<< "$context" 2>/dev/null) || exit 0
+    [[ -d $cwd ]] || exit 0
+    refresh_metadata "$workspace_id" "$(realpath -- "$cwd")"
     exit 0
 fi
 
