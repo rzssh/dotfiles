@@ -116,18 +116,21 @@ let
   wrappers = lib.mapAttrs (
     name: client:
     pkgs.writeShellScript "ai-${name}" (
-      if name == "claude" then
+      if name == "pi" then
+        ''
+          profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
+          protection="${dots}/agents/pi/extensions/profile-protection.ts"
+          protection_args=(--extension "$protection")
+          case "''${1:-}" in
+            install|remove|uninstall|update|list|config) protection_args=() ;;
+          esac
+          exec ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "''${protection_args[@]}" "$@"
+        ''
+      else if name == "claude" then
         ''
           profile="''${AI_PROFILE:-''${AI_DEFAULT_PROFILE:-personal}}"
           ${releaseAgent name}
-          scrub=(--set CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1)
-          for argument in "$@"; do
-            if [ "$argument" = --dangerously-skip-permissions ]; then
-              scrub=()
-              break
-            fi
-          done
-          ${aiRun} ${clientArgs client} "''${scrub[@]}" "$profile" -- ${client.executable} "$@"
+          ${aiRun} ${clientArgs client} "$profile" -- ${client.executable} "$@"
         ''
       else
         ''
@@ -161,10 +164,10 @@ in
 
   home.packages = [
     localPkgs.babysitter
-    localPkgs.pi-coding-agent
     localPkgs.llama-cpp-cuda
     openspec
     pkgs.opencode
+    pkgs.socat
     hermes
     herdr
   ];
@@ -174,14 +177,13 @@ in
 
   home.file = wrapperFiles // {
     ".local/bin/ai-run".source = link "bin/ai-run";
+    ".local/bin/pi".source = wrappers.pi;
     ".local/bin/ai-workspace".source = link "bin/ai-workspace";
     ".local/bin/ai-workspace-picker".source = link "bin/ai-workspace-picker";
     ".claude/CLAUDE.md".source = link "agents/AGENTS.md";
     ".codex/AGENTS.md".source = link "agents/AGENTS.md";
     ".pi/agent/AGENTS.md".source = link "agents/AGENTS.md";
     ".pi/agent/extensions/web.ts".source = link "agents/pi/extensions/web.ts";
-    ".pi/agent/extensions/workspace-sandbox.ts".source =
-      link "agents/pi/extensions/workspace-sandbox.ts";
     ".pi/agent/lib/web.ts".source = link "agents/pi/lib/web.ts";
     ".config/opencode/AGENTS.md".source = link "agents/AGENTS.md";
     ".config/opencode/plugins/profile-protection.js".source =
@@ -283,12 +285,13 @@ in
         managed_link "${dots}/agents/AGENTS.md" "$codex/AGENTS.md"
         managed_link "${dots}/agents/AGENTS.md" "$pi/AGENTS.md"
         managed_link "${dots}/agents/pi/extensions/web.ts" "$pi/extensions/web.ts"
-        managed_link "${dots}/agents/pi/extensions/workspace-sandbox.ts" "$pi/extensions/workspace-sandbox.ts"
         managed_link "${dots}/agents/pi/lib/web.ts" "$pi/lib/web.ts"
         managed_link "${dots}/agents/AGENTS.md" "$opencode/AGENTS.md"
         managed_link "${dots}/agents/opencode/plugins/profile-protection.js" "$opencode/plugins/profile-protection.js"
         managed_link "${dots}/config/gh/config.yml" "$gh/config.yml"
       fi
+
+      ${pkgs.coreutils}/bin/rm -f "$pi/extensions/profile-protection.ts" "$pi/extensions/workspace-sandbox.ts"
 
       json_overlay "${dots}/agents/claude/settings.json" "$claude/settings.json"
       json_overlay "${dots}/agents/pi/settings.json" "$pi/settings.json"

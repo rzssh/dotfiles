@@ -3,11 +3,32 @@ set -euo pipefail
 
 [[ ${1:-} =~ ^[1-9]$ ]] || exit 2
 
-workspace_id=$("$HERDR_BIN_PATH" workspace list | jq -r --argjson number "$1" '.result.workspaces[] | select(.number == $number) | .workspace_id')
+herdr=${HERDR_BIN_PATH:-herdr}
+profile_suffix_re='^.* \| \[([A-Za-z0-9][A-Za-z0-9._-]*)\]$'
+workspaces=$("$herdr" workspace list)
+workspace_id=$(jq -r --argjson number "$1" '.result.workspaces[] | select(.number == $number) | .workspace_id' <<< "$workspaces")
 [[ -n "$workspace_id" && "$workspace_id" != "$HERDR_ACTIVE_WORKSPACE_ID" ]] || exit 0
 
-tab=$("$HERDR_BIN_PATH" tab get "$HERDR_ACTIVE_TAB_ID")
-layout=$("$HERDR_BIN_PATH" pane layout --pane "$HERDR_ACTIVE_PANE_ID")
+workspace_profile() {
+  local label
+  label=$(jq -r --arg id "$1" '.result.workspaces[] | select(.workspace_id == $id) | .label' <<< "$workspaces")
+  if [[ $label =~ $profile_suffix_re ]]; then
+    printf '%s\n' "${BASH_REMATCH[1]}"
+  else
+    printf '%s\n' "${AI_DEFAULT_PROFILE:-personal}"
+  fi
+}
+
+source_profile=$(workspace_profile "$HERDR_ACTIVE_WORKSPACE_ID")
+target_profile=$(workspace_profile "$workspace_id")
+if [[ $source_profile != "$target_profile" ]]; then
+  "$herdr" notification show "AI environment mismatch" \
+    --body "$source_profile -> $target_profile. Move continues; running processes keep $source_profile, new shells use $target_profile." \
+    --sound request >/dev/null || true
+fi
+
+tab=$("$herdr" tab get "$HERDR_ACTIVE_TAB_ID")
+layout=$("$herdr" pane layout --pane "$HERDR_ACTIVE_PANE_ID")
 label=$(jq -r '.result.tab.label' <<<"$tab")
 focused_pane=$(jq -r '.result.layout.focused_pane_id' <<<"$layout")
 split=$(jq -r '.result.layout.splits[0].direction // "right"' <<<"$layout")
@@ -17,7 +38,7 @@ mapfile -t panes < <(jq -r '.result.layout.panes[].pane_id' <<<"$layout")
 [[ ${#panes[@]} -gt 0 ]] || exit 1
 
 if [[ $zoomed == true ]]; then
-  "$HERDR_BIN_PATH" pane zoom --pane "$focused_pane" --off >/dev/null
+  "$herdr" pane zoom --pane "$focused_pane" --off >/dev/null
 fi
 
 focus=(--no-focus)
@@ -25,7 +46,7 @@ if [[ ${panes[0]} == "$focused_pane" ]]; then
   focus=(--focus)
 fi
 
-move=$("$HERDR_BIN_PATH" pane move "${panes[0]}" --new-tab --workspace "$workspace_id" --label "$label" "${focus[@]}")
+move=$("$herdr" pane move "${panes[0]}" --new-tab --workspace "$workspace_id" --label "$label" "${focus[@]}")
 jq -e '.result.move_result.changed == true' >/dev/null <<<"$move"
 target_tab=$(jq -r '.result.move_result.created_tab.tab_id' <<<"$move")
 target_pane=$(jq -r '.result.move_result.pane.pane_id' <<<"$move")
@@ -37,14 +58,14 @@ for ((i = ${#panes[@]} - 1; i >= 1; i--)); do
   if [[ ${panes[i]} == "$focused_pane" ]]; then
     focus=(--focus)
   fi
-  move=$("$HERDR_BIN_PATH" pane move "${panes[i]}" --tab "$target_tab" --target-pane "$target_pane" --split "$split" --ratio "$ratio" "${focus[@]}")
+  move=$("$herdr" pane move "${panes[i]}" --tab "$target_tab" --target-pane "$target_pane" --split "$split" --ratio "$ratio" "${focus[@]}")
   jq -e '.result.move_result.changed == true' >/dev/null <<<"$move"
   if [[ ${panes[i]} == "$focused_pane" ]]; then
     focused_target_pane=$(jq -r '.result.move_result.pane.pane_id' <<<"$move")
   fi
 done
 
-"$HERDR_BIN_PATH" tab focus "$target_tab" >/dev/null
+"$herdr" tab focus "$target_tab" >/dev/null
 if [[ $zoomed == true ]]; then
-  "$HERDR_BIN_PATH" pane zoom --pane "$focused_target_pane" --on >/dev/null
+  "$herdr" pane zoom --pane "$focused_target_pane" --on >/dev/null
 fi

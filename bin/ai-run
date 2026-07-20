@@ -48,13 +48,9 @@ SAFE_KEYS = {
     "XDG_STATE_HOME",
 }
 SAFE_PREFIXES = ("HERDR_", "LC_", "NIX_")
-RUNTIME_KEYS = {
-    "AI_PROFILE",
-    "AI_PROFILE_KEYS",
+HOME_KEYS = {
     "CLAUDE_CONFIG_DIR",
     "CODEX_HOME",
-    "GH_CONFIG_DIR",
-    "GIT_CONFIG_GLOBAL",
     "HERMES_HOME",
     "OPENCODE_CONFIG_DIR",
     "PI_CODING_AGENT_DIR",
@@ -63,20 +59,20 @@ RUNTIME_KEYS = {
     "XDG_DATA_HOME",
     "XDG_STATE_HOME",
 }
-RESERVED_KEYS = SAFE_KEYS | RUNTIME_KEYS
-CLEAR_KEYS = {
-    "AI_PROFILE_KEYS",
-    "AI_PROFILE_LOADED",
+AGENT_HOME_KEYS = {
     "CLAUDE_CONFIG_DIR",
     "CODEX_HOME",
-    "GH_CONFIG_DIR",
-    "GIT_CONFIG_GLOBAL",
     "HERMES_HOME",
     "OPENCODE_CONFIG_DIR",
     "PI_CODING_AGENT_DIR",
 }
-
-
+RUNTIME_KEYS = AGENT_HOME_KEYS | {
+    "AI_PROFILE",
+    "AI_PROFILE_KEYS",
+    "GH_CONFIG_DIR",
+    "GIT_CONFIG_GLOBAL",
+}
+RESERVED_KEYS = SAFE_KEYS | RUNTIME_KEYS
 def fail(message):
     print(f"ai-run: {message}", file=sys.stderr)
     raise SystemExit(2)
@@ -88,7 +84,7 @@ def parse_assignment(raw, option):
     key, value = raw.split("=", 1)
     if not KEY_RE.fullmatch(key):
         fail(f"invalid runtime key: {key}")
-    if key not in RUNTIME_KEYS and option != "--set":
+    if key not in HOME_KEYS and option != "--set":
         fail(f"unsupported home key: {key}")
     return key, value
 
@@ -102,9 +98,6 @@ def arguments():
             "[profile] -- command [args...]"
         )
         raise SystemExit(0)
-    if raw == ["--profile-keys"]:
-        return {"action": "profile-keys"}
-
     credentials = set()
     homes = []
     values = {}
@@ -137,8 +130,8 @@ def arguments():
                 homes.append(parse_assignment(item, option))
             else:
                 key, value = parse_assignment(item, option)
-                if key in SAFE_KEYS or key.startswith(SAFE_PREFIXES):
-                    fail(f"cannot override safe key: {key}")
+                if key in RESERVED_KEYS or key.startswith(SAFE_PREFIXES):
+                    fail(f"cannot override runtime key: {key}")
                 values[key] = value
             index += 2
             continue
@@ -256,19 +249,23 @@ def env_keys(path):
         if not line or line.startswith("#") or "=" not in line:
             continue
         key = line.split("=", 1)[0].strip()
-        if KEY_RE.fullmatch(key):
+        if (
+            KEY_RE.fullmatch(key)
+            and key not in RESERVED_KEYS
+            and not key.startswith(SAFE_PREFIXES)
+        ):
             keys.add(key)
     return keys
 
 
-def print_profile_keys(home):
+def profile_keys(home):
     root = profile_root(home)
-    keys = set(CLEAR_KEYS)
+    keys = set()
     if root.is_dir():
         for directory in root.iterdir():
             if directory.is_dir() and PROFILE_RE.fullmatch(directory.name):
                 keys.update(env_keys(directory / "env"))
-    print("\n".join(sorted(keys)))
+    return keys
 
 
 def common_paths(profile, directory, home):
@@ -310,11 +307,18 @@ def ensure_paths(paths, profile, home):
         path.mkdir(mode=0o700, parents=True, exist_ok=True)
 
 
-def clean_environment():
+def clean_environment(home):
+    keys = profile_keys(home)
+    keys.update(
+        key
+        for key in os.environ.get("AI_PROFILE_KEYS", "").split(",")
+        if KEY_RE.fullmatch(key) and key not in RESERVED_KEYS
+    )
     return {
         key: value
         for key, value in os.environ.items()
-        if key in SAFE_KEYS or key.startswith(SAFE_PREFIXES)
+        if key not in keys
+        and key not in RUNTIME_KEYS
     }
 
 
@@ -327,10 +331,6 @@ def write_workspace_environment(profile, paths):
 def main():
     home = Path(os.environ.get("HOME", "~")).expanduser()
     options = arguments()
-    if options["action"] == "profile-keys":
-        print_profile_keys(home)
-        return
-
     profile = options["profile"]
     directory = profile_root(home) / profile
     check_directory(directory)
@@ -349,7 +349,7 @@ def main():
         write_workspace_environment(profile, paths)
         return
 
-    environment = clean_environment()
+    environment = clean_environment(home)
     if options["all_credentials"]:
         environment.update(profile_env)
     else:

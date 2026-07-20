@@ -39,7 +39,6 @@ def current_profile(workspace):
         return os.environ.get("AI_PROFILE") or default
     env = os.environ.copy()
     env.pop("AI_PROFILE", None)
-    env.pop("AI_PROFILE_LOADED", None)
     env["HERDR_WORKSPACE_ID"] = workspace
     result = subprocess.run(
         ["ai-workspace", "--current-profile"],

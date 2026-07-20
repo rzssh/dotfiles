@@ -10,6 +10,8 @@ if test -d "/run/user/"(id -u)"/hypr"
     set -gx HYPRLAND_INSTANCE_SIGNATURE (ls -t /run/user/(id -u)/hypr/ 2>/dev/null | head -1)
 end
 
+fish_add_path --global --move "$HOME/.local/share/ai/bin" "$HOME/.local/bin"
+
 starship init fish | source
 zoxide init --cmd cd fish | source
 fx --comp fish | source

@@ -35,7 +35,6 @@ def jj_root(cwd):
 def workspace_profile(workspace):
     env = os.environ.copy()
     env.pop("AI_PROFILE", None)
-    env.pop("AI_PROFILE_LOADED", None)
     if workspace:
         env["HERDR_WORKSPACE_ID"] = workspace
     result = subprocess.run(

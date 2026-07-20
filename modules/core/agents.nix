@@ -5,33 +5,24 @@
     model = "gpt-5.6-sol"
     model_reasoning_effort = "max"
     plan_mode_reasoning_effort = "max"
-    default_permissions = "profile-protected"
+    default_permissions = "developer"
 
     [shell_environment_policy]
     inherit = "all"
-    ignore_default_excludes = false
-    exclude = ["*_API_KEY", "*_TOKEN", "*_SECRET", "AI_PROFILE_KEYS"]
+    ignore_default_excludes = true
+    exclude = ["OPENAI_API_KEY", "AI_PROFILE_KEYS"]
 
-    [permissions.profile-protected]
-    description = "Workspace access without profile or authentication files."
+    [permissions.developer]
+    description = "Read system, write projects, use network without prompts."
     extends = ":workspace"
 
-    [permissions.profile-protected.filesystem]
-    glob_scan_max_depth = 4
-    "~/.local/share/ai/profiles" = "deny"
-    "~/.config/sops" = "deny"
-    "~/.codex/auth.json" = "deny"
-    "~/.claude/.credentials.json" = "deny"
-    "~/.pi/agent/auth.json" = "deny"
-    "~/.hermes/auth.json" = "deny"
-    "~/.local/share/opencode/auth.json" = "deny"
-    "~/.config/gh/hosts.yml" = "deny"
-    "~/.git-credentials" = "deny"
-    "~/.netrc" = "deny"
+    [permissions.developer.filesystem]
+    ":root" = "read"
+    "~/projects" = "write"
+    "~/notes" = "write"
 
-    [permissions.profile-protected.filesystem.":workspace_roots"]
-    "**/*.env" = "deny"
-    "secrets" = "deny"
+    [permissions.developer.network]
+    enabled = true
   '';
 
   sops = {

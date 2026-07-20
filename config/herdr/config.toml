@@ -9,8 +9,8 @@ show_agent_labels_on_pane_borders = true
 
 [ui.sidebar.spaces]
 rows = [
-  ["state_icon", "$cwd", "$profile"],
-  ["$vcs_ref", "git_status"],
+  ["state_icon", "workspace"],
+  ["$vcs_ref", "git_status", "$vcs_state"],
 ]
 
 [ui.sidebar.agents]

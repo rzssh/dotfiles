@@ -86,8 +86,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "rzssh";
       repo = "tuxedo";
-      rev = "01bb3e614d3670c4c3f1a792c904ed8dc858c569";
-      hash = "sha256-UFjcrUa2db96CbySC+yTxzeJPtMigZYjnF3mWEjrfmY=";
+      rev = "46d0ce47b2a22a4298f47dbcac0a4036d1bc80e4";
+      hash = "sha256-KQraBkSV8cOb+BenptuytszGChyPTIPkTXi6qpzqns8=";
     };
     cargoLock.lockFile = "${src}/Cargo.lock";
     nativeCheckInputs = [ pkgs.writableTmpDirAsHomeHook ];

@@ -1,9 +1,6 @@
 if set -q HERDR_ENV
     set -l profile (ai-workspace --current-profile)
     if test $status -eq 0
-        for key in (ai-run --profile-keys)
-            set -e $key
-        end
         set -l workspace_env (ai-run --workspace-env "$profile" | string split0)
         for assignment in $workspace_env
             set -l pair (string split -m 1 = -- "$assignment")
@@ -12,7 +9,13 @@ if set -q HERDR_ENV
             end
         end
         if set -q HERDR_WORKSPACE_ID
-            ai-workspace --bind-profile "$HERDR_WORKSPACE_ID" "$profile" "$PWD"
+            ai-workspace --set-profile "$HERDR_WORKSPACE_ID" "$profile" "$PWD"
         end
+    end
+end
+
+function __ai_workspace_refresh --on-event fish_postexec
+    if set -q HERDR_ENV HERDR_WORKSPACE_ID
+        command ai-workspace --refresh-metadata "$HERDR_WORKSPACE_ID" "$PWD" >/dev/null 2>&1
     end
 end
