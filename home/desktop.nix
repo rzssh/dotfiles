@@ -1,5 +1,12 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  inputs,
+  ...
+}:
 
+let
+  helium = inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default;
+in
 {
   xdg.mimeApps =
     let
@@ -90,6 +97,19 @@
     mimeType = [
       "x-scheme-handler/mailto"
       "x-scheme-handler/mailspring"
+    ];
+  };
+
+  xdg.desktopEntries.whatsapp = {
+    name = "WhatsApp";
+    genericName = "Instant Messenger";
+    exec = "${helium}/bin/helium --no-first-run --user-data-dir=/home/razen/.local/share/webapps/whatsapp --app=https://web.whatsapp.com/";
+    icon = "whatsapp";
+    terminal = false;
+    categories = [
+      "Network"
+      "InstantMessaging"
+      "Chat"
     ];
   };
 

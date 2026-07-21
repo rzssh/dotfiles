@@ -252,7 +252,6 @@ in
 
     # gui apps
     mailspring
-    karere
     vesktop
     telegram-desktop
     slack
