@@ -1,4 +1,10 @@
-{ config, inputs, lib, vars, ... }:
+{
+  config,
+  inputs,
+  lib,
+  vars,
+  ...
+}:
 
 {
   imports = [ inputs.dms.nixosModules.greeter ];

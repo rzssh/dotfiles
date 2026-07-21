@@ -1,4 +1,10 @@
-{ config, pkgs, inputs, lib, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
 
 let
   dots = "/home/razen/projects/dotfiles";
@@ -201,15 +207,15 @@ in
   };
 
   xdg.configFile."vesktop-flags.conf".text = ''
---enable-features=VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder,WaylandWindowDecorations,UseOzonePlatform,WebRTCPipeWireCapturer
---ozone-platform=wayland
---enable-gpu-rasterization
---enable-zero-copy
---ignore-gpu-blocklist
---enable-hardware-overlays
---disable-gpu-driver-bug-workarounds
---use-gl=angle
---force-device-scale-factor=1.10
+    --enable-features=VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder,WaylandWindowDecorations,UseOzonePlatform,WebRTCPipeWireCapturer
+    --ozone-platform=wayland
+    --enable-gpu-rasterization
+    --enable-zero-copy
+    --ignore-gpu-blocklist
+    --enable-hardware-overlays
+    --disable-gpu-driver-bug-workarounds
+    --use-gl=angle
+    --force-device-scale-factor=1.10
   '';
 
   home.file = {
@@ -232,7 +238,8 @@ in
     ".local/bin/theme-telegram".source = link "bin/theme/telegram";
     ".local/bin/theme-icons".source = link "bin/theme/icons";
     ".local/bin/theme-vesktop".source = link "bin/theme/vesktop";
-    ".local/share/kio/servicemenus/admin-folder.desktop".source = link "home/files/kio/admin-folder.desktop";
+    ".local/share/kio/servicemenus/admin-folder.desktop".source =
+      link "home/files/kio/admin-folder.desktop";
     ".local/share/kio/servicemenus/print.desktop".source = link "home/files/kio/print.desktop";
   };
 }

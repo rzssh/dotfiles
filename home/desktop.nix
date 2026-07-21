@@ -63,7 +63,18 @@
     name = "Neovim";
     exec = "ghostty --class=ghostty.nvim -e nvim %F";
     terminal = false;
-    mimeType = [ "text/plain" "text/english" "text/x-makefile" "text/x-c++src" "text/x-csrc" "text/x-java" "text/x-tex" "application/x-shellscript" "text/x-c" "text/x-c++" ];
+    mimeType = [
+      "text/plain"
+      "text/english"
+      "text/x-makefile"
+      "text/x-c++src"
+      "text/x-csrc"
+      "text/x-java"
+      "text/x-tex"
+      "application/x-shellscript"
+      "text/x-c"
+      "text/x-c++"
+    ];
   };
 
   xdg.desktopEntries.mailspring = {
@@ -72,8 +83,14 @@
     exec = "${pkgs.mailspring}/bin/mailspring --password-store=gnome-libsecret %U";
     icon = "mailspring";
     terminal = false;
-    categories = [ "Network" "Email" ];
-    mimeType = [ "x-scheme-handler/mailto" "x-scheme-handler/mailspring" ];
+    categories = [
+      "Network"
+      "Email"
+    ];
+    mimeType = [
+      "x-scheme-handler/mailto"
+      "x-scheme-handler/mailspring"
+    ];
   };
 
   xdg.desktopEntries.Zoom = {
@@ -111,8 +128,15 @@
     exec = "Telegram -scale 110 -- %U";
     icon = "org.telegram.desktop";
     terminal = false;
-    categories = [ "Chat" "Network" "InstantMessaging" ];
-    mimeType = [ "x-scheme-handler/tg" "x-scheme-handler/tonsite" ];
+    categories = [
+      "Chat"
+      "Network"
+      "InstantMessaging"
+    ];
+    mimeType = [
+      "x-scheme-handler/tg"
+      "x-scheme-handler/tonsite"
+    ];
     settings.StartupWMClass = "TelegramDesktop";
   };
 
@@ -121,8 +145,19 @@
     exec = "env GDK_BACKEND=x11 WEBKIT_DISABLE_DMABUF_RENDERER=1 WEBKIT_DISABLE_COMPOSITING_MODE=1 __GLX_VENDOR_LIBRARY_NAME=mesa __EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink bambu-studio %U";
     icon = "BambuStudio";
     terminal = false;
-    categories = [ "Graphics" "3DGraphics" "Engineering" ];
-    mimeType = [ "model/stl" "model/3mf" "application/vnd.ms-3mfdocument" "application/prs.wavefront-obj" "application/x-amf" "x-scheme-handler/bambustudio" ];
+    categories = [
+      "Graphics"
+      "3DGraphics"
+      "Engineering"
+    ];
+    mimeType = [
+      "model/stl"
+      "model/3mf"
+      "application/vnd.ms-3mfdocument"
+      "application/prs.wavefront-obj"
+      "application/x-amf"
+      "x-scheme-handler/bambustudio"
+    ];
   };
 
   xdg.desktopEntries."org.freecad.FreeCAD" = {
@@ -130,7 +165,10 @@
     exec = "env QT_QPA_PLATFORM=xcb FreeCAD - --single-instance %F";
     icon = "org.freecad.FreeCAD";
     terminal = false;
-    categories = [ "Graphics" "Engineering" ];
+    categories = [
+      "Graphics"
+      "Engineering"
+    ];
     mimeType = [ "application/x-extension-fcstd" ];
   };
 

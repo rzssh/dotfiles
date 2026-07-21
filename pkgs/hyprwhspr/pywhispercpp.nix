@@ -18,78 +18,79 @@
 
 (buildPythonPackage.override {
   stdenv = if cudaSupport then cudaPackages.backendStdenv else stdenv;
-}) {
-  pname = "pywhispercpp";
-  version = "1.4.1";
-  pyproject = true;
+})
+  {
+    pname = "pywhispercpp";
+    version = "1.4.1";
+    pyproject = true;
 
-  src = fetchFromGitHub {
-    owner = "absadiki";
-    repo = "pywhispercpp";
-    tag = "v1.4.1";
-    fetchSubmodules = true;
-    hash = "sha256-8PhI6YDpJQ4F2M96ehG95C/SJ7ZbmyZ0KprgjWjQEzQ=";
-  };
+    src = fetchFromGitHub {
+      owner = "absadiki";
+      repo = "pywhispercpp";
+      tag = "v1.4.1";
+      fetchSubmodules = true;
+      hash = "sha256-8PhI6YDpJQ4F2M96ehG95C/SJ7ZbmyZ0KprgjWjQEzQ=";
+    };
 
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace-fail '"ninja",' "" \
-      --replace-fail '"cmake>=3.12",' "" \
-      --replace-fail '"repairwheel",' ""
-  '';
+    postPatch = ''
+      substituteInPlace pyproject.toml \
+        --replace-fail '"ninja",' "" \
+        --replace-fail '"cmake>=3.12",' "" \
+        --replace-fail '"repairwheel",' ""
+    '';
 
-  build-system = [
-    setuptools
-    setuptools-scm
-  ];
+    build-system = [
+      setuptools
+      setuptools-scm
+    ];
 
-  nativeBuildInputs = [
-    cmake
-  ]
-  ++ lib.optionals cudaSupport [
-    cudaPackages.cuda_nvcc
-    autoAddDriverRunpath
-  ];
+    nativeBuildInputs = [
+      cmake
+    ]
+    ++ lib.optionals cudaSupport [
+      cudaPackages.cuda_nvcc
+      autoAddDriverRunpath
+    ];
 
-  buildInputs = lib.optionals cudaSupport [
-    (cudaPackages.cccl or cudaPackages.cuda_cccl)
-    cudaPackages.cuda_cudart
-    cudaPackages.libcublas
-  ];
+    buildInputs = lib.optionals cudaSupport [
+      (cudaPackages.cccl or cudaPackages.cuda_cccl)
+      cudaPackages.cuda_cudart
+      cudaPackages.libcublas
+    ];
 
-  dependencies = [
-    numpy
-    requests
-    tqdm
-    platformdirs
-  ];
+    dependencies = [
+      numpy
+      requests
+      tqdm
+      platformdirs
+    ];
 
-  dontUseCmakeConfigure = true;
+    dontUseCmakeConfigure = true;
 
-  env = {
-    NO_REPAIR = "1";
-    SETUPTOOLS_SCM_PRETEND_VERSION = "1.4.1";
-    CMAKE_INSTALL_RPATH = "$ORIGIN";
-    CMAKE_BUILD_WITH_INSTALL_RPATH = "ON";
-    GGML_NATIVE = "OFF";
+    env = {
+      NO_REPAIR = "1";
+      SETUPTOOLS_SCM_PRETEND_VERSION = "1.4.1";
+      CMAKE_INSTALL_RPATH = "$ORIGIN";
+      CMAKE_BUILD_WITH_INSTALL_RPATH = "ON";
+      GGML_NATIVE = "OFF";
+    }
+    // lib.optionalAttrs cudaSupport {
+      GGML_CUDA = "1";
+      CMAKE_CUDA_ARCHITECTURES = lib.concatStringsSep ";" (
+        map (c: lib.replaceStrings [ "." ] [ "" ] c) cudaCapabilities
+      );
+    };
+
+    preBuild = ''
+      export CMAKE_BUILD_PARALLEL_LEVEL=$NIX_BUILD_CORES
+    '';
+
+    pythonImportsCheck = [ "pywhispercpp" ];
+
+    meta = {
+      description = "Python bindings for whisper.cpp";
+      homepage = "https://github.com/absadiki/pywhispercpp";
+      license = lib.licenses.mit;
+      platforms = lib.platforms.linux;
+    };
   }
-  // lib.optionalAttrs cudaSupport {
-    GGML_CUDA = "1";
-    CMAKE_CUDA_ARCHITECTURES = lib.concatStringsSep ";" (
-      map (c: lib.replaceStrings [ "." ] [ "" ] c) cudaCapabilities
-    );
-  };
-
-  preBuild = ''
-    export CMAKE_BUILD_PARALLEL_LEVEL=$NIX_BUILD_CORES
-  '';
-
-  pythonImportsCheck = [ "pywhispercpp" ];
-
-  meta = {
-    description = "Python bindings for whisper.cpp";
-    homepage = "https://github.com/absadiki/pywhispercpp";
-    license = lib.licenses.mit;
-    platforms = lib.platforms.linux;
-  };
-}

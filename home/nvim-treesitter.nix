@@ -18,15 +18,48 @@ let
   '';
   tsParsers = pkgs.symlinkJoin {
     name = "nvim-ts-parsers";
-    paths = (with ts.grammarPlugins; [
-      bash c cmake cpp css dockerfile fish gitignore go graphql haskell
-      html javascript jsdoc json kdl lua markdown markdown_inline prisma
-      odin query rust supercollider svelte tmux tsx typescript vim yaml zig
-    ]) ++ [ ghosttyParser ];
+    paths =
+      (with ts.grammarPlugins; [
+        bash
+        c
+        cmake
+        cpp
+        css
+        dockerfile
+        fish
+        gitignore
+        go
+        graphql
+        haskell
+        html
+        javascript
+        jsdoc
+        json
+        kdl
+        lua
+        markdown
+        markdown_inline
+        prisma
+        odin
+        query
+        rust
+        supercollider
+        svelte
+        tmux
+        tsx
+        typescript
+        vim
+        yaml
+        zig
+      ])
+      ++ [ ghosttyParser ];
   };
   tsQueries = pkgs.symlinkJoin {
     name = "nvim-ts-queries";
-    paths = [ "${ts}/runtime/queries" "${ghosttyGrammar}/queries" ];
+    paths = [
+      "${ts}/runtime/queries"
+      "${ghosttyGrammar}/queries"
+    ];
   };
 in
 {

@@ -44,7 +44,13 @@ rustPlatform.buildRustPackage {
 
   postInstall = ''
     wrapProgram $out/bin/qmk-hid-host \
-      --prefix PATH : ${lib.makeBinPath [ curl hyprland wireplumber ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          curl
+          hyprland
+          wireplumber
+        ]
+      }
   '';
 
   meta = {

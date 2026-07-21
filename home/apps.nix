@@ -1,4 +1,9 @@
-{ pkgs, inputs, lib, ... }:
+{
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
 
 let
   localPkgs = import ../pkgs { inherit pkgs inputs; };
@@ -51,14 +56,16 @@ let
     pref("general.config.obscure_value", 0);
     pref("general.config.sandbox_enabled", false);
   '';
-  zenUnwrapped = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.beta-unwrapped.overrideAttrs (old: {
-    postInstall = (old.postInstall or "") + ''
-      lib_dir="$out/lib/zen-bin-${old.version}"
-      chmod u+w "$lib_dir" "$lib_dir/defaults" "$lib_dir/defaults/pref"
-      install -Dm444 ${zenAutoConfigPrefs} "$lib_dir/defaults/pref/zen-tab-shortcuts-autoconfig.js"
-      install -Dm444 ${zenAutoConfig} "$lib_dir/zen-tab-shortcuts.cfg"
-    '';
-  });
+  zenUnwrapped =
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.beta-unwrapped.overrideAttrs
+      (old: {
+        postInstall = (old.postInstall or "") + ''
+          lib_dir="$out/lib/zen-bin-${old.version}"
+          chmod u+w "$lib_dir" "$lib_dir/defaults" "$lib_dir/defaults/pref"
+          install -Dm444 ${zenAutoConfigPrefs} "$lib_dir/defaults/pref/zen-tab-shortcuts-autoconfig.js"
+          install -Dm444 ${zenAutoConfig} "$lib_dir/zen-tab-shortcuts.cfg"
+        '';
+      });
   zen = pkgs.wrapFirefox zenUnwrapped {
     icon = "zen-browser";
     extraPolicies.ExtensionSettings.${vimiumId} = {
@@ -102,19 +109,19 @@ let
 in
 {
   home.activation.vimiumSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    for db in "$HOME"/.zen/*/storage-sync-v2.sqlite "$HOME"/.config/zen/*/storage-sync-v2.sqlite; do
-      [ -f "$db" ] || continue
-      ${pkgs.sqlite}/bin/sqlite3 "$db" <<'SQL'
-.timeout 5000
-INSERT INTO storage_sync_data (ext_id, data, sync_change_counter)
-VALUES ('${vimiumId}', '${vimiumSettingsJson}', 1)
-ON CONFLICT (ext_id) DO UPDATE SET
-  data = json_patch(COALESCE(storage_sync_data.data, '{}'), '${vimiumSettingsJson}'),
-  sync_change_counter = storage_sync_data.sync_change_counter + 1
-WHERE json_extract(storage_sync_data.data, '$.linkHintCharacters') IS NOT '${vimiumSettings.linkHintCharacters}'
-   OR json_extract(storage_sync_data.data, '$.ignoreKeyboardLayout') IS NOT 1;
-SQL
-    done
+        for db in "$HOME"/.zen/*/storage-sync-v2.sqlite "$HOME"/.config/zen/*/storage-sync-v2.sqlite; do
+          [ -f "$db" ] || continue
+          ${pkgs.sqlite}/bin/sqlite3 "$db" <<'SQL'
+    .timeout 5000
+    INSERT INTO storage_sync_data (ext_id, data, sync_change_counter)
+    VALUES ('${vimiumId}', '${vimiumSettingsJson}', 1)
+    ON CONFLICT (ext_id) DO UPDATE SET
+      data = json_patch(COALESCE(storage_sync_data.data, '{}'), '${vimiumSettingsJson}'),
+      sync_change_counter = storage_sync_data.sync_change_counter + 1
+    WHERE json_extract(storage_sync_data.data, '$.linkHintCharacters') IS NOT '${vimiumSettings.linkHintCharacters}'
+       OR json_extract(storage_sync_data.data, '$.ignoreKeyboardLayout') IS NOT 1;
+    SQL
+        done
   '';
 
   home.packages = with pkgs; [
