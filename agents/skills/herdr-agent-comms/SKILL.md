@@ -19,8 +19,8 @@ Worker uses `HERDR_PARENT_PANE_ID` as lead target. `delegate-work` injects it wi
 `HERDR_AGENT_ROLE=worker`. If either variable is absent, do not guess a parent. List agents and ask
 user only when multiple plausible targets remain.
 
-Lead keeps pane or terminal ID returned by `herdr agent start`. After context loss, list agents and
-match worker name prefix `worker-${HERDR_PANE_ID//[:]/-}`.
+Lead keeps `result.agent.pane_id` returned by `herdr agent start`. After context loss, list agents
+and match worker name prefix `worker-${HERDR_PANE_ID//[:]/-}`.
 
 ## Send safely
 
@@ -31,7 +31,7 @@ herdr agent get "$target"
 ```
 
 If target is `working`, wait for `idle`, `done`, or `blocked`. Do not type into an active prompt. When
-safe, submit one concise message with `herdr pane run "$target" "$message"`.
+safe, submit one concise message with `herdr agent prompt "$target" "$message"`.
 
 Use these message shapes:
 

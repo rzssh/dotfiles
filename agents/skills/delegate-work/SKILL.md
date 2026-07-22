@@ -35,8 +35,8 @@ Worker must stop and report when scope is wrong, dependency is missing, or accep
 
 Never start concurrent writers in the lead's working copy.
 
-- Git: use `herdr worktree create`, parse returned JSON, then start worker in returned workspace and
-  path.
+- Git: use `herdr worktree create`, then parse `result.workspace.workspace_id`,
+  `result.worktree.path`, and `result.root_pane.pane_id` from returned JSON.
 - JJ: use `jj workspace add` in a unique sibling path, create a Herdr workspace for that path, and
   parse returned JSON.
 - Re-read IDs after every mutation. Never invent Herdr IDs.
@@ -47,9 +47,10 @@ Preserve selected profile:
 profile=${AI_PROFILE:-personal}
 parent=${HERDR_PANE_ID:?}
 worker_name="worker-${parent//[:]/-}"
-herdr agent start "$worker_name" --cwd "$worker_path" --workspace "$workspace_id" --no-focus \
-  --env "AI_PROFILE=$profile" --env "HERDR_AGENT_ROLE=worker" --env "HERDR_PARENT_PANE_ID=$parent" -- \
-  pi
+printf -v worker_env 'export AI_PROFILE=%q HERDR_AGENT_ROLE=worker HERDR_PARENT_PANE_ID=%q' \
+  "$profile" "$parent"
+herdr pane run "$worker_pane" "$worker_env"
+herdr agent start "$worker_name" --kind pi --pane "$worker_pane"
 ```
 
 Use unique worker names when another worker exists. Follow the `herdr` skill for prompt submission,
