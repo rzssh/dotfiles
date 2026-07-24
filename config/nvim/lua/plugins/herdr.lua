@@ -33,11 +33,18 @@ return {
       desc = "Append file",
     },
     {
-      "<leader>HD",
+      "<leader>Hd",
       function()
         require("herdr.agent").append(require("herdr.context").diagnostics())
       end,
-      desc = "Append diagnostics",
+      desc = "Append buffer diagnostics",
+    },
+    {
+      "<leader>HD",
+      function()
+        require("herdr.agent").append(require("herdr.context").workspace_diagnostics())
+      end,
+      desc = "Append workspace diagnostics",
     },
     {
       "<leader>Hq",
@@ -45,20 +52,6 @@ return {
         require("herdr.agent").append(require("herdr.context").quickfix())
       end,
       desc = "Append quickfix",
-    },
-    {
-      "<leader>Ha",
-      function()
-        require("herdr.agent").focus()
-      end,
-      desc = "Focus agent",
-    },
-    {
-      "<leader>Hp",
-      function()
-        require("herdr.agent").select()
-      end,
-      desc = "Select agent",
     },
   },
 }
