@@ -226,6 +226,7 @@ in
     ".gitattributes_global".source = link "home/files/.gitattributes_global";
     ".dblab.yaml".source = link "home/files/.dblab.yaml";
     ".local/bin/wallpaper-state".source = link "bin/wallpaper-state";
+    ".local/bin/vault-folder".source = link "bin/vault-folder";
     ".local/bin/ns".source = link "bin/ns";
     ".local/bin/herdr-jj-workspace".source = link "bin/herdr-jj-workspace";
     ".local/bin/herdr-move-tab-workspace".source = link "bin/herdr-move-tab-workspace";
@@ -238,8 +239,8 @@ in
     ".local/bin/theme-telegram".source = link "bin/theme/telegram";
     ".local/bin/theme-icons".source = link "bin/theme/icons";
     ".local/bin/theme-vesktop".source = link "bin/theme/vesktop";
-    ".local/share/kio/servicemenus/admin-folder.desktop".source =
-      link "home/files/kio/admin-folder.desktop";
+    ".local/share/kio/servicemenus/encrypted-folder.desktop".source =
+      link "home/files/kio/encrypted-folder.desktop";
     ".local/share/kio/servicemenus/print.desktop".source = link "home/files/kio/print.desktop";
   };
 }

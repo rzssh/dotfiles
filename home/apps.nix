@@ -148,6 +148,9 @@ in
     localPkgs.figlet
     gdu
     gnupg
+    gocryptfs
+    attr
+    rsync
     unzip
     (p7zip.override { enableUnfree = true; })
     imagemagick
@@ -243,7 +246,7 @@ in
     # kde integration & thumbnails
     kdePackages.okular
     kdePackages.ark
-    kdePackages.kio-admin
+    kdePackages.kdialog
     kdePackages.kservice
     kdePackages.ffmpegthumbs
     kdePackages.kdegraphics-thumbnailers

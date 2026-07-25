@@ -1,0 +1,432 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vault_base="${XDG_DATA_HOME:-$HOME/.local/share}/vaults"
+vault_root="$vault_base/folders"
+attr_name="user.gocryptfs.cipher_dir"
+retired_attr_name="user.gocryptfs.retired_cipher_dir"
+
+notify() {
+    notify-send "Encrypted Folder" "$1" >/dev/null 2>&1 || true
+}
+
+die() {
+    kdialog --title "Encrypted Folder" --error "$1" >/dev/null 2>&1 || true
+    printf '%s\n' "$1" >&2
+    exit 1
+}
+
+cipher_for() {
+    local value resolved filesystem_type
+
+    if mountpoint -q "$folder"; then
+        filesystem_type=$(findmnt -n -o FSTYPE --target "$folder")
+        [[ "$filesystem_type" == fuse.gocryptfs ]] || return 1
+        value=$(findmnt -n -o SOURCE --target "$folder")
+    else
+        value=$(getfattr --only-values -n "$attr_name" "$folder" 2>/dev/null) || true
+    fi
+    [[ -n "$value" ]] || return 1
+
+    resolved=$(realpath -e -- "$value" 2>/dev/null) || return 1
+    case "$resolved" in
+        "$vault_base" | "$vault_base"/*) ;;
+        *) return 1 ;;
+    esac
+    [[ -f "$resolved/gocryptfs.conf" ]] || return 1
+    printf '%s\n' "$resolved"
+}
+
+retired_cipher_for() {
+    local value resolved
+
+    value=$(getfattr --only-values -n "$retired_attr_name" "$folder" 2>/dev/null) || return 1
+    resolved=$(realpath -e -- "$value" 2>/dev/null) || return 1
+    case "$resolved" in
+        "$vault_base"/*) ;;
+        *) return 1 ;;
+    esac
+    [[ -f "$resolved/gocryptfs.conf" ]] || return 1
+    printf '%s\n' "$resolved"
+}
+
+ensure_empty_mountpoint() {
+    local entry
+
+    entry=$(find "$folder" -mindepth 1 -maxdepth 1 -printf x -quit)
+    [[ -z "$entry" ]] || die "Locked mountpoint is not empty: $folder"
+}
+
+find_nested_mount() {
+    findmnt --submounts --target "$folder" -rn -o TARGET |
+        awk -v prefix="$folder/" 'index($0, prefix) == 1 { print; exit }'
+}
+
+unlock_folder() {
+    local cipher
+
+    if mountpoint -q "$folder"; then
+        return
+    fi
+    cipher=$(cipher_for) || die "Folder is not protected: $folder"
+    ensure_empty_mountpoint
+    chmod 700 "$folder"
+    if ! gocryptfs -q -extpass "$HOME/.local/bin/vault-folder password" -- "$cipher" "$folder"; then
+        die "Unlock canceled or failed: $folder"
+    fi
+    notify "Unlocked $folder"
+}
+
+lock_folder() {
+    if ! mountpoint -q "$folder"; then
+        notify "Already locked: $folder"
+        return
+    fi
+    if ! fusermount3 -u "$folder"; then
+        die "Folder is busy. Close files and Dolphin views, then retry."
+    fi
+    chmod 700 "$folder"
+    notify "Locked $folder"
+}
+
+protect_folder() {
+    local parent backup cipher stage password difference_count cutover completed nested_mount prompt reuse_retired retired_attr_removed
+    local -a sync_delete
+
+    mountpoint -q "$folder" && die "Folder is already mounted: $folder"
+    if cipher=$(cipher_for); then
+        die "Folder is already protected: $folder"
+    fi
+    reuse_retired=0
+    if cipher=$(retired_cipher_for); then
+        reuse_retired=1
+    fi
+
+    parent=$(dirname -- "$folder")
+    [[ -w "$folder" && -w "$parent" ]] || die "Folder and parent must be writable."
+    nested_mount=$(find_nested_mount)
+    [[ -z "$nested_mount" ]] || die "Folder contains another mounted filesystem: $nested_mount"
+    backup="$folder.plaintext-backup-$(date +%Y%m%d-%H%M%S)"
+    [[ ! -e "$backup" ]] || die "Backup path already exists: $backup"
+
+    if [[ "$reuse_retired" -eq 1 ]]; then
+        prompt="Encrypt $folder again using its retained vault? Current plaintext will replace the encrypted recovery contents. Close programs writing there first. A mode-000 plaintext backup remains after checksum verification."
+    else
+        prompt="Encrypt $folder? Close programs writing there first. Original remains as a mode-000 plaintext backup after checksum verification."
+    fi
+    if ! kdialog \
+        --title "Protect Folder" \
+        --warningcontinuecancel "$prompt" \
+        --continue-label "Protect" \
+        --cancel-label "Cancel"; then
+        return
+    fi
+
+    if [[ "$reuse_retired" -eq 1 ]]; then
+        password=$(kdialog --title "Protect Folder" --password "Vault password") || return
+    else
+        password=$(kdialog --title "Protect Folder" --newpassword "Choose vault password") || return
+    fi
+    [[ -n "$password" ]] || die "Password cannot be empty."
+
+    if [[ "$reuse_retired" -eq 0 ]]; then
+        install -d -m 700 "$vault_root"
+        cipher=$(mktemp -d "$vault_root/folder.XXXXXXXX")
+    fi
+    stage=$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/vault-folder.XXXXXXXX")
+    cutover=0
+    completed=0
+    retired_attr_removed=0
+    sync_delete=()
+
+    cleanup_protect() {
+        local status=$?
+
+        if [[ -n "${stage:-}" ]] && mountpoint -q "$stage"; then
+            fusermount3 -u "$stage" >/dev/null 2>&1 || true
+        fi
+        [[ -n "${stage:-}" ]] && rmdir "$stage" >/dev/null 2>&1 || true
+        if [[ "$cutover" -eq 1 ]] && ! mountpoint -q "$folder"; then
+            rmdir "$folder" >/dev/null 2>&1 || true
+            if [[ -d "$backup" && ! -e "$folder" ]]; then
+                chmod 700 "$backup" >/dev/null 2>&1 || true
+                mv "$backup" "$folder"
+            fi
+        fi
+        if
+            [[ "$reuse_retired" -eq 1 && "$retired_attr_removed" -eq 1 ]] &&
+                [[ -d "$folder" ]] &&
+                ! mountpoint -q "$folder"
+        then
+            setfattr -n "$retired_attr_name" -v "$cipher" "$folder" >/dev/null 2>&1 || true
+        fi
+        unset password
+        if [[ "$status" -ne 0 && "$completed" -eq 0 ]]; then
+            kdialog \
+                --title "Protect Folder" \
+                --error "Protection failed. Original folder remains or was restored. Encrypted working copy: $cipher" \
+                >/dev/null 2>&1 || true
+        fi
+    }
+    trap cleanup_protect EXIT
+
+    chmod 700 "$folder"
+    if [[ "$reuse_retired" -eq 1 ]]; then
+        sync_delete=(--delete)
+    else
+        printf '%s\n' "$password" | gocryptfs -init -q -passfile /dev/stdin -- "$cipher"
+    fi
+    printf '%s\n' "$password" | gocryptfs -q -passfile /dev/stdin -- "$cipher" "$stage"
+    if [[ "$reuse_retired" -eq 1 ]]; then
+        setfattr -x "$retired_attr_name" "$folder"
+        retired_attr_removed=1
+    fi
+
+    notify "Encrypting $folder"
+    rsync -aHAXSx --numeric-ids --protect-args "${sync_delete[@]}" -- "$folder/" "$stage/"
+    rsync -aHAXSx --numeric-ids --protect-args "${sync_delete[@]}" -- "$folder/" "$stage/"
+    difference_count=$(
+        rsync \
+            -aHAXSxnc \
+            --numeric-ids \
+            --protect-args \
+            "${sync_delete[@]}" \
+            --itemize-changes \
+            --out-format='%i' \
+            -- \
+            "$folder/" \
+            "$stage/" |
+            wc -l
+    )
+    [[ "$difference_count" -eq 0 ]]
+
+    fusermount3 -u "$stage"
+    rmdir "$stage"
+    stage=""
+
+    cutover=1
+    mv "$folder" "$backup"
+    chmod 000 "$backup"
+    install -d -m 700 "$folder"
+    setfattr -n "$attr_name" -v "$cipher" "$folder"
+    printf '%s\n' "$password" | gocryptfs -q -passfile /dev/stdin -- "$cipher" "$folder"
+
+    cutover=0
+    completed=1
+    unset password
+    trap - EXIT
+
+    notify "Protected and unlocked $folder"
+    kdialog \
+        --title "Protect Folder" \
+        --msgbox "Protected and checksum-verified. Plaintext backup retained at $backup. Test lock and unlock before removing it." \
+        >/dev/null 2>&1 || true
+}
+
+unprotect_folder() {
+    local cipher parent basename restored difference_count nested_mount completed
+
+    cipher=$(cipher_for) || die "Folder is not protected: $folder"
+    if ! kdialog \
+        --title "Remove Folder Protection" \
+        --warningcontinuecancel "Restore $folder as an ordinary plaintext folder? Close programs writing there first. Encrypted recovery copy remains at $cipher." \
+        --continue-label "Remove Protection" \
+        --cancel-label "Cancel"; then
+        return
+    fi
+
+    if ! mountpoint -q "$folder"; then
+        unlock_folder
+    fi
+
+    nested_mount=$(find_nested_mount)
+    [[ -z "$nested_mount" ]] || die "Folder contains another mounted filesystem: $nested_mount"
+
+    parent=$(dirname -- "$folder")
+    basename=$(basename -- "$folder")
+    restored=$(mktemp -d "$parent/.${basename#.}.decrypted.XXXXXXXX")
+    chmod 700 "$restored"
+    completed=0
+
+    cleanup_unprotect() {
+        local status=$?
+
+        if [[ "$status" -ne 0 && "$completed" -eq 0 && -d "${restored:-}" ]]; then
+            chmod 000 "$restored" >/dev/null 2>&1 || true
+            kdialog \
+                --title "Remove Folder Protection" \
+                --error "Removal failed. Protected data remains available. Partial plaintext copy retained mode 000 at $restored." \
+                >/dev/null 2>&1 || true
+        fi
+    }
+    trap cleanup_unprotect EXIT
+
+    notify "Restoring plaintext $folder"
+    rsync -aHAXSx --numeric-ids --protect-args -- "$folder/" "$restored/"
+    rsync -aHAXSx --numeric-ids --protect-args -- "$folder/" "$restored/"
+    difference_count=$(
+        rsync \
+            -aHAXSxnc \
+            --numeric-ids \
+            --protect-args \
+            --itemize-changes \
+            --out-format='%i' \
+            -- \
+            "$folder/" \
+            "$restored/" |
+            wc -l
+    )
+    [[ "$difference_count" -eq 0 ]]
+
+    fusermount3 -u "$folder"
+    rmdir "$folder"
+    setfattr -x "$attr_name" "$restored" 2>/dev/null || true
+    mv "$restored" "$folder"
+    restored=""
+    chmod 700 "$folder"
+    setfattr -n "$retired_attr_name" -v "$cipher" "$folder"
+
+    completed=1
+    trap - EXIT
+    notify "Protection removed from $folder"
+    kdialog \
+        --title "Remove Folder Protection" \
+        --msgbox "Plaintext restored and checksum-verified. Encrypted recovery copy retained at $cipher." \
+        >/dev/null 2>&1 || true
+}
+
+delete_retired_copy() {
+    local cipher
+
+    cipher=$(retired_cipher_for) || die "No encrypted recovery copy is registered."
+    if findmnt -rn -t fuse.gocryptfs -o SOURCE | grep -Fqx -- "$cipher"; then
+        die "Encrypted recovery copy is mounted and cannot be deleted: $cipher"
+    fi
+    if ! kdialog \
+        --title "Delete Encrypted Recovery Copy" \
+        --warningcontinuecancel "Permanently delete $cipher? Plaintext folder remains at $folder. This cannot be undone." \
+        --continue-label "Delete Permanently" \
+        --cancel-label "Cancel"; then
+        return
+    fi
+
+    find "$cipher" -xdev -depth -delete
+    [[ ! -e "$cipher" ]] || die "Could not completely delete: $cipher"
+    setfattr -x "$retired_attr_name" "$folder"
+    notify "Deleted encrypted recovery copy for $folder"
+}
+
+manage_folder() {
+    local choice
+
+    if mountpoint -q "$folder"; then
+        choice=$(
+            kdialog \
+                --title "Encrypted Folder" \
+                --menu "Folder is unlocked." \
+                lock "Lock" \
+                remove "Remove Protection…"
+        ) || return
+    elif cipher_for >/dev/null; then
+        choice=$(
+            kdialog \
+                --title "Encrypted Folder" \
+                --menu "Folder is locked." \
+                unlock "Unlock" \
+                remove "Remove Protection…"
+        ) || return
+    elif retired_cipher_for >/dev/null; then
+        choice=$(
+            kdialog \
+                --title "Encrypted Folder" \
+                --menu "Folder is plaintext; encrypted recovery copy remains." \
+                encrypt "Encrypt Again…" \
+                delete-retired "Delete Encrypted Recovery Copy…"
+        ) || return
+    else
+        choice=$(
+            kdialog \
+                --title "Encrypted Folder" \
+                --menu "Folder is not encrypted." \
+                encrypt "Encrypt…"
+        ) || return
+    fi
+
+    case "$choice" in
+        encrypt)
+            protect_folder
+            ;;
+        unlock)
+            unlock_folder
+            ;;
+        lock)
+            lock_folder
+            ;;
+        remove)
+            unprotect_folder
+            ;;
+        delete-retired)
+            delete_retired_copy
+            ;;
+    esac
+}
+
+action="${1:-}"
+
+case "$action" in
+    password)
+        exec kdialog --title "Unlock Folder" --password "Vault password"
+        ;;
+esac
+
+selected="${2:-}"
+[[ -n "$selected" ]] || die "Select one folder."
+[[ ! -L "$selected" ]] || die "Symlinked folders are not supported."
+folder=$(realpath -e -- "$selected" 2>/dev/null) || die "Folder does not exist: $selected"
+[[ -d "$folder" ]] || die "Not a folder: $folder"
+
+case "$folder" in
+    / | "$HOME" | "$vault_base" | "$vault_base"/*)
+        die "Refusing protected system, home, or vault-storage path: $folder"
+        ;;
+esac
+
+case "$vault_base" in
+    "$folder" | "$folder"/*)
+        die "Selected folder contains vault storage: $folder"
+        ;;
+esac
+
+case "$action" in
+    manage)
+        manage_folder
+        ;;
+    delete-retired)
+        delete_retired_copy
+        ;;
+    protect)
+        protect_folder
+        ;;
+    unlock)
+        unlock_folder
+        ;;
+    open)
+        unlock_folder
+        dolphin "$folder" >/dev/null 2>&1 &
+        ;;
+    lock)
+        lock_folder
+        ;;
+    status)
+        if mountpoint -q "$folder"; then
+            printf 'unlocked\n'
+        elif cipher_for >/dev/null; then
+            printf 'locked\n'
+        else
+            printf 'unprotected\n'
+        fi
+        ;;
+    *)
+        die "Usage: vault-folder {manage|protect|unlock|open|lock|delete-retired|status} FOLDER"
+        ;;
+esac

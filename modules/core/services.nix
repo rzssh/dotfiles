@@ -2,6 +2,7 @@
 
 {
   security.polkit.enable = true;
+  programs.fuse.enable = true;
   services.printing.enable = true;
   services.printing.drivers = [ pkgs.brlaser ];
   hardware.printers.ensurePrinters = [

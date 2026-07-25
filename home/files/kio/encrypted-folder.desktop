@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Service
+Name=Encrypted Folder
+MimeType=inode/directory;
+Actions=manageFolder;
+X-KDE-Submenu=Encrypted Folder
+X-KDE-Priority=TopLevel
+X-KDE-Protocols=file
+X-KDE-RequiredNumberOfUrls=1
+
+[Desktop Action manageFolder]
+Name=Manage Encryption…
+Icon=folder-locked
+Exec=/home/razen/.local/bin/vault-folder manage %f

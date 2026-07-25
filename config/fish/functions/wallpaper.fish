@@ -51,13 +51,34 @@ function wallpaper --description "Manage wallpapers via DMS"
         command find "$live" -maxdepth 1 -type l -name "$area"'__*' -delete 2>/dev/null
     end
 
+    function _area_status -a area
+        vault-folder status "$HOME/wallpapers/.$area" 2>/dev/null
+    end
+
+    function _unlock_area -a area
+        test -d "$HOME/wallpapers/.$area"; or return 1
+        test (_area_status $area) = locked; or return 0
+        vault-folder unlock "$HOME/wallpapers/.$area"
+    end
+
+    function _lock_area -a area
+        test (_area_status $area) = unlocked; or return 0
+        vault-folder lock "$HOME/wallpapers/.$area"
+    end
+
     function _rebuild_live
         set -l live "$HOME/wallpapers/.live"
         command mkdir -p "$live"
         command find "$live" -maxdepth 1 -type l -delete 2>/dev/null
         test (wallpaper-state get exclude_default) != true; and _link_area root
         for cat in (wallpaper-state restricted-folders | string split " ")
-            test (wallpaper-state get allow_$cat) = true; and _link_area $cat
+            if test (wallpaper-state get allow_$cat) = true
+                if _unlock_area $cat
+                    _link_area $cat
+                else
+                    wallpaper-state set allow_$cat false
+                end
+            end
         end
     end
 
@@ -66,6 +87,13 @@ function wallpaper --description "Manage wallpapers via DMS"
         set -l n (command ls -A "$live" 2>/dev/null | count)
         if not test -d "$live"; or test "$n" -eq 0
             _rebuild_live
+            return
+        end
+        for cat in (wallpaper-state restricted-folders | string split " ")
+            if test (wallpaper-state get allow_$cat) = true; and test (_area_status $cat) = locked
+                _rebuild_live
+                return
+            end
         end
     end
 
@@ -141,7 +169,6 @@ function wallpaper --description "Manage wallpapers via DMS"
             end
 
         case toggle-nsfw toggle-restricted toggle-explicit toggle-default
-            _ensure_live
             set -l name (string replace "toggle-" "" $argv[1])
             if test "$name" = default
                 if test (wallpaper-state get exclude_default) = true
@@ -156,11 +183,27 @@ function wallpaper --description "Manage wallpapers via DMS"
                 end
             else
                 if test (wallpaper-state get allow_$name) = true
+                    set -l current (_wp_current)
+                    set -l current_real
+                    test -n "$current"; and set current_real (command realpath "$current" 2>/dev/null)
                     wallpaper-state set allow_$name false
                     _unlink_area $name
-                    test -z (_wp_current); and _set_random
+                    set -l remaining (_wp_current)
+                    if test -z "$remaining"; or string match -q -- "$HOME/wallpapers/.$name/*" "$current_real"
+                        _set_random
+                    end
+                    if not _lock_area $name
+                        _notify "$name: OFF; folder still unlocked"
+                        return 1
+                    end
                     _notify "$name: OFF"
                 else
+                    if not _unlock_area $name
+                        wallpaper-state set allow_$name false
+                        _unlink_area $name
+                        _notify "$name: OFF"
+                        return 1
+                    end
                     wallpaper-state set allow_$name true
                     _link_area $name
                     _notify "$name: ON"
