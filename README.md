@@ -8,7 +8,7 @@
 | Compositor | Hyprland                                                    |
 | Shell      | DankMaterialShell                                           |
 | Terminal   | Ghostty + herdr + fish                                      |
-| Editor     | Neovim                                                      |
+| Editor     | [Neovim](https://github.com/rzssh/nvim)                     |
 | Keyboard   | [Custom 34 keys alt layout](https://github.com/rzssh/keebs) |
 
 ## Install
