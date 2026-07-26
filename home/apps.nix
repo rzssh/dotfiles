@@ -180,6 +180,7 @@ in
     gnumake
     python3
     nodejs_24
+    localPkgs.llama-cpp-cuda
     uv
     rustc
     cargo

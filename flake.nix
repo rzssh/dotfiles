@@ -4,23 +4,13 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    ai-toolchain = {
+      url = "github:rzssh/ai-toolchain";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    herdr = {
-      url = "github:ogulcancelik/herdr";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    treehouse = {
-      url = "github:kunchenguid/treehouse/v2.0.1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    crit = {
-      url = "github:tomasz-tomczyk/crit/v0.18.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -65,18 +55,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hermes-agent.url = "github:NousResearch/hermes-agent";
-
-    pi-coding-agent-src = {
-      url = "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.80.10.tgz";
-      flake = false;
-    };
-
-    openspec = {
-      url = "github:Fission-AI/OpenSpec";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -118,7 +96,10 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "hmbak";
-            home-manager.extraSpecialArgs = { inherit inputs vars; };
+            home-manager.extraSpecialArgs = {
+              inherit inputs vars;
+              aiToolchainProfiles = [ "personal" ];
+            };
             home-manager.users.${vars.username} = import ./home/razen.nix;
           }
         ];

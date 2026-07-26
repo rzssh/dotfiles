@@ -15,17 +15,26 @@ in
     inputs.dms.homeModules.dank-material-shell
     inputs.dank-calendar.homeModules.dank-calendar
     inputs.nix-index-database.homeModules.nix-index
+    inputs.sops-nix.homeManagerModules.sops
+    inputs.ai-toolchain.homeManagerModules.default
     ./nvim-treesitter.nix
     ./theming.nix
     ./services.nix
     ./desktop.nix
     ./apps.nix
-    ./agents.nix
   ];
 
   home.username = "razen";
   home.homeDirectory = "/home/razen";
   home.stateVersion = "25.05";
+
+  sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+  sops.secrets."ai-profiles/personal" = {
+    sopsFile = ../secrets/ai-profiles/personal.env;
+    format = "dotenv";
+    mode = "0400";
+    path = "${config.home.homeDirectory}/.local/share/ai/profiles/personal/env";
+  };
 
   home.sessionVariables = {
     EDITOR = "nvim";
