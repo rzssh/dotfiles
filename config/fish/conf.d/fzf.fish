@@ -25,17 +25,6 @@ set -Ux FZF_CTRL_T_OPTS "\
 --bind='ctrl-d:half-page-down' \
 --bind='ctrl-u:half-page-up'"
 
-set -Ux FZF_ALT_C_OPTS "\
---walker-skip .git,node_modules \
---preview 'eza --tree --level=2 --icons --all --color=always --group-directories-first {} 2>/dev/null' \
---preview-window 'right:60%:border-left:wrap' \
---border-label=' Directories ' \
---prompt='📁  ' \
---header='CTRL-/: toggle preview' \
---bind='ctrl-/:toggle-preview' \
---bind='ctrl-d:half-page-down' \
---bind='ctrl-u:half-page-up'"
-
 set -Ux FZF_CTRL_R_OPTS "\
 --no-preview \
 --border-label=' Command History ' \
@@ -50,6 +39,11 @@ set -U fzf_preview_dir_cmd eza --tree --level=2 --icons --all --color=always --g
 set -U fzf_preview_file_cmd bat --color=always --style=numbers,changes --line-range=:500
 
 fzf --fish | source
+
+bind \ec 'cdi; commandline -f repaint'
+if bind -M insert >/dev/null 2>&1
+    bind -M insert \ec 'cdi; commandline -f repaint'
+end
 
 bind \cq '__fzf_search_home'
 if bind -M insert >/dev/null 2>&1
