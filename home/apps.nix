@@ -77,16 +77,6 @@ let
     system = "x86_64-linux";
     config.allowUnfree = true;
   };
-  vesktop =
-    if pkgs.vesktop.version == "1.6.5" then
-      (pkgs.vesktop.override { electron_40 = pkgs.electron_41-bin; }).overrideAttrs {
-        preBuild = ''
-          cp -r ${pkgs.electron_41-bin.dist} electron-dist
-          chmod -R u+w electron-dist
-        '';
-      }
-    else
-      throw "Recheck Vesktop Electron workaround in home/apps.nix";
   tuxedoLatest = pkgs.rustPlatform.buildRustPackage rec {
     pname = "tuxedo";
     version = "2026.7.1";
@@ -272,7 +262,7 @@ in
     blender
     bambuPkgs.freecad
     kicad
-    openscad-unstable
+    openscad
     bambuPkgs.bambu-studio
 
     # theming

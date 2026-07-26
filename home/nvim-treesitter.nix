@@ -45,7 +45,6 @@ let
         rust
         supercollider
         svelte
-        tmux
         tsx
         typescript
         vim

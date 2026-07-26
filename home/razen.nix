@@ -16,7 +16,7 @@ in
     inputs.dank-calendar.homeModules.dank-calendar
     inputs.nix-index-database.homeModules.nix-index
     inputs.sops-nix.homeManagerModules.sops
-    inputs.ai-toolchain.homeManagerModules.default
+    inputs.agents.homeManagerModules.default
     ./nvim-treesitter.nix
     ./theming.nix
     ./services.nix
@@ -169,7 +169,7 @@ in
   };
 
   xdg.configFile = {
-    "nvim".source = link "config/nvim";
+    "nvim".source = config.lib.file.mkOutOfStoreSymlink "/home/razen/projects/nvim";
     "fish/conf.d".source = link "config/fish/conf.d";
     "fish/functions".source = link "config/fish/functions";
     "ghostty/config".source = link "config/ghostty/config";

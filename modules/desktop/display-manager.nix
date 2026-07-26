@@ -7,9 +7,9 @@
 }:
 
 {
-  imports = [ inputs.dms.nixosModules.greeter ];
+  imports = [ inputs.dank-greeter.nixosModules.default ];
 
-  programs.dank-material-shell.greeter = {
+  programs.dms-greeter = {
     enable = true;
     compositor.name = "hyprland";
     configHome = "/home/${vars.username}";
