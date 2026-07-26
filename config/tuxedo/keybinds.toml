@@ -1,0 +1,3 @@
+[normal]
+move_task_down = "Shift-Down"
+move_task_up = "Shift-Up"

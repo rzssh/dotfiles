@@ -180,6 +180,7 @@ in
     "lazydocker".source = link "config/lazydocker";
     "lazygit".source = link "config/lazygit";
     "jj/config.toml".source = link "config/jj/config.toml";
+    "tuxedo/keybinds.toml".source = link "config/tuxedo/keybinds.toml";
     "gh/config.yml".source = link "config/gh/config.yml";
     "gh-dash".source = link "config/gh-dash";
     "herdr/plugins/current-workspace-agents".source =
