@@ -252,5 +252,7 @@ in
     ".local/share/kio/servicemenus/encrypted-folder.desktop".source =
       link "home/files/kio/encrypted-folder.desktop";
     ".local/share/kio/servicemenus/print.desktop".source = link "home/files/kio/print.desktop";
+    ".local/share/kio/servicemenus/rotate-image.desktop".source =
+      link "home/files/kio/rotate-image.desktop";
   };
 }

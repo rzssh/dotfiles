@@ -1,9 +1,35 @@
-# These always run last and override whatever
-function fish_user_key_bindings
-    bind ctrl-space 'commandline -i " "'
-    bind ctrl-o edit_command_buffer
-    bind f2 'bind --user | fzf --no-preview --border-label=" Fish Bindings " --header="ESC: close" >/dev/null; commandline -f repaint'
+function __binding_help
+    set -l action (
+        printf '%s\t%s\t%s\n' \
+            'cdi' Alt-C 'Jump directory' \
+            'frg' Alt-F 'Search project text' \
+            'fzf-history-widget' Ctrl-R 'Search command history' \
+            'fzf-file-widget' Ctrl-T 'Insert file or directory' \
+            'fzf_complete' Shift-Tab 'Fuzzy completions' \
+            'fkill' Alt-X 'Kill process' \
+            'fgit' Ctrl-G 'Open tracked Git file' \
+            '__fzf_search_home' Ctrl-Q 'Search home' \
+            'commandline -f edit_command_buffer' Ctrl-O 'Edit command in Neovim' \
+            'commandline -i " "' Ctrl-Space 'Insert space without expanding abbreviation' |
+        fzf \
+            --disabled \
+            --delimiter=\t \
+            --no-input \
+            --no-info \
+            --no-preview \
+            --no-scrollbar \
+            --height='~100%' \
+            --with-nth=2.. \
+            --accept-nth=1 \
+            --border-label=' Shortcuts ' \
+            --header='ENTER: run | ESC: close'
+    )
+    test -n "$action"; and eval "$action"
 end
+
+bind ctrl-space 'commandline -i " "'
+bind ctrl-o edit_command_buffer
+bind f2 '__binding_help; commandline -f repaint'
 
 abbr -a b bun
 abbr -a v nvim
