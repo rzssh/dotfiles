@@ -117,6 +117,12 @@ command = "herdr pane close $HERDR_ACTIVE_PANE_ID"
 description = "close pane"
 
 [[keys.command]]
+key = "prefix+alt+t"
+type = "shell"
+command = 'herdr pane move "$HERDR_ACTIVE_PANE_ID" --new-tab --focus'
+description = "move pane to new tab"
+
+[[keys.command]]
 key = "alt+left"
 type = "plugin_action"
 command = "herdr-nvim.nav-left"
