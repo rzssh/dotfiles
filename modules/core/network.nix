@@ -7,6 +7,11 @@
     "wifi.autoconnect" = "no";
   };
 
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
+  };
+
   networking.firewall.extraCommands = ''
     iptables -A nixos-fw -p tcp -s 172.16.0.0/12 -m multiport --dports 8012,8013,8014 -j nixos-fw-accept
   '';
