@@ -105,7 +105,7 @@ hl.layer_rule({ name = "dms-blur", match = { namespace = "^dms:.*$" }, blur = tr
 
 hl.window_rule({ match = { class = "^(org.kde.dolphin|org.kde.ark)$" }, float = true, size = "(monitor_w*0.5) (monitor_h*0.6)" })
 hl.window_rule({ match = { class = "^qimgv$" }, float = true, size = "(monitor_w*0.6) (monitor_h*0.8)" })
-hl.window_rule({ match = { class = "^vlc$" }, float = true, size = "(monitor_w*0.5) (monitor_h*0.6)" })
+hl.window_rule({ match = { class = "^vlc$", initial_title = "^VLC media player$" }, float = true, size = "(monitor_w*0.5) (monitor_h*0.6)" })
 hl.window_rule({ match = { class = "^org.pulseaudio.pavucontrol$" }, float = true, center = true, size = "(monitor_w*0.5) (monitor_h*0.4)" })
 hl.window_rule({ match = { class = "^1password$" }, float = true, center = true, size = "(monitor_w*0.4) (monitor_h*0.5)" })
 hl.window_rule({ match = { class = "^org\\.kde\\.kdialog$", title = "^Encrypted Folder$" }, float = true, center = true, size = "(monitor_w*0.32) (monitor_h*0.32)" })

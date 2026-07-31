@@ -231,6 +231,7 @@ in
     yt-dlp
     qbittorrent
     vlc
+    losslesscut
     qimgv
     loupe
 
