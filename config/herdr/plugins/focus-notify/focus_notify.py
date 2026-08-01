@@ -3,13 +3,23 @@ import fcntl
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import time
 
 KINDS = {"done": "finished", "blocked": "needs input"}
-TERMINAL_CLASS = os.environ.get("HERDR_TERMINAL_CLASS", "com.mitchellh.ghostty")
-TERMINAL_SELECTOR = os.environ.get("HERDR_WINDOW_SELECTOR", f"class:{TERMINAL_CLASS}")
+terminal_classes = os.environ.get("HERDR_TERMINAL_CLASSES") or os.environ.get("HERDR_TERMINAL_CLASS")
+TERMINAL_CLASSES = set(
+    filter(
+        None,
+        (terminal_classes or "org.wezfurlong.wezterm").split(","),
+    )
+)
+terminal_pattern = "|".join(re.escape(name) for name in TERMINAL_CLASSES)
+TERMINAL_SELECTOR = os.environ.get(
+    "HERDR_WINDOW_SELECTOR", f"class:^({terminal_pattern})$"
+)
 
 
 def run(
@@ -107,7 +117,7 @@ def active_terminal():
     if not r or r.returncode != 0:
         return False
     try:
-        return json.loads(r.stdout or "{}").get("class") == TERMINAL_CLASS
+        return json.loads(r.stdout or "{}").get("class") in TERMINAL_CLASSES
     except Exception:
         return False
 
@@ -126,7 +136,7 @@ def focus_pane(pane_id):
         run(
             "hyprctl",
             "dispatch",
-            f'hl.dsp.focus({{ window = "{TERMINAL_SELECTOR}" }})',
+            f"hl.dsp.focus({{ window = {json.dumps(TERMINAL_SELECTOR)} }})",
             env=env,
         )
 

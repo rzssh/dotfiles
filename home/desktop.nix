@@ -68,7 +68,7 @@ in
 
   xdg.desktopEntries.nvim = {
     name = "Neovim";
-    exec = "ghostty --class=ghostty.nvim -e nvim %F";
+    exec = "wezterm start --class=wezterm.nvim -- nvim %F";
     terminal = false;
     mimeType = [
       "text/plain"

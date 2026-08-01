@@ -41,11 +41,6 @@ input_path = "/home/razen/.config/matugen/templates/kcolorscheme.colors"
 output_path = "/home/razen/.local/share/color-schemes/matugen.colors"
 post_hook = "/home/razen/.local/bin/theme-kde matugen 2>/dev/null || true"
 
-[templates.ghostty]
-input_path = "/home/razen/.config/matugen/templates/ghostty"
-output_path = "/home/razen/.config/ghostty/themes/matugen"
-post_hook = "pkill -SIGUSR2 ghostty 2>/dev/null || true"
-
 [templates.yazi]
 input_path = "/home/razen/.config/matugen/templates/yazi.toml"
 output_path = "/home/razen/.config/yazi/flavors/matugen.yazi/flavor.toml"
@@ -69,4 +64,3 @@ output_path = "/home/razen/.cache/matugen/yt-music-theme.css"
 input_path = "/home/razen/.config/matugen/templates/wled.json"
 output_path = "/home/razen/.cache/matugen/wled.json"
 post_hook = "sh -c 'curl -s --connect-timeout 2 -m 4 --retry 1 -X POST \"http://192.168.0.18/json/state\" -H \"Content-Type: application/json\" -d @/home/razen/.cache/matugen/wled.json >/dev/null 2>&1 &'"
-

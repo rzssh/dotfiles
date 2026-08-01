@@ -172,8 +172,7 @@ in
     "nvim".source = config.lib.file.mkOutOfStoreSymlink "/home/razen/projects/nvim";
     "fish/conf.d".source = link "config/fish/conf.d";
     "fish/functions".source = link "config/fish/functions";
-    "ghostty/config".source = link "config/ghostty/config";
-    "ghostty/themes/dankcolors".source = link "config/ghostty/themes/dankcolors";
+    "wezterm/wezterm.lua".source = link "config/wezterm/wezterm.lua";
     "yazi/keymap.toml".source = link "config/yazi/keymap.toml";
     "yazi/theme.toml".source = link "config/yazi/theme.toml";
     "yazi/yazi.toml".source = link "config/yazi/yazi.toml";

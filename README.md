@@ -7,7 +7,7 @@
 | OS         | NixOS + CachyOS kernel                                      |
 | Compositor | Hyprland                                                    |
 | Shell      | DankMaterialShell                                           |
-| Terminal   | Ghostty + herdr + fish                                      |
+| Terminal   | WezTerm + herdr + fish                                      |
 | Editor     | [Neovim](https://github.com/rzssh/nvim)                     |
 | Keyboard   | [Custom 34 keys alt layout](https://github.com/rzssh/keebs) |
 

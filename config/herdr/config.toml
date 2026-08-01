@@ -30,6 +30,7 @@ focus_pane_left  = ""
 focus_pane_right = ""
 focus_pane_up    = ""
 focus_pane_down  = ""
+close_pane       = "alt+shift+x"
 swap_pane_left   = "alt+shift+left"
 swap_pane_right  = "alt+shift+right"
 swap_pane_up     = "alt+shift+up"
@@ -109,12 +110,6 @@ key = "alt+h"
 type = "shell"
 command = "herdr pane split --current --direction down --focus"
 description = "split pane horizontally"
-
-[[keys.command]]
-key = "alt+shift+x"
-type = "shell"
-command = "herdr pane close $HERDR_ACTIVE_PANE_ID"
-description = "close pane"
 
 [[keys.command]]
 key = "prefix+alt+t"

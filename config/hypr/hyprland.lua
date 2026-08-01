@@ -1,5 +1,5 @@
 local mainMod     = "SUPER"
-local terminal    = "ghostty"
+local terminal    = "wezterm"
 local fileManager = "dolphin"
 
 hl.monitor({ output = "", mode = "1920x1080@360", position = "auto", scale = "auto" })
@@ -109,14 +109,14 @@ hl.window_rule({ match = { class = "^vlc$", initial_title = "^VLC media player$"
 hl.window_rule({ match = { class = "^org.pulseaudio.pavucontrol$" }, float = true, center = true, size = "(monitor_w*0.5) (monitor_h*0.4)" })
 hl.window_rule({ match = { class = "^1password$" }, float = true, center = true, size = "(monitor_w*0.4) (monitor_h*0.5)" })
 hl.window_rule({ match = { class = "^org\\.kde\\.kdialog$", title = "^Encrypted Folder$" }, float = true, center = true, size = "(monitor_w*0.32) (monitor_h*0.32)" })
-hl.window_rule({ match = { class = "^com.mitchellh.ghostty$", title = "^(btop|htop)$" }, float = true, center = true, size = "(monitor_w*0.7) (monitor_h*0.8)" })
-hl.window_rule({ match = { class = "^com.mitchellh.ghostty$", title = "^nmtui$" }, float = true, center = true, size = "(monitor_w*0.7) (monitor_h*0.8)" })
-hl.window_rule({ match = { class = "^ghostty.nvim$" }, float = true, center = true, size = "(monitor_w*0.7) (monitor_h*0.8)" })
+hl.window_rule({ match = { class = "^org.wezfurlong.wezterm$", title = "^(btop|htop)$" }, float = true, center = true, size = "(monitor_w*0.7) (monitor_h*0.8)" })
+hl.window_rule({ match = { class = "^org.wezfurlong.wezterm$", title = "^nmtui$" }, float = true, center = true, size = "(monitor_w*0.7) (monitor_h*0.8)" })
+hl.window_rule({ match = { class = "^wezterm.nvim$" }, float = true, center = true, size = "(monitor_w*0.7) (monitor_h*0.8)" })
 hl.window_rule({ match = { class = "^org.qbittorrent.qBittorrent$" }, float = true, size = "(monitor_w*0.7) (monitor_h*0.8)" })
 hl.window_rule({ match = { class = "^nm-connection-editor$" }, float = true })
 hl.window_rule({ match = { class = "^xdg-desktop-portal.*" }, float = true, size = "68% 65%" })
 hl.window_rule({ match = { class = "^zen$" }, render_unfocused = true })
-hl.window_rule({ match = { class = "^com.mitchellh.ghostty$" }, no_blur = true })
+hl.window_rule({ match = { class = "^org.wezfurlong.wezterm$" }, no_blur = true })
 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + C", hl.dsp.window.close())

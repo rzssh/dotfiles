@@ -116,7 +116,7 @@ in
 
   home.packages = with pkgs; [
     # shell & terminal
-    ghostty
+    wezterm
     helix
     yazi
     aerc
