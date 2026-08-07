@@ -153,6 +153,7 @@ in
     jujutsu
     jjui
     lazygit
+    git-remote-gcrypt
     gh
     gh-dash
     delta

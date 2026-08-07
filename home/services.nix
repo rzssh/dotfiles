@@ -23,6 +23,11 @@ let
   };
 in
 {
+  services.gpg-agent = {
+    enable = true;
+    pinentry.package = pkgs.pinentry-qt;
+  };
+
   systemd.user.settings.Manager.DefaultTimeoutStopSec = "5s";
 
   systemd.user.services = {
