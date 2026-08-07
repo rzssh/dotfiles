@@ -150,6 +150,12 @@ width = 48
 height = 3
 
 [[keys.command]]
+key = "prefix+f"
+type = "plugin_action"
+command = "razen.current-workspace-agents.cycle"
+description = "cycle agent view"
+
+[[keys.command]]
 key = "prefix+alt+p"
 type = "popup"
 command = "ai-workspace-picker"
@@ -192,21 +198,3 @@ kitty_graphics = true
 [theme]
 name = "terminal"
 auto_switch = false
-
-[theme.custom]
-accent = "#ffabee"
-panel_bg = "reset"
-surface0 = "reset"
-surface1 = "#271c24"
-surface_dim = "#1a1018"
-overlay0 = "#9c8c96"
-overlay1 = "#d4c1cc"
-text = "reset"
-subtext0 = "#f1dde9"
-mauve = "#fdb2c6"
-green = "#94da00"
-yellow = "#ffba48"
-red = "#ffb1c0"
-blue = "#bcc2ff"
-teal = "#00daf5"
-peach = "#ebb9d0"

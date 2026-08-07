@@ -120,13 +120,7 @@ in
     json_overlay "${dots}/config/dms/settings.json" "$HOME/.config/DankMaterialShell/settings.json"
     json_overlay "${dots}/config/dms/plugin-settings.json" "$HOME/.config/DankMaterialShell/plugin_settings.json"
     btop_overlay "${dots}/config/btop.defaults.conf" "$HOME/.config/btop/btop.conf"
-    herdr_directory="$HOME/.config/herdr"
-    ${pkgs.coreutils}/bin/mkdir -p "$herdr_directory"
-    ${pkgs.coreutils}/bin/chmod 700 "$herdr_directory"
-    herdr_config="$(${pkgs.coreutils}/bin/mktemp "$herdr_directory/.config.XXXXXX")"
-    ${pkgs.coreutils}/bin/install -m600 "${dots}/config/herdr/config.toml" "$herdr_config"
-    ${pkgs.coreutils}/bin/mv -f "$herdr_config" "$herdr_directory/config.toml"
-    ${pkgs.python3}/bin/python3 "${dots}/bin/theme/herdr"
+    "${dots}/bin/theme/herdr"
   '';
 
   programs.dank-material-shell = {

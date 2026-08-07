@@ -1,9 +1,14 @@
 id = "razen.current-workspace-agents"
 name = "Current Workspace Agents"
-version = "0.1.0"
-min_herdr_version = "0.7.4"
-description = "Show only agents in the currently presented Herdr workspace."
+version = "0.3.0"
+min_herdr_version = "0.8.0"
+description = "Cycle between current-workspace and all-agent views."
 platforms = ["linux"]
 
 [[startup]]
 command = ["python3", "apply.py"]
+
+[[actions]]
+id = "cycle"
+title = "Cycle agent view"
+command = ["python3", "apply.py", "--cycle"]
