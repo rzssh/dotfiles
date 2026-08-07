@@ -71,21 +71,21 @@ config.enable_kitty_keyboard = true
 config.enable_csi_u_key_encoding = true
 config.disable_default_key_bindings = true
 config.check_for_updates = false
+
+local smart_paste = wezterm.action_callback(function(window, pane)
+  local ok, types = wezterm.run_child_process({ "wl-paste", "--list-types" })
+  local paste = act.PasteFrom("Clipboard")
+  if ok and types:find("image/", 1, true) then
+    paste = act.SendKey({ key = "v", mods = "CTRL" })
+  end
+  window:perform_action(paste, pane)
+end)
+
 config.keys = {
   { key = "mapped:v", mods = "CTRL", action = act.DisableDefaultAssignment },
+  { key = "mapped:v", mods = "CTRL|SHIFT", action = smart_paste },
   { key = "Backspace", mods = "CTRL", action = act.SendString("\x17") },
-  {
-    key = "Paste",
-    mods = "NONE",
-    action = wezterm.action_callback(function(window, pane)
-      local ok, types = wezterm.run_child_process({ "wl-paste", "--list-types" })
-      local paste = act.PasteFrom("Clipboard")
-      if ok and types:find("image/", 1, true) then
-        paste = act.SendKey({ key = "v", mods = "CTRL" })
-      end
-      window:perform_action(paste, pane)
-    end),
-  },
+  { key = "Paste", mods = "NONE", action = smart_paste },
 }
 
 return config
