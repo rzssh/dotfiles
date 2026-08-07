@@ -250,11 +250,10 @@ hl.bind("Z", function()
     if z and z ~= 1 then hl.config({ cursor = { zoom_factor = 1 } }) end
 end, { release = true, ignore_mods = true, non_consuming = true, transparent = true })
 
-hl.bind(mainMod .. " + ALT + S", hl.dsp.exec_cmd("hyprwhspr record toggle"))
-
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("dms screenshot region"))
-hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("dms screenshot full"))
-hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd([[sh -c 'dms screenshot region --stdout --no-file --no-clipboard | satty -f - --copy-command wl-copy']]))
+hl.bind(mainMod .. " + F1", hl.dsp.exec_cmd("dms screenshot region"))
+hl.bind(mainMod .. " + F2", hl.dsp.exec_cmd("dms screenshot full"))
+hl.bind(mainMod .. " + F3", hl.dsp.exec_cmd([[sh -c 'dms screenshot region --stdout --no-file --no-clipboard | satty -f - --copy-command wl-copy']]))
+hl.bind(mainMod .. " + F4", hl.dsp.exec_cmd("hyprwhspr record toggle"))
 hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("~/.config/hypr/scripts/color-picker.sh"))
 hl.bind(mainMod .. " + CTRL + F10", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_opacity.sh"))
 
@@ -265,7 +264,8 @@ hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_S
 
 hl.bind(mainMod .. " + F5",  hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true })
 hl.bind(mainMod .. " + F6",  hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true })
-hl.bind(mainMod .. " + F8",  hl.dsp.exec_cmd("playerctl previous"),                              { locked = true })
+hl.bind(mainMod .. " + F7",  hl.dsp.exec_cmd("playerctl previous"),                              { locked = true })
+hl.bind(mainMod .. " + F8",  hl.dsp.exec_cmd("playerctl play-pause"),                            { locked = true })
 hl.bind(mainMod .. " + F9",  hl.dsp.exec_cmd("playerctl next"),                                  { locked = true })
 hl.bind(mainMod .. " + F11", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
 hl.bind(mainMod .. " + F12", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
