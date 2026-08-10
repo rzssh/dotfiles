@@ -172,7 +172,6 @@ in
     "yazi/yazi.toml".source = link "config/yazi/yazi.toml";
     "lazydocker".source = link "config/lazydocker";
     "lazygit".source = link "config/lazygit";
-    "jj/config.toml".source = link "config/jj/config.toml";
     "tuxedo/keybinds.toml".source = link "config/tuxedo/keybinds.toml";
     "gh/config.yml".source = link "config/gh/config.yml";
     "gh-dash".source = link "config/gh-dash";
@@ -231,7 +230,6 @@ in
     ".local/bin/wallpaper-state".source = link "bin/wallpaper-state";
     ".local/bin/vault-folder".source = link "bin/vault-folder";
     ".local/bin/ns".source = link "bin/ns";
-    ".local/bin/herdr-jj-workspace".source = link "bin/herdr-jj-workspace";
     ".local/bin/herdr-move-tab-workspace".source = link "bin/herdr-move-tab-workspace";
     ".local/bin/theme-terminals".source = link "bin/theme/terminals";
     ".local/bin/theme-gtk".source = link "bin/theme/gtk";

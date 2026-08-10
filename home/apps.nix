@@ -150,8 +150,6 @@ in
     nix-search-tv
 
     # git & dev workflow
-    jujutsu
-    jjui
     lazygit
     git-remote-gcrypt
     gh

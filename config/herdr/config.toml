@@ -171,24 +171,6 @@ description = "tasks"
 width = "90%"
 height = "85%"
 
-[[keys.command]]
-key = "prefix+a"
-type = "shell"
-command = "herdr-jj-workspace workspace"
-description = "new jj workspace"
-
-[[keys.command]]
-key = "prefix+shift+a"
-type = "shell"
-command = "herdr-jj-workspace tab"
-description = "new jj workspace tab"
-
-[[keys.command]]
-key = "prefix+d"
-type = "shell"
-command = "herdr-jj-workspace remove"
-description = "remove jj workspace"
-
 [advanced]
 scrollback_limit_bytes = 200000000
 
