@@ -59,7 +59,11 @@ defaults:
 keybindings:
   universal: []
   issues: []
-  prs: []
+  prs:
+    - key: C
+      name: Review with tuicr
+      command: >-
+        tuicr pr "https://github.com/{{.RepoName}}/pull/{{.PrNumber}}"
   branches: []
 repoPaths: {}
 theme:

@@ -171,6 +171,22 @@ description = "tasks"
 width = "90%"
 height = "85%"
 
+[[keys.command]]
+key = "alt+g"
+type = "popup"
+command = "lazygit"
+description = "local git"
+width = "95%"
+height = "90%"
+
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = "gh-dash"
+description = "GitHub dashboard"
+width = "95%"
+height = "90%"
+
 [advanced]
 scrollback_limit_bytes = 200000000
 
