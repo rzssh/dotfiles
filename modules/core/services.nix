@@ -18,6 +18,7 @@
   services.geoclue2.enable = true;
   services.automatic-timezoned.enable = true;
   services.gnome.gnome-keyring.enable = true;
+  services.gnome.at-spi2-core.enable = true;
   services.accounts-daemon.enable = true;
   services.udisks2.enable = true;
   hardware.logitech.wireless = {
