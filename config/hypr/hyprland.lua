@@ -158,6 +158,7 @@ hl.bind(mainMod .. " + SHIFT + C", hl.dsp.window.center())
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = 0 }))
 hl.bind(mainMod .. " + F",         hl.dsp.window.fullscreen({ mode = 1 }))
 hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.window.pin())
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + CTRL + G", hl.dsp.group.toggle())
 

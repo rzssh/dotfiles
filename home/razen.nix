@@ -230,6 +230,7 @@ in
   '';
 
   home.file = {
+    ".pi/agent/keybindings.json".source = link "config/pi/keybindings.json";
     ".gitconfig".source = link "home/files/.gitconfig";
     ".editorconfig".source = link "home/files/.editorconfig";
     ".rgignore".source = link "home/files/.rgignore";
