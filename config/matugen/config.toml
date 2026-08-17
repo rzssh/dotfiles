@@ -56,9 +56,9 @@ output_path = "/home/razen/.cache/matugen/zen/userContent.css"
 post_hook = "/home/razen/.local/bin/theme-zen || true"
 
 
-[templates.yt_music]
+[templates.yt_music_webapp]
 input_path = "/home/razen/.config/matugen/templates/yt-music.css"
-output_path = "/home/razen/.cache/matugen/yt-music-theme.css"
+output_path = "/home/razen/.local/share/webapps/youtube-music-theme/theme.css"
 
 [templates.wled]
 input_path = "/home/razen/.config/matugen/templates/wled.json"

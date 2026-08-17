@@ -123,6 +123,15 @@ in
     "${dots}/bin/theme/herdr"
   '';
 
+  home.activation.youtubeMusicTheme = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    directory="$HOME/.local/share/webapps/youtube-music-theme"
+    ${pkgs.coreutils}/bin/mkdir -p "$directory"
+    for file in manifest.json inject.js background.js; do
+      ${pkgs.coreutils}/bin/cp --remove-destination "${dots}/config/youtube-music-webapp/$file" "$directory/$file"
+      ${pkgs.coreutils}/bin/chmod 644 "$directory/$file"
+    done
+  '';
+
   programs.dank-material-shell = {
     enable = true;
     systemd.enable = true;

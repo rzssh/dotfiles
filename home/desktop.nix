@@ -192,10 +192,10 @@ in
     mimeType = [ "application/x-extension-fcstd" ];
   };
 
-  xdg.desktopEntries."com.github.th_ch.youtube_music" = {
-    name = "Pear Desktop";
-    exec = "pear-desktop --force-device-scale-factor=1.10 %U";
-    icon = "pear-desktop";
+  xdg.desktopEntries.youtube-music-webapp = {
+    name = "YouTube Music";
+    exec = "${helium}/bin/helium --no-first-run --user-data-dir=/home/razen/.local/share/webapps/youtube-music --load-extension=/home/razen/.local/share/webapps/youtube-music-theme --app=https://music.youtube.com/ --force-device-scale-factor=1.10";
+    icon = "youtube-music";
     terminal = false;
     categories = [ "AudioVideo" ];
   };

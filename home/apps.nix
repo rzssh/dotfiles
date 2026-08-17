@@ -253,7 +253,6 @@ in
     obsidian
     zen
     inputs.helium.packages.x86_64-linux.default
-    pear-desktop
     libreoffice-qt6-fresh
     gimp
     krita
