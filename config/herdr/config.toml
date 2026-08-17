@@ -16,7 +16,7 @@ rows = [
 [ui.sidebar.agents]
 rows = [
   ["state_icon", { token = "agent", fg = "#ffffff", bold = true, dim = false }],
-  ["tab"],
+  ["state_text", "tab"],
 ]
 
 [ui.sound]

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import json
 import os
+import pathlib
 import re
+import signal
 import subprocess
 import sys
 import time
-import zlib
 
 KINDS = {"done": "finished", "blocked": "needs input"}
 terminal_classes = os.environ.get("HERDR_TERMINAL_CLASSES") or os.environ.get("HERDR_TERMINAL_CLASS")
@@ -97,26 +98,71 @@ def focus_pane(pane_id):
         )
 
 
-def wait_notification(title, pane_id, notification_id):
+def dms_pid():
     result = run(
-        "notify-send",
-        "-a",
-        "herdr",
-        "-r",
-        notification_id,
-        "-A",
-        "default=Open",
-        title,
-        timeout=None,
+        "systemctl",
+        "--user",
+        "show",
+        "--property=MainPID",
+        "--value",
+        "dms.service",
     )
-    if result and (result.stdout or "").strip() == "default":
+    try:
+        return int(result.stdout)
+    except (AttributeError, TypeError, ValueError):
+        return 0
+
+
+def stop_notification(pane_id):
+    script = os.path.realpath(__file__)
+    for entry in pathlib.Path("/proc").iterdir():
+        if not entry.name.isdigit():
+            continue
+        try:
+            args = (entry / "cmdline").read_bytes().rstrip(b"\0").split(b"\0")
+            pid = int(entry.name)
+            if (
+                len(args) == 5
+                and os.path.realpath(os.fsdecode(args[1])) == script
+                and args[2] == b"--wait"
+                and os.fsdecode(args[4]) == pane_id
+                and os.getpgid(pid) == pid
+            ):
+                os.killpg(pid, signal.SIGTERM)
+        except (OSError, UnicodeError):
+            pass
+
+
+def wait_notification(title, pane_id):
+    server_pid = dms_pid()
+    if not server_pid:
+        return
+    process = subprocess.Popen(
+        ["notify-send", "-a", "herdr", "-A", "default=Open", title],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    while True:
+        try:
+            stdout, _ = process.communicate(timeout=1)
+            break
+        except subprocess.TimeoutExpired:
+            if not pathlib.Path(f"/proc/{server_pid}").exists():
+                process.terminate()
+                try:
+                    process.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                return
+    if stdout.strip() == "default":
         focus_pane(pane_id)
 
 
 def spawn_notification(title, pane_id):
-    notification_id = str(zlib.crc32(pane_id.encode()) or 1)
+    stop_notification(pane_id)
     subprocess.Popen(
-        [sys.executable, __file__, "--wait", title, pane_id, notification_id],
+        [sys.executable, __file__, "--wait", title, pane_id],
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
@@ -149,7 +195,7 @@ def test():
 
 def main():
     if sys.argv[1:2] == ["--wait"]:
-        wait_notification(sys.argv[2], sys.argv[3], sys.argv[4])
+        wait_notification(sys.argv[2], sys.argv[3])
     elif sys.argv[1:2] == ["--test"]:
         test()
     else:
