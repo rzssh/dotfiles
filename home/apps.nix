@@ -77,25 +77,6 @@ let
     system = "x86_64-linux";
     config.allowUnfree = true;
   };
-  tuxedoLatest = pkgs.rustPlatform.buildRustPackage rec {
-    pname = "tuxedo";
-    version = "2026.7.1";
-    src = pkgs.fetchFromGitHub {
-      owner = "rzssh";
-      repo = "tuxedo";
-      rev = "e30e2702e88202217be346dff4263fecc20b34c2";
-      hash = "sha256-T8vN678XF2rfhfAvZzk6UpCfCS3aW6QNqpq6IIDd5Ak=";
-    };
-    cargoLock.lockFile = "${src}/Cargo.lock";
-    nativeCheckInputs = [ pkgs.writableTmpDirAsHomeHook ];
-    postPatch = ''
-      substituteInPlace src/note.rs src/app/mutations.rs \
-        --replace-fail 'projects/tuxedo-tasks' 'task-details'
-      substituteInPlace src/main.rs \
-        --replace-fail 'open_path_in_editor(&path)?;' 'open_path_in_editor(&path)?;
-                        terminal.clear()?;'
-    '';
-  };
 in
 {
   home.activation.vimiumSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -126,7 +107,7 @@ in
     fzf
     jq
     just
-    tuxedoLatest
+    inputs.tuxedo.packages.${pkgs.stdenv.hostPlatform.system}.default
 
     # cli utils
     eza

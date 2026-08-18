@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    tuxedo = {
+      url = "github:webstonehq/tuxedo";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agents = {
       url = "path:/home/razen/projects/agents";
       inputs.nixpkgs.follows = "nixpkgs";
