@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+herdr=${HERDR_BIN_PATH:-herdr}
+snapshot=$("$herdr" api snapshot)
+
+selection=$(
+  {
+    printf '+  New workspace\tnew workspace\tnew-workspace\n'
+    jq -r --arg current "$HERDR_ACTIVE_TAB_ID" '
+  .result.snapshot as $snapshot
+  | [
+      $snapshot.workspaces[] as $workspace
+      | [$snapshot.tabs[] | select(.workspace_id == $workspace.workspace_id and .tab_id != $current)] as $tabs
+      | select($tabs | length > 0)
+      | { workspace: "\($workspace.number)  \($workspace.label)", tabs: $tabs }
+    ] as $groups
+  | ($groups | map(.workspace | length) | max) as $width
+  | $groups[]
+  | . as $group
+  | .tabs | to_entries[]
+  | . as $entry
+  | $entry.value as $tab
+  | (if $entry.key == 0 then $group.workspace else "" end) as $workspace
+  | "\($workspace)\(" " * ($width - ($workspace | length)))  \(if $entry.key == ($group.tabs | length) - 1 then "└─" else "├─" end) Tab \($tab.number)\(if $tab.label == ($tab.number | tostring) then "" else ": \($tab.label)" end)\t\($group.workspace)\t\($tab.tab_id)"
+' <<< "$snapshot"
+  } | fzf \
+    --delimiter=$'\t' \
+    --with-nth=1 \
+    --nth=1,2 \
+    --accept-nth=3 \
+    --layout=reverse \
+    --prompt='Destination: ' \
+    --header='workspace                         tab'
+) || exit 0
+
+target=$selection
+if [[ $target == new-workspace ]]; then
+  move=$("$herdr" pane move "$HERDR_ACTIVE_PANE_ID" --new-workspace --no-focus)
+else
+  move=$("$herdr" pane move "$HERDR_ACTIVE_PANE_ID" --tab "$target" --split right --no-focus)
+fi
+
+workspace=$(jq -r '.result.move_result.pane.workspace_id' <<< "$move")
+tab=$(jq -r '.result.move_result.pane.tab_id' <<< "$move")
+"$herdr" workspace focus "$workspace" >/dev/null
+"$herdr" tab focus "$tab" >/dev/null

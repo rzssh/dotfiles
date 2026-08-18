@@ -240,6 +240,7 @@ in
     ".local/bin/wallpaper-state".source = link "bin/wallpaper-state";
     ".local/bin/vault-folder".source = link "bin/vault-folder";
     ".local/bin/ns".source = link "bin/ns";
+    ".local/bin/herdr-move-pane-tab".source = link "bin/herdr-move-pane-tab";
     ".local/bin/herdr-move-tab-workspace".source = link "bin/herdr-move-tab-workspace";
     ".local/bin/theme-terminals".source = link "bin/theme/terminals";
     ".local/bin/theme-gtk".source = link "bin/theme/gtk";

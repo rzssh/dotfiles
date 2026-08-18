@@ -118,6 +118,14 @@ command = 'herdr pane move "$HERDR_ACTIVE_PANE_ID" --new-tab --focus'
 description = "move pane to new tab"
 
 [[keys.command]]
+key = "prefix+m"
+type = "popup"
+command = "herdr-move-pane-tab"
+description = "move pane to tab"
+width = "70%"
+height = "50%"
+
+[[keys.command]]
 key = "alt+left"
 type = "plugin_action"
 command = "herdr-nvim.nav-left"
