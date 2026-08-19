@@ -14,8 +14,8 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1786934739,
-        "narHash": "sha256-sG6tosb+JpyYzQ6WgY5Lt3yDYiWfEdD1hHYbyhOxZJY=",
+        "lastModified": 1787160115,
+        "narHash": "sha256-7WVfAdyQQxV/nIcs/feJ3jlnAVxPlpPgVD0egMaPId0=",
         "path": "/home/razen/projects/agents",
         "type": "path"
       },
@@ -695,13 +695,13 @@
       "flake": false,
       "locked": {
         "lastModified": 499162500,
-        "narHash": "sha256-yhKp8UtDAj+2C+iDGZOnQVcCMOey7D0Oh0ROSAHAAls=",
+        "narHash": "sha256-9dv6prGh2inmg4pEFkC8OsU/Eh18L3wCvcUde5rOMdc=",
         "type": "tarball",
-        "url": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.84.1.tgz"
+        "url": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.84.2.tgz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.84.1.tgz"
+        "url": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.84.2.tgz"
       }
     },
     "pre-commit": {
