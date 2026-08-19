@@ -1520,6 +1520,11 @@ ytmusic-app[is-bauhaus-sidenav-enabled] #guide-wrapper.ytmusic-app {
 	border: none !important;
 }
 
+#guide-wrapper.ytmusic-app,
+ytmusic-guide-renderer.ytmusic-app {
+	background: var(--ctp-crust) !important;
+}
+
 #divider.ytmusic-guide-section-renderer {
 	border: none !important;
 }
