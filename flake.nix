@@ -108,7 +108,7 @@
             home-manager.backupFileExtension = "hmbak";
             home-manager.extraSpecialArgs = {
               inherit inputs vars;
-              aiToolchainProfiles = [ "personal" ];
+              aiToolchainProfiles = [ "personal" "misha" ];
             };
             home-manager.users.${vars.username} = import ./home/razen.nix;
           }
