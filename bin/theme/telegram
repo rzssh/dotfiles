@@ -75,6 +75,8 @@ def main():
                 z.writestr("colors.tdesktop-theme", colors)
                 z.write(bg_path, "background.jpg")
             shutil.move(tmp_zip, OUT)
+    elif os.path.exists(OUT):
+        return 0
     else:
         with open(OUT, "w") as f:
             f.write(colors)
