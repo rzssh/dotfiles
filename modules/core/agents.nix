@@ -26,13 +26,16 @@
   '';
 
   sops = {
-    defaultSopsFile = ../../secrets/system.env;
-    defaultSopsFormat = "dotenv";
+    defaultSopsFile = ../../secrets/system.yaml;
+    defaultSopsFormat = "yaml";
     age.keyFile = "/home/razen/.config/sops/age/keys.txt";
     secrets.SEARX_SECRET_KEY = { };
-    templates."searx.env".content = ''
-      SEARX_SECRET_KEY=${config.sops.placeholder.SEARX_SECRET_KEY}
-    '';
+    templates."searx.env" = {
+      content = ''
+        SEARX_SECRET_KEY=${config.sops.placeholder.SEARX_SECRET_KEY}
+      '';
+      restartUnits = [ "searx.service" ];
+    };
   };
 
   services.searx = {

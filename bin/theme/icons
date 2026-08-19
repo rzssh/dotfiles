@@ -236,6 +236,10 @@ def main():
     lock = open(f"{CACHE}/matugen/icons.lock", "w")
     fcntl.flock(lock, fcntl.LOCK_EX)
 
+    for entry in os.scandir(ICONS):
+        if entry.is_dir(follow_symlinks=False) and entry.name.startswith(f".{THEME}.base.tmp-"):
+            shutil.rmtree(entry.path, ignore_errors=True)
+
     try:
         with open(f"{CACHE}/matugen/colors.json") as f:
             accent = json.load(f)["special"]["cursor"].lstrip("#")

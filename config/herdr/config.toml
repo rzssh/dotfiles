@@ -6,6 +6,7 @@ new_cwd = "follow"
 [ui]
 prompt_new_tab_name = false
 show_agent_labels_on_pane_borders = true
+hide_tab_bar_when_single_tab = true
 
 [ui.sidebar.spaces]
 rows = [

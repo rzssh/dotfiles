@@ -127,6 +127,7 @@ in
     imagemagick
     ghostscript
     poppler-utils
+    (tesseract.override { enableLanguages = [ "eng" "rus" "ukr" ]; })
     bubblewrap
     nix-search-tv
 

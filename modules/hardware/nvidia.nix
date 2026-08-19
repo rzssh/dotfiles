@@ -30,6 +30,7 @@
         "${config.hardware.nvidia.package.bin}/bin/nvidia-smi --lock-memory-clocks=5001,10501"
       ];
       RemainAfterExit = true;
+      SuccessExitStatus = 18;
     };
   };
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
