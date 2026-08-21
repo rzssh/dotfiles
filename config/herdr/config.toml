@@ -103,13 +103,13 @@ description = "move tab to workspace 9"
 [[keys.command]]
 key = "alt+v"
 type = "shell"
-command = "herdr pane split --current --direction right --focus"
+command = '"$HERDR_BIN_PATH" pane split "$HERDR_ACTIVE_PANE_ID" --direction right --focus'
 description = "split pane vertically"
 
 [[keys.command]]
 key = "alt+h"
 type = "shell"
-command = "herdr pane split --current --direction down --focus"
+command = '"$HERDR_BIN_PATH" pane split "$HERDR_ACTIVE_PANE_ID" --direction down --focus'
 description = "split pane horizontally"
 
 [[keys.command]]

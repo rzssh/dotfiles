@@ -1,6 +1,9 @@
 [theme.custom]
 accent = "{{colors.primary.default.hex}}"
 panel_bg = "reset"
+sidebar_bg = "reset"
+active_row_bg = "{{colors.surface_container.default.hex}}"
+selection_bg = "{{colors.surface_container_high.default.hex}}"
 surface0 = "reset"
 surface1 = "{{colors.surface_container.default.hex}}"
 surface_dim = "{{colors.surface.default.hex}}"
