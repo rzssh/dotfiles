@@ -21,8 +21,9 @@
   services.gnome.at-spi2-core.enable = true;
   services.accounts-daemon.enable = true;
   services.udisks2.enable = true;
-  hardware.logitech.wireless = {
+  programs.solaar = {
     enable = true;
-    enableGraphical = true;
+    userService.enable = true;
+    userService.window = "hide";
   };
 }
