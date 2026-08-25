@@ -27,6 +27,52 @@ let
         const index = match ? Number(match[1]) - 1 : tabs.length - 1;
         gBrowser.selectedTab = tabs[Math.min(index, tabs.length - 1)];
       }, true);
+
+      const classes = Components.classes;
+      const interfaces = Components.interfaces;
+      const chromeDir = classes["@mozilla.org/file/directory_service;1"]
+        .getService(interfaces.nsIProperties)
+        .get("UChrm", interfaces.nsIFile);
+      const io = classes["@mozilla.org/network/io-service;1"]
+        .getService(interfaces.nsIIOService);
+      const styleSheets = classes["@mozilla.org/content/style-sheet-service;1"]
+        .getService(interfaces.nsIStyleSheetService);
+      const chromeFile = chromeDir.clone();
+      const contentFile = chromeDir.clone();
+      chromeFile.append("userChrome.css");
+      contentFile.append("userContent.css");
+      const chromeUri = io.newFileURI(chromeFile);
+      const contentUri = io.newFileURI(contentFile);
+      let chromeVersion;
+      let contentVersion;
+
+      const version = file => file.exists()
+        ? file.lastModifiedTime + ":" + file.fileSize
+        : null;
+
+      const reloadStyles = () => {
+        const nextChromeVersion = version(chromeFile);
+        if (nextChromeVersion && nextChromeVersion !== chromeVersion) {
+          if (chromeVersion) {
+            windowUtils.removeSheet(chromeUri, windowUtils.USER_SHEET);
+          }
+          windowUtils.loadSheet(chromeUri, windowUtils.USER_SHEET);
+          chromeVersion = nextChromeVersion;
+        }
+
+        const nextContentVersion = version(contentFile);
+        if (nextContentVersion && nextContentVersion !== contentVersion) {
+          if (styleSheets.sheetRegistered(contentUri, styleSheets.USER_SHEET)) {
+            styleSheets.unregisterSheet(contentUri, styleSheets.USER_SHEET);
+          }
+          styleSheets.loadAndRegisterSheet(contentUri, styleSheets.USER_SHEET);
+          contentVersion = nextContentVersion;
+        }
+      };
+
+      reloadStyles();
+      const styleTimer = setInterval(reloadStyles, 1000);
+      addEventListener("unload", () => clearInterval(styleTimer), { once: true });
     })();
   '';
   zenAutoConfig = pkgs.writeText "zen-tab-shortcuts.cfg" ''
