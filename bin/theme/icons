@@ -79,7 +79,7 @@ def build_base():
     tmp_real = os.path.realpath(tmp)
     src_parent = os.path.dirname(src)
     for root, dirs, files in os.walk(tmp):
-        for d in list(dirs):
+        for d in list(dirs) + files:
             dp = os.path.join(root, d)
             if not os.path.islink(dp):
                 continue
@@ -231,6 +231,36 @@ def read_file(path):
         return ""
 
 
+def apply_theme():
+    out = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "icon-theme"], capture_output=True, text=True)
+    if THEME not in out.stdout:
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", THEME], capture_output=True)
+
+    kdeglobals = f"{CONFIG}/kdeglobals"
+    kg = read_file(kdeglobals)
+    if f"Theme={THEME}" not in kg:
+        if "[Icons]" in kg:
+            head, _, rest = kg.partition("[Icons]")
+            section, nl, tail = rest.partition("\n[")
+            if "Theme=" in section:
+                section = re.sub(r"Theme=.*", f"Theme={THEME}", section, count=1)
+            else:
+                section = f"\nTheme={THEME}" + section
+            kg = head + "[Icons]" + section + nl + tail
+        else:
+            kg += f"\n[Icons]\nTheme={THEME}\n"
+        try:
+            with open(kdeglobals, "w") as f:
+                f.write(kg)
+        except OSError:
+            pass
+
+    subprocess.run(
+        ["dbus-send", "--session", "--type=signal", "/KIconLoader", "org.kde.KIconLoader.iconChanged", "int32:0"],
+        capture_output=True,
+    )
+
+
 def main():
     t0 = time.monotonic()
     lock = open(f"{CACHE}/matugen/icons.lock", "w")
@@ -250,6 +280,7 @@ def main():
     mark = basemark()
 
     if read_file(f"{LIVE}/.accent") == qaccent and read_file(f"{LIVE}/.basemark") == mark:
+        apply_theme()
         return 0
 
     if read_file(f"{BASE}/.basemark") != mark:
@@ -307,29 +338,7 @@ def main():
     with open(f"{LIVE}/.accent", "w") as f:
         f.write(qaccent)
 
-    out = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "icon-theme"], capture_output=True, text=True)
-    if THEME not in out.stdout:
-        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", THEME], capture_output=True)
-
-    kdeglobals = f"{CONFIG}/kdeglobals"
-    kg = read_file(kdeglobals)
-    if f"Theme={THEME}" not in kg:
-        if "[Icons]" in kg:
-            head, _, rest = kg.partition("[Icons]")
-            section, nl, tail = rest.partition("\n[")
-            if "Theme=" in section:
-                section = re.sub(r"Theme=.*", f"Theme={THEME}", section, count=1)
-            else:
-                section = f"\nTheme={THEME}" + section
-            kg = head + "[Icons]" + section + nl + tail
-        else:
-            kg += f"\n[Icons]\nTheme={THEME}\n"
-        try:
-            with open(kdeglobals, "w") as f:
-                f.write(kg)
-        except OSError:
-            pass
-
+    apply_theme()
     print(f"theme-icons: {len(svg_pairs)} svg + {len(png_jobs)} png -> {accent} in {time.monotonic()-t0:.2f}s", file=sys.stderr)
     return 0
 
