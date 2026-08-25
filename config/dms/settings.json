@@ -81,6 +81,10 @@
           "enabled": true
         },
         {
+          "id": "dankActions:variant_screen_recording",
+          "enabled": true
+        },
+        {
           "id": "dankKDEConnect",
           "enabled": true
         },

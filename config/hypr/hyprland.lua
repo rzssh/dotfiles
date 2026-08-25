@@ -257,6 +257,8 @@ hl.bind(mainMod .. " + F3", hl.dsp.exec_cmd([[sh -c 'dms screenshot region --std
 hl.bind(mainMod .. " + F4", hl.dsp.exec_cmd("hyprwhspr record toggle"), { description = "Toggle dictation" })
 hl.bind(mainMod .. " + CTRL + F1", hl.dsp.exec_cmd([[fish -c recg]]), { description = "Toggle region recording" })
 hl.bind(mainMod .. " + CTRL + F2", hl.dsp.exec_cmd([[fish -c rec]]), { description = "Toggle display recording" })
+hl.bind(mainMod .. " + ALT + F1", hl.dsp.exec_cmd([[fish -c 'recg --no-audio']]), { description = "Toggle silent region recording" })
+hl.bind(mainMod .. " + ALT + F2", hl.dsp.exec_cmd([[fish -c 'rec --no-audio']]), { description = "Toggle silent display recording" })
 hl.bind(mainMod .. " + CTRL + F3", hl.dsp.exec_cmd([[fish -c ocr]]), { description = "Copy text from region" })
 hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("~/.config/hypr/scripts/color-picker.sh"), { description = "Pick color" })
 hl.bind(mainMod .. " + CTRL + F10", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_opacity.sh"), { description = "Toggle window opacity" })

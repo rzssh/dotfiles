@@ -84,6 +84,7 @@ end)
 config.keys = {
   { key = "mapped:v", mods = "CTRL", action = act.DisableDefaultAssignment },
   { key = "mapped:v", mods = "CTRL|SHIFT", action = smart_paste },
+  { key = "Escape", mods = "NONE", action = act.SendString("\x1b") },
   { key = "Backspace", mods = "CTRL", action = act.SendString("\x17") },
   { key = "Paste", mods = "NONE", action = smart_paste },
 }

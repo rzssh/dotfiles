@@ -140,6 +140,7 @@ in
     enableCalendarEvents = true;
     enableClipboardPaste = true;
     managePluginSettings = false;
+    plugins.dankActions.src = "${inputs.dms-plugins}/DankActions";
     plugins.dankKDEConnect.src = "${inputs.dms-plugins}/DankKDEConnect";
   };
 

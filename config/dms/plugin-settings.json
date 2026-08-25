@@ -1,4 +1,21 @@
 {
+  "dankActions": {
+    "enabled": true,
+    "variants": [
+      {
+        "id": "variant_screen_recording",
+        "name": "Screen Recording",
+        "icon": "fiber_manual_record",
+        "displayCommand": "pid=$(pgrep -n -x wf-recorder) || exit 0; elapsed=$(ps -o etime= -p \"$pid\" | tr -d ' '); printf '\\033[1;31m● REC %s\\033[0m\\n' \"$elapsed\"",
+        "clickCommand": "pkill -INT -x wf-recorder",
+        "updateInterval": 1,
+        "showIcon": false,
+        "showText": true,
+        "visibilityCommand": "pgrep -x wf-recorder >/dev/null",
+        "visibilityInterval": 1
+      }
+    ]
+  },
   "dankKDEConnect": {
     "enabled": true
   }
