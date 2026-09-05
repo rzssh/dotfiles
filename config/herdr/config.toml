@@ -42,8 +42,8 @@ focus_agent        = "ctrl+shift+1..9"
 switch_tab         = "alt+1..9"
 zoom               = ["prefix+z", "alt+z"]
 toggle_sidebar     = "alt+e"
-previous_workspace = "alt+shift+["
-next_workspace     = "alt+shift+]"
+previous_workspace = "ctrl+shift+tab"
+next_workspace     = "ctrl+tab"
 switch_workspace   = "alt+shift+1..9"
 
 [[keys.command]]

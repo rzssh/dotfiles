@@ -1,11 +1,6 @@
 { pkgs, ... }:
 {
   hardware.bluetooth.enable = true;
-  hardware.bluetooth.settings.LE = {
-    MinConnectionInterval = 6;
-    MaxConnectionInterval = 6;
-    ConnectionLatency = 0;
-  };
   boot.extraModprobeConfig = "options btusb enable_autosuspend=n";
   services.blueman.enable = true;
 
