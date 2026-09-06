@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, vars, ... }:
 
 {
   environment.etc."codex/config.toml".text = ''
@@ -28,8 +28,17 @@
   sops = {
     defaultSopsFile = ../../secrets/system.yaml;
     defaultSopsFormat = "yaml";
-    age.keyFile = "/home/razen/.config/sops/age/keys.txt";
-    secrets.SEARX_SECRET_KEY = { };
+    age.keyFile = "/home/${vars.username}/.config/sops/age/keys.txt";
+    useSystemdActivation = true;
+    secrets = {
+      SEARX_SECRET_KEY = { };
+      "ai-profiles/personal" = {
+        sopsFile = ../../secrets/ai-profiles/personal.env;
+        format = "dotenv";
+        owner = config.users.users.${vars.username}.name;
+        path = "/home/${vars.username}/.local/share/ai/profiles/personal/env";
+      };
+    };
     templates."searx.env" = {
       content = ''
         SEARX_SECRET_KEY=${config.sops.placeholder.SEARX_SECRET_KEY}
