@@ -1,8 +1,13 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   hardware.bluetooth.enable = true;
   boot.extraModprobeConfig = "options btusb enable_autosuspend=n";
   services.blueman.enable = true;
+
+  specialisation.bluetooth-stable.configuration = {
+    system.nixos.tags = [ "bluetooth-stable" ];
+    boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_18;
+  };
 
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="2357", ATTR{idProduct}=="0604", ATTR{authorized}="0"
