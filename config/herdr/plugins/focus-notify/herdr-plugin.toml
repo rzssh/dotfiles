@@ -17,6 +17,10 @@ command = ["python3", "focus_notify.py"]
 on = "pane.focused"
 command = ["ai-workspace", "--refresh-event"]
 
+[[events]]
+on = "pane.closed"
+command = ["ai-workspace", "--refresh-event"]
+
 [[actions]]
 id = "test"
 title = "Send test notification"
