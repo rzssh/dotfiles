@@ -108,6 +108,7 @@ in
       ${pkgs.coreutils}/bin/rm -f "$current"
     }
 
+    json_overlay "${dots}/config/hyprwhspr/config.json" "$HOME/.config/hyprwhspr/config.json"
     json_overlay "${dots}/config/dms/settings.json" "$HOME/.config/DankMaterialShell/settings.json"
     json_overlay "${dots}/config/dms/plugin-settings.json" "$HOME/.config/DankMaterialShell/plugin_settings.json"
     btop_overlay "${dots}/config/btop.defaults.conf" "$HOME/.config/btop/btop.conf"
@@ -232,6 +233,8 @@ in
     ".local/bin/wallpaper-state".source = link "bin/wallpaper-state";
     ".local/bin/vault-folder".source = link "bin/vault-folder";
     ".local/bin/ns".source = link "bin/ns";
+    ".local/bin/hyprwhspr-system".source = link "bin/hyprwhspr-system";
+    ".local/bin/hyprwhspr-system-recorder".source = link "bin/hyprwhspr-system-recorder";
     ".local/bin/herdr-move-pane-tab".source = link "bin/herdr-move-pane-tab";
     ".local/bin/herdr-move-tab-workspace".source = link "bin/herdr-move-tab-workspace";
     ".local/bin/theme-terminals".source = link "bin/theme/terminals";

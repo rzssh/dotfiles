@@ -21,15 +21,15 @@
 })
   {
     pname = "pywhispercpp";
-    version = "1.4.1";
+    version = "1.5.1";
     pyproject = true;
 
     src = fetchFromGitHub {
       owner = "absadiki";
       repo = "pywhispercpp";
-      tag = "v1.4.1";
+      tag = "v1.5.1";
       fetchSubmodules = true;
-      hash = "sha256-8PhI6YDpJQ4F2M96ehG95C/SJ7ZbmyZ0KprgjWjQEzQ=";
+      hash = "sha256-FIYlAPkvuSGGp+XpveGVc9uZx/ND008k8PPsTHGmadA=";
     };
 
     postPatch = ''
@@ -69,7 +69,7 @@
 
     env = {
       NO_REPAIR = "1";
-      SETUPTOOLS_SCM_PRETEND_VERSION = "1.4.1";
+      SETUPTOOLS_SCM_PRETEND_VERSION = "1.5.1";
       CMAKE_INSTALL_RPATH = "$ORIGIN";
       CMAKE_BUILD_WITH_INSTALL_RPATH = "ON";
       GGML_NATIVE = "OFF";

@@ -256,6 +256,8 @@ hl.bind(mainMod .. " + F1", hl.dsp.exec_cmd("dms screenshot region"), { descript
 hl.bind(mainMod .. " + F2", hl.dsp.exec_cmd("dms screenshot full"), { description = "Capture display" })
 hl.bind(mainMod .. " + F3", hl.dsp.exec_cmd([[sh -c 'dms screenshot region --stdout --no-file --no-clipboard | satty -f - --copy-command wl-copy']]), { description = "Capture and annotate region" })
 hl.bind(mainMod .. " + F4", hl.dsp.exec_cmd("hyprwhspr record toggle"), { description = "Toggle dictation" })
+hl.bind(mainMod .. " + CTRL + F4", hl.dsp.exec_cmd("/home/razen/.local/bin/hyprwhspr-system visible"), { description = "Toggle system transcription" })
+hl.bind(mainMod .. " + SHIFT + F4", hl.dsp.exec_cmd("/home/razen/.local/bin/hyprwhspr-system stealth"), { description = "Toggle stealth system transcription" })
 hl.bind(mainMod .. " + CTRL + F1", hl.dsp.exec_cmd([[fish -c recg]]), { description = "Toggle region recording" })
 hl.bind(mainMod .. " + CTRL + F2", hl.dsp.exec_cmd([[fish -c rec]]), { description = "Toggle display recording" })
 hl.bind(mainMod .. " + ALT + F1", hl.dsp.exec_cmd([[fish -c 'recg --no-audio']]), { description = "Toggle silent region recording" })

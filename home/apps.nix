@@ -238,6 +238,7 @@ in
     libnotify
     brightnessctl
     pavucontrol
+    pulseaudio
     wl-clip-persist
     wf-recorder
     slurp

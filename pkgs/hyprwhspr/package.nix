@@ -34,7 +34,8 @@ let
     pywhispercpp
     ps.sounddevice
     ps.numpy
-    ps.scipy
+    ps.soxr
+    ps.soundfile
     ps.evdev
     ps.pyperclip
     ps.requests
@@ -44,6 +45,7 @@ let
     ps.pulsectl
     ps.dbus-python
     ps.rich
+    ps.jsonschema
     ps.pygobject3
     ps.pycairo
   ]);
@@ -59,13 +61,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "hyprwhspr";
-  version = "1.32.0";
+  version = "1.45.0";
 
   src = fetchFromGitHub {
     owner = "goodroot";
     repo = "hyprwhspr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-9PPwJfn68IRRIYCUAKkIGxkMyZuYYKkhqpU5Ee/RoS4=";
+    hash = "sha256-jAUWxTvLNSO636WoE3bY7Ri/KVGjNgRUyQFrl76oysE=";
   };
 
   nativeBuildInputs = [
@@ -104,7 +106,7 @@ stdenv.mkDerivation (finalAttrs: {
     case "\$1" in
       -h|--help|help) exec "\$py" "\$cli" --help ;;
       --version) exec "\$py" "\$cli" --version ;;
-      test|setup|install|config|waybar|systemd|status|model|validate|uninstall|backend|state|mic-osd|keyboard|record)
+      test|setup|install|config|waybar|noctalia|systemd|status|model|validate|uninstall|backend|state|mic-osd|keyboard|record|transcribe)
         exec "\$py" "\$cli" "\$@" ;;
     esac
     exec "\$py" "$out/lib/hyprwhspr/lib/main.py" "\$@"

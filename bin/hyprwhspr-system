@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+host_runtime=${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is not set}
+runtime="$host_runtime/hyprwhspr-system"
+exec 9>"$host_runtime/hyprwhspr-system.lock"
+flock 9
+mode_file="$runtime/mode"
+audio="$runtime/audio.wav"
+transcript="$runtime/transcript.txt"
+hyprwhspr_runtime="$host_runtime/hyprwhspr"
+shared_feed="$hyprwhspr_runtime/mic_osd_level_feed"
+status="$hyprwhspr_runtime/recording_status"
+visualizer_state="$hyprwhspr_runtime/visualizer_state"
+osd_pid="$hyprwhspr_runtime/mic_osd.pid"
+unit=hyprwhspr-system-capture.service
+hyprwhspr_bin=$(readlink -f "$(command -v hyprwhspr)")
+assets="$(dirname "$(dirname "$hyprwhspr_bin")")/lib/hyprwhspr/share/assets"
+
+play() {
+  paplay "$assets/$1" >/dev/null 2>&1 || true
+}
+
+signal_osd() {
+  [[ -s "$osd_pid" ]] || return 0
+  pid=$(<"$osd_pid")
+  if kill -0 "$pid" 2>/dev/null; then
+    kill -s "$1" "$pid" 2>/dev/null || true
+  fi
+}
+
+if [[ -f "$mode_file" ]]; then
+  mode=$(<"$mode_file")
+  systemctl --user stop "$unit" >/dev/null 2>&1 || true
+  if [[ "$mode" != stealth ]]; then
+    printf 'false\n' > "$status"
+    printf 'processing\n' > "$visualizer_state"
+    play ping-down.ogg
+  fi
+  if hyprwhspr transcribe --output "$transcript" "$audio" && [[ -s "$transcript" ]]; then
+    wl-copy < "$transcript"
+    result=success
+  else
+    result=error
+    [[ "$mode" == stealth ]] || play ping-error.ogg
+  fi
+  if [[ "$mode" != stealth ]]; then
+    printf '%s\n' "$result" > "$visualizer_state"
+    sleep 1.25
+    signal_osd USR2
+    rm -f "$shared_feed" "$status" "$visualizer_state"
+  fi
+  rm -rf "$runtime"
+  exit
+fi
+
+mode=${1:-visible}
+if [[ "$mode" != visible && "$mode" != stealth ]]; then
+  printf 'usage: hyprwhspr-system [visible|stealth]\n' >&2
+  exit 2
+fi
+
+if [[ -d "$runtime" ]]; then
+  systemctl --user stop "$unit" >/dev/null 2>&1 || true
+  rm -rf "$runtime"
+  rm -f "$shared_feed"
+fi
+
+sink=$(pactl get-default-sink)
+monitor="$sink.monitor"
+pactl list short sources | cut -f2 | grep -Fxq "$monitor"
+mkdir -p "$runtime"
+chmod 700 "$runtime"
+if [[ "$mode" == visible ]]; then
+  mkdir -p "$hyprwhspr_runtime"
+  feed="$shared_feed"
+  printf '0 %.0s' {1..33} > "$feed"
+  play ping-up.ogg
+else
+  feed="$runtime/level"
+fi
+recorder="$(dirname "$(readlink -f "$0")")/hyprwhspr-system-recorder"
+if ! systemd-run --user --quiet --collect \
+  --unit="$unit" \
+  --property=Type=exec \
+  "$recorder" "$(command -v parec)" "$monitor" "$audio" "$feed"; then
+  [[ "$mode" == stealth ]] || play ping-error.ogg
+  rm -rf "$runtime"
+  [[ "$mode" == stealth ]] || rm -f "$shared_feed"
+  exit 1
+fi
+printf '%s\n' "$mode" > "$mode_file"
+if [[ "$mode" == visible ]]; then
+  printf 'true\n' > "$status"
+  printf 'recording\n' > "$visualizer_state"
+  signal_osd USR1
+fi
