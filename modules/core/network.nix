@@ -1,5 +1,6 @@
 {
   networking.networkmanager.enable = true;
+  networking.modemmanager.enable = false;
   networking.networkmanager.wifi.powersave = false;
 
   networking.networkmanager.settings.connection = {
