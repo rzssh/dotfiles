@@ -141,8 +141,6 @@ in
     systemd.enable = true;
   };
 
-  programs.git.enable = true;
-
   programs.fish = {
     enable = true;
     generateCompletions = false;

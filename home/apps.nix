@@ -174,12 +174,10 @@ in
     wezterm
     helix
     yazi
-    aerc
     starship
     fishPlugins.autopair
     zoxide
     fzf
-    jq
     just
     inputs.tuxedo.packages.${pkgs.stdenv.hostPlatform.system}.default
 
@@ -194,14 +192,18 @@ in
     gdu
     gnupg
     gocryptfs
-    attr
-    rsync
     unzip
     (p7zip.override { enableUnfree = true; })
     imagemagick
     ghostscript
     poppler-utils
-    (tesseract.override { enableLanguages = [ "eng" "rus" "ukr" ]; })
+    (tesseract.override {
+      enableLanguages = [
+        "eng"
+        "rus"
+        "ukr"
+      ];
+    })
     bubblewrap
     nix-search-tv
 
@@ -243,7 +245,7 @@ in
     lua-language-server
     stylua
     vtsls
-    typescript-go
+    typescript
     vscode-langservers-extracted
     biome
     prettierd
@@ -272,14 +274,13 @@ in
     slurp
     hyprpicker
     wayscriber
-    matugen
     satty
     localPkgs.hyprwhspr
     localPkgs.qmk-hid-host
     localPkgs.wl-kbptr
-    xdg-utils
 
     # system & hardware
+    libinput.bin
     psmisc
     usbutils
 
