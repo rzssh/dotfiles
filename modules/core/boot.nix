@@ -16,8 +16,6 @@
   };
   boot.loader.timeout = 0;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
-
   boot.tmp.cleanOnBoot = true;
   boot.kernelParams = [ "usbcore.autosuspend=-1" ];
 

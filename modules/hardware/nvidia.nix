@@ -14,7 +14,6 @@
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     powerManagement.enable = true;
-    nvidiaPersistenced = true;
   };
 
   boot.kernelParams = [ "nvidia_drm.modeset=1" ];

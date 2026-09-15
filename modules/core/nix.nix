@@ -4,7 +4,6 @@
     "flakes"
   ];
   nix.settings.max-jobs = 8;
-  nix.settings.cores = 0;
   nix.settings.auto-optimise-store = true;
 
   nix.settings.extra-substituters = [

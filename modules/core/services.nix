@@ -15,7 +15,6 @@
     }
   ];
   hardware.printers.ensureDefaultPrinter = "Brother_HL-L1232W";
-  services.geoclue2.enable = true;
   services.automatic-timezoned.enable = true;
   services.gnome.gnome-keyring.enable = true;
   services.gnome.at-spi2-core.enable = true;
