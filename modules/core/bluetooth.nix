@@ -1,4 +1,16 @@
 { lib, pkgs, ... }:
+let
+  ax210BluetoothFirmware = pkgs.runCommand "ax210-bluetooth-firmware-23.80.0.3" { } ''
+    install -Dm644 ${pkgs.fetchurl {
+      url = "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/bf24e495b1a009e926ddc8816580cbbc9e58cb8b/intel/ibt-0041-0041.sfi";
+      hash = "sha256-taQgnTOqTgJTMGA2Fyfaqbo0QZr2Ha3hTG82Kq287vA=";
+    }} $out/lib/firmware/intel/ibt-0041-0041.sfi
+    install -Dm644 ${pkgs.fetchurl {
+      url = "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/bf24e495b1a009e926ddc8816580cbbc9e58cb8b/intel/ibt-0041-0041.ddc";
+      hash = "sha256-/icpgld+/cKJz+Povtr8pgfAt9bJ3xqrGIDiLvkw0Hc=";
+    }} $out/lib/firmware/intel/ibt-0041-0041.ddc
+  '';
+in
 {
   hardware.bluetooth.enable = true;
   boot.extraModprobeConfig = "options btusb enable_autosuspend=n";
@@ -7,6 +19,11 @@
   specialisation.bluetooth-stable.configuration = {
     system.nixos.tags = [ "bluetooth-stable" ];
     boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_18;
+  };
+
+  specialisation.bluetooth-firmware-23-80.configuration = {
+    system.nixos.tags = [ "bluetooth-fw-23.80" ];
+    hardware.firmware = lib.mkBefore [ ax210BluetoothFirmware ];
   };
 
   services.udev.extraRules = ''

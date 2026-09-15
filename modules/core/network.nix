@@ -13,7 +13,7 @@
   };
 
   boot.extraModprobeConfig = ''
-    options iwlwifi bt_coex_active=0 power_save=0
+    options iwlwifi power_save=0
     options iwlmvm power_scheme=1
   '';
 }
