@@ -41,6 +41,10 @@
         {
           "id": "weather",
           "enabled": true
+        },
+        {
+          "id": "bongoCat",
+          "enabled": true
         }
       ],
       "centerWidgets": [
