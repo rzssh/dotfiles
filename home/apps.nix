@@ -15,19 +15,6 @@ let
   vimiumSettingsJson = builtins.toJSON vimiumSettings;
   zenTabShortcuts = pkgs.writeText "zen-tab-shortcuts.js" ''
     (() => {
-      document.addEventListener("command", event => {
-        const match = /^key_selectTab([1-8])$/.exec(event.target.id);
-        if (!match && event.target.id !== "key_selectLastTab") return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        const tabs = gBrowser.visibleTabs.filter(
-          tab => !tab.pinned && !tab.hasAttribute("zen-glance-tab")
-        );
-        if (!tabs.length) return;
-        const index = match ? Number(match[1]) - 1 : tabs.length - 1;
-        gBrowser.selectedTab = tabs[Math.min(index, tabs.length - 1)];
-      }, true);
-
       const classes = Components.classes;
       const interfaces = Components.interfaces;
       const chromeDir = classes["@mozilla.org/file/directory_service;1"]
@@ -107,6 +94,47 @@ let
       (old: {
         postInstall = (old.postInstall or "") + ''
           lib_dir="$out/lib/zen-bin-${old.version}"
+          omni="$lib_dir/browser/omni.ja"
+          work_dir=$(mktemp -d)
+          chmod u+w "$omni"
+          ${pkgs.unzip}/bin/unzip -q "$omni" -d "$work_dir" || [ $? = 2 ]
+          browser_sets="$work_dir/chrome/browser/content/browser/browser-sets.js"
+          ${pkgs.python3}/bin/python - "$browser_sets" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          source = path.read_text()
+          numbered = """          let index = event.target.id.at(-1) - 1;
+                    gBrowser.selectTabAtIndex(index, {
+                      event,
+                      metricsContext: gBrowser.TabMetrics.userTriggeredContext(
+                        gBrowser.TabMetrics.METRIC_SOURCE.KEYBOARD
+                      ),
+                    });"""
+          numbered_unpinned = """          const tabs = gBrowser.visibleTabs.filter(
+                      tab => !tab.pinned && !tab.hasAttribute(\"zen-glance-tab\")
+                    );
+                    const index = event.target.id.at(-1) - 1;
+                    gBrowser.selectedTab =
+                      tabs[Math.min(index, tabs.length - 1)] ?? gBrowser.selectedTab;"""
+          last = """          gBrowser.selectTabAtIndex(-1, {
+                      event,
+                      metricsContext: gBrowser.TabMetrics.userTriggeredContext(
+                        gBrowser.TabMetrics.METRIC_SOURCE.KEYBOARD
+                      ),
+                    });"""
+          last_unpinned = """          gBrowser.selectedTab =
+                      gBrowser.visibleTabs.findLast(
+                        tab => !tab.pinned && !tab.hasAttribute(\"zen-glance-tab\")
+                      ) ?? gBrowser.selectedTab;"""
+          if source.count(numbered) != 1 or source.count(last) != 1:
+              raise SystemExit("Zen tab shortcut source changed")
+          path.write_text(source.replace(numbered, numbered_unpinned).replace(last, last_unpinned))
+          PY
+          patched_omni="$work_dir.patched"
+          (cd "$work_dir" && ${pkgs.zip}/bin/zip -0qr "$patched_omni" .)
+          cp "$patched_omni" "$omni"
           chmod u+w "$lib_dir" "$lib_dir/defaults" "$lib_dir/defaults/pref"
           install -Dm444 ${zenAutoConfigPrefs} "$lib_dir/defaults/pref/zen-tab-shortcuts-autoconfig.js"
           install -Dm444 ${zenAutoConfig} "$lib_dir/zen-tab-shortcuts.cfg"
