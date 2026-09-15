@@ -199,9 +199,6 @@ height = "90%"
 [advanced]
 scrollback_limit_bytes = 200000000
 
-[experimental]
-kitty_graphics = true
-
 [theme]
 name = "terminal"
 auto_switch = false
