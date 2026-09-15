@@ -132,6 +132,8 @@ hl.bind(mainMod .. " + CTRL + SHIFT + 3", hl.dsp.exec_cmd("hyprctl switchxkblayo
 hl.bind(mainMod .. " + R",       hl.dsp.exec_cmd("dms ipc call spotlight toggle"),     { description = "Open launcher" })
 hl.bind(mainMod .. " + N",       hl.dsp.exec_cmd("dms ipc call notifications toggle"), { description = "Open notifications" })
 hl.bind(mainMod .. " + V",       hl.dsp.exec_cmd("dms ipc call clipboard toggle"),     { description = "Open clipboard history" })
+hl.bind(mainMod .. " + CTRL + SHIFT + V", hl.dsp.exec_cmd("dms clipboard clear"), { description = "Clear clipboard history" })
+hl.bind(mainMod .. " + CTRL + ALT + V", hl.dsp.exec_cmd("wl-copy --clear"), { description = "Clear clipboard" })
 hl.bind(mainMod .. " + comma",   hl.dsp.exec_cmd("dms ipc call settings toggle"),      { description = "Open settings" })
 hl.bind(mainMod .. " + M",       hl.dsp.exec_cmd("dms ipc call processlist toggle"),   { description = "Open process list" })
 hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd("dms ipc call lock lock"),            { description = "Lock screen" })
