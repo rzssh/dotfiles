@@ -1,5 +1,7 @@
 # Dotfiles
 
+![Desktop screenshot](assets/screenshot.webp)
+
 ## Tooling
 
 | Layer      | Tooling                                                     |
