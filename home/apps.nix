@@ -303,6 +303,7 @@ in
     qt6.qtimageformats
 
     # gui apps
+    localPkgs.flectar-mail
     mailspring
     vesktop
     telegram-desktop

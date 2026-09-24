@@ -7,6 +7,7 @@ let
 in
 {
   figlet = pkgs.callPackage ./figlet/package.nix { };
+  flectar-mail = pkgs.callPackage ./flectar-mail/package.nix { };
   hyprwhspr = llamaPkgs.callPackage ./hyprwhspr/package.nix { };
   llama-cpp-cuda = llamaPkgs.llama-cpp.override { cudaSupport = true; };
   qmk-hid-host = pkgs.callPackage ./qmk-hid-host/package.nix { };
