@@ -20,3 +20,6 @@ update:
 
 hm-build:
     nix build .#nixosConfigurations.razen.config.home-manager.users.razen.home.activationPackage -o result-home
+
+hm-switch: hm-build
+    ./result-home/activate
