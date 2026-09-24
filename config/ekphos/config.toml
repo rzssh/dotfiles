@@ -1,0 +1,108 @@
+[general]
+notes_dir = "/home/razen/notes"
+journal_dir = "Journal"
+attachments_dir = "attachments"
+welcome_shown = true
+theme = "ekphos-dawn"
+show_empty_dir = true
+syntax_theme = "base16-ocean.dark"
+image_height = 8
+inline_image_height = 4
+latex_height = 8
+inline_latex_height = 2
+sidebar_width_percent = 20
+outline_width_percent = 20
+sidebar_collapsed = false
+outline_collapsed = false
+folders_first = true
+frontmatter_hidden = true
+show_tags = true
+check_updates = true
+last_seen_changelog_version = "0.50.20"
+transparent_bg = false
+floating_cursor = false
+style = "outlined"
+
+[editor]
+mode = "vim"
+line_wrap = true
+tab_width = 4
+left_padding = 0
+right_padding = 1
+line_numbers = "absolute"
+scrolloff = 0
+
+[keybindings]
+activate = ["enter"]
+cancel_cut = ["esc"]
+canvas_redo = ["ctrl+r"]
+canvas_select_left = ["shift+h"]
+canvas_select_right = ["shift+l"]
+canvas_undo = ["u"]
+canvas_zoom_in = ["z i"]
+canvas_zoom_out = ["z o"]
+content_action = ["space"]
+create_folder = ["shift+n"]
+create_note = ["n"]
+cut_item = ["x"]
+cycle_sort = ["s"]
+delete_item = ["d"]
+edit_note = ["e"]
+find_in_buffer = ["ctrl+f"]
+focus_next = [
+    "tab",
+    "l",
+    "right",
+]
+focus_previous = [
+    "shift+tab",
+    "h",
+    "left",
+]
+fold_all = ["z shift+m"]
+go_first = ["g g"]
+go_last = ["shift+g"]
+grow_panel = [">"]
+half_page_down = ["ctrl+d"]
+half_page_up = ["ctrl+u"]
+history_back = ["-"]
+history_forward = ["="]
+insert_task = ["ctrl+l"]
+move_down = [
+    "down",
+    "j",
+]
+move_up = [
+    "up",
+    "k",
+]
+next_target = ["]"]
+open_graph = ["ctrl+g"]
+open_journal = ["t"]
+open_quick_search = ["ctrl+k"]
+open_selected = ["o"]
+open_task_view = ["ctrl+y"]
+open_theme_selector = ["ctrl+t"]
+paste_item = ["p"]
+previous_target = ["["]
+quit = ["q"]
+reload_config = ["ctrl+shift+r"]
+reload_files = ["shift+r"]
+rename_item = ["r"]
+show_changelog = ["f2"]
+show_help = ["?"]
+shrink_panel = ["<"]
+sidebar_search = ["/"]
+toggle_canvas_shortcuts = ["f3"]
+toggle_editor_fold = ["tab"]
+toggle_editor_mode = ["f6"]
+toggle_floating_cursor = [
+    "shift+j",
+    "shift+k",
+]
+toggle_fold = ["z a"]
+toggle_frontmatter = ["ctrl+m"]
+toggle_outline = ["ctrl+o"]
+toggle_sidebar = ["ctrl+b"]
+toggle_zen = ["ctrl+z"]
+unfold_all = ["z shift+r"]

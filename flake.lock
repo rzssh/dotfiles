@@ -166,6 +166,27 @@
         "type": "github"
       }
     },
+    "ekphos": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790183540,
+        "narHash": "sha256-HFeuVHoTwNjE041ly2ZLcfwrI2zVtOMayYuuHU7n9LM=",
+        "owner": "nostacks",
+        "repo": "ekphos",
+        "rev": "01c8cb284b193263660494bf6a421827ee124500",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nostacks",
+        "repo": "ekphos",
+        "type": "github"
+      }
+    },
     "fenix": {
       "inputs": {
         "nixpkgs": [
@@ -293,6 +314,24 @@
       "original": {
         "owner": "hercules-ci",
         "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems_2"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
         "type": "github"
       }
     },
@@ -743,6 +782,7 @@
         "dank-greeter": "dank-greeter",
         "dms": "dms",
         "dms-plugins": "dms-plugins",
+        "ekphos": "ekphos",
         "helium": "helium",
         "home-manager": "home-manager",
         "lanzaboote": "lanzaboote",
@@ -837,6 +877,21 @@
       }
     },
     "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_2": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

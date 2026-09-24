@@ -173,6 +173,10 @@ in
     "lazydocker".source = link "config/lazydocker";
     "lazygit".source = link "config/lazygit";
     "tuxedo/keybinds.toml".source = link "config/tuxedo/keybinds.toml";
+    "ekphos/config.toml" = {
+      source = link "config/ekphos/config.toml";
+      force = true;
+    };
     "gh/config.yml".source = link "config/gh/config.yml";
     "gh-dash".source = link "config/gh-dash";
     "herdr/plugins/current-workspace-agents".source =

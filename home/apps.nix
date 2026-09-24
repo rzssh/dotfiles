@@ -180,6 +180,7 @@ in
     fzf
     just
     inputs.tuxedo.packages.${pkgs.stdenv.hostPlatform.system}.default
+    inputs.ekphos.packages.${pkgs.stdenv.hostPlatform.system}.default
 
     # cli utils
     eza

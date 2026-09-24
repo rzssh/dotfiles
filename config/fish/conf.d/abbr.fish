@@ -42,6 +42,7 @@ abbr -a oc opencode
 abbr -a td tuxedo
 abbr -a tda "tuxedo add"
 abbr -a tdl "tuxedo list"
+abbr -a ek 'ekphos "$HOME/notes"'
 abbr -a ls "eza -la --icons --group-directories-first --git"
 
 abbr -a gs "git status"

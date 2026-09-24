@@ -181,6 +181,14 @@ width = "90%"
 height = "85%"
 
 [[keys.command]]
+key = "alt+n"
+type = "popup"
+command = 'ekphos "$HOME/notes"'
+description = "notes"
+width = "95%"
+height = "90%"
+
+[[keys.command]]
 key = "alt+g"
 type = "popup"
 command = "lazygit"

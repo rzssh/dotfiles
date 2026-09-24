@@ -9,6 +9,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    ekphos = {
+      url = "github:nostacks/ekphos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agents = {
       url = "path:/home/razen/projects/agents";
       inputs.nixpkgs.follows = "nixpkgs";
