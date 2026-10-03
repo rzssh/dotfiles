@@ -313,7 +313,7 @@ in
     obsidian
     zen
     inputs.helium.packages.x86_64-linux.default
-    libreoffice-qt6-fresh
+    libreoffice-qt
     gimp
     krita
 
@@ -322,7 +322,7 @@ in
     bambuPkgs.freecad
     kicad
     openscad
-    bambuPkgs.bambu-studio
+    bambu-studio
 
     # theming
     papirus-icon-theme
