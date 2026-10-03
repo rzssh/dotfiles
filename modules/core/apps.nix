@@ -6,6 +6,10 @@
       mailspring = previous.mailspring.overrideAttrs (old: {
         patches = (old.patches or [ ]) ++ [ ../../patches/mailspring-system-notification-sound.patch ];
       });
+      mergiraf = previous.mergiraf.overrideAttrs {
+        doCheck = false;
+        doInstallCheck = false;
+      };
     })
   ];
 
