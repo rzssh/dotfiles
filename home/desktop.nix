@@ -194,8 +194,9 @@ in
 
   xdg.desktopEntries.youtube-music-webapp = {
     name = "YouTube Music";
-    exec = "${helium}/bin/helium --no-first-run --user-data-dir=/home/razen/.local/share/webapps/youtube-music --load-extension=/home/razen/.local/share/webapps/youtube-music-theme --app=https://music.youtube.com/ --force-device-scale-factor=1.10";
+    exec = "${helium}/bin/helium --no-first-run --class=youtube-music --user-data-dir=/home/razen/.local/share/webapps/youtube-music --load-extension=/home/razen/.local/share/webapps/youtube-music-theme --app=https://music.youtube.com/ --force-device-scale-factor=1.10";
     icon = "youtube-music";
+    settings.StartupWMClass = "youtube-music";
     terminal = false;
     categories = [ "AudioVideo" ];
   };
