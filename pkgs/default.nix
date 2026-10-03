@@ -12,4 +12,5 @@ in
   llama-cpp-cuda = llamaPkgs.llama-cpp.override { cudaSupport = true; };
   qmk-hid-host = pkgs.callPackage ./qmk-hid-host/package.nix { };
   wl-kbptr = pkgs.callPackage ./wl-kbptr/package.nix { };
+  zmk-vim-mode = pkgs.callPackage ./zmk-vim-mode/package.nix { };
 }

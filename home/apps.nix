@@ -279,6 +279,7 @@ in
     localPkgs.hyprwhspr
     localPkgs.qmk-hid-host
     localPkgs.wl-kbptr
+    localPkgs.zmk-vim-mode
 
     # system & hardware
     libinput.bin
