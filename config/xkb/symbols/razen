@@ -1,0 +1,60 @@
+partial alphanumeric_keys
+xkb_symbols "symbols" {
+    key <TLDE> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, grave, asciitilde ] };
+    key <AE01> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 1, exclam ] };
+    key <AE02> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 2, at ] };
+    key <AE03> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 3, numbersign ] };
+    key <AE04> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 4, dollar ] };
+    key <AE05> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 5, percent ] };
+    key <AE06> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 6, asciicircum ] };
+    key <AE07> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 7, ampersand ] };
+    key <AE08> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 8, asterisk ] };
+    key <AE09> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 9, parenleft ] };
+    key <AE10> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, 0, parenright ] };
+    key <AE11> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, minus, underscore ] };
+    key <AE12> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, equal, plus ] };
+    key <AD11> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, bracketleft, braceleft ] };
+    key <AD12> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, bracketright, braceright ] };
+    key <BKSL> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, backslash, bar ] };
+    key <AC10> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, semicolon, colon ] };
+    key <AC11> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, apostrophe, quotedbl ] };
+    key <AB08> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, comma, less ] };
+    key <AB09> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, period, greater ] };
+    key <AB10> { type[Group1] = "FOUR_LEVEL", [ NoSymbol, NoSymbol, slash, question ] };
+    include "level3(ralt_switch)"
+};
+
+partial alphanumeric_keys
+xkb_symbols "us" {
+    include "us(basic)"
+    include "razen(symbols)"
+    name[Group1] = "English";
+};
+
+partial alphanumeric_keys
+xkb_symbols "ru" {
+    include "ru(winkeys)"
+    include "razen(symbols)"
+    name[Group1] = "Russian";
+    key <TLDE> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AD11> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AD12> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AC10> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AC11> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AB08> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AB09> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+};
+
+partial alphanumeric_keys
+xkb_symbols "ua" {
+    include "ua(unicode)"
+    include "razen(symbols)"
+    name[Group1] = "Ukrainian";
+    key <AD11> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AD12> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <BKSL> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AC10> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AC11> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AB08> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+    key <AB09> { type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC" };
+};

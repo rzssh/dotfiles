@@ -17,7 +17,7 @@
 
 rustPlatform.buildRustPackage {
   pname = "qmk-hid-host";
-  version = "0-unstable-2026-06-21";
+  version = "latest-unstable-2026-06-23";
 
   src = fetchFromGitHub {
     owner = "rzssh";

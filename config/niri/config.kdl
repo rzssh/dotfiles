@@ -1,0 +1,353 @@
+input {
+    keyboard {
+        xkb {
+            layout "razen,razen,razen"
+            variant "us,ru,ua"
+            options "grp:win_space_toggle"
+        }
+        repeat-rate 40
+        repeat-delay 300
+        track-layout "global"
+    }
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+output "DP-3" {
+    mode "1920x1080"
+    scale 1
+}
+
+cursor {
+    xcursor-theme "Bibata-Modern-Ice"
+    xcursor-size 24
+}
+
+environment {
+    LIBVA_DRIVER_NAME "nvidia"
+    NVD_BACKEND "direct"
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+}
+
+layout {
+    gaps 8
+    struts {
+        left 7
+        right 7
+        top 7
+        bottom 7
+    }
+    default-column-width { proportion 1.0; }
+    preset-column-widths {
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
+    }
+    center-focused-column "always"
+    background-color "transparent"
+    focus-ring { off; }
+    border {
+        on
+        width 2
+        active-color "#33ccffee"
+        inactive-color "#595959aa"
+    }
+    shadow {
+        on
+        softness 4
+        spread 0
+        color "#1a1a1aee"
+    }
+}
+
+prefer-no-csd
+
+overview {
+    zoom 0.6
+}
+
+blur {
+    passes 1
+    offset 3
+}
+
+animations {
+    window-open {
+        duration-ms 150
+        curve "ease-out-expo"
+    }
+    window-close {
+        duration-ms 100
+        curve "ease-out-quad"
+    }
+}
+
+hotkey-overlay {
+    hide-not-bound
+}
+
+spawn-at-startup "bash" "/home/razen/projects/dotfiles/bin/niri-startup"
+
+workspace "terminal"
+workspace "browser"
+workspace "chat"
+
+window-rule {
+    geometry-corner-radius 10
+    clip-to-geometry true
+    draw-border-with-background false
+    background-effect { blur true; }
+}
+
+window-rule {
+    match is-active=false
+    opacity 0.9
+}
+
+window-rule {
+    match app-id=r#"^(org\.wezfurlong\.wezterm|wezterm\.(startup|nvim))$"#
+    background-effect { blur false; }
+}
+
+window-rule {
+    match app-id="^wezterm.startup$"
+    open-on-workspace "terminal"
+    open-focused true
+}
+
+window-rule {
+    match app-id=r#"^org\.telegram\.desktop$"#
+    exclude title="^Media viewer$"
+    open-on-workspace "chat"
+}
+
+window-rule {
+    match app-id="^(vesktop|discord)$"
+    open-on-workspace "chat"
+}
+
+window-rule {
+    match app-id="^zen(-beta)?$"
+    open-on-workspace "browser"
+}
+
+window-rule {
+    match app-id="^youtube-music$"
+    match app-id=r#"^chrome-music\.youtube\.com__-Default$"#
+    open-on-workspace "browser"
+}
+
+window-rule {
+    match app-id="^Mailspring$"
+    open-on-workspace "chat"
+}
+
+window-rule {
+    match app-id=r#"^org\.telegram\.desktop$"# at-startup=true
+    match app-id="^(vesktop|discord|zen(-beta)?|youtube-music|Mailspring)$" at-startup=true
+    match app-id=r#"^chrome-music\.youtube\.com__-Default$"# at-startup=true
+    exclude title="^Media viewer$"
+    open-focused false
+}
+
+window-rule {
+    match app-id=r#"^org\.telegram\.desktop$"# title="^Media viewer$"
+    open-fullscreen true
+}
+
+window-rule {
+    match app-id=r#"^org\.kde\.(dolphin|ark)$"#
+    match app-id="^vlc$" title="^VLC media player$"
+    open-floating true
+    default-column-width { proportion 0.5; }
+    default-window-height { proportion 0.6; }
+}
+
+window-rule {
+    match app-id="^qimgv$"
+    open-floating true
+    default-column-width { proportion 0.6; }
+    default-window-height { proportion 0.8; }
+}
+
+window-rule {
+    match app-id=r#"^org\.pulseaudio\.pavucontrol$"#
+    open-floating true
+    default-column-width { proportion 0.5; }
+    default-window-height { proportion 0.4; }
+}
+
+window-rule {
+    match app-id="^1password$"
+    open-floating true
+    default-column-width { proportion 0.4; }
+    default-window-height { proportion 0.5; }
+}
+
+window-rule {
+    match app-id=r#"^org\.kde\.kdialog$"# title="^Encrypted Folder$"
+    open-floating true
+    default-column-width { proportion 0.32; }
+    default-window-height { proportion 0.32; }
+}
+
+window-rule {
+    match app-id=r#"^org\.wezfurlong\.wezterm$"# title="^(btop|htop|nmtui)$"
+    match app-id="^wezterm.nvim$"
+    match app-id=r#"^org\.qbittorrent\.qBittorrent$"#
+    open-floating true
+    default-column-width { proportion 0.7; }
+    default-window-height { proportion 0.8; }
+}
+
+window-rule {
+    match app-id="^(nm-connection-editor|com.danklinux.dms)$"
+    open-floating true
+}
+
+window-rule {
+    match app-id="^xdg-desktop-portal.*"
+    open-floating true
+    default-column-width { proportion 0.68; }
+    default-window-height { proportion 0.65; }
+}
+
+layer-rule {
+    match namespace="^(quickshell|dms:blurwallpaper)$"
+    place-within-backdrop true
+}
+
+binds {
+    Mod+Q repeat=false hotkey-overlay-title="Open terminal" { spawn "wezterm"; }
+    Mod+C { close-window; }
+    Mod+P repeat=false { spawn "dolphin"; }
+    Mod+Shift+P repeat=false { spawn "wezterm"; }
+    Mod+Ctrl+P repeat=false { spawn "dms" "ipc" "call" "clipboard" "toggle"; }
+    Mod+Alt+P repeat=false { spawn "dms" "ipc" "call" "notifications" "toggle"; }
+    Mod+K repeat=false { spawn "1password"; }
+    Mod+D repeat=false { spawn "wayscriber" "--active"; }
+    Mod+Ctrl+Shift+Q repeat=false { spawn "systemctl" "poweroff"; }
+    Mod+Ctrl+Shift+1 { switch-layout "0"; }
+    Mod+Ctrl+Shift+2 { switch-layout "1"; }
+    Mod+Ctrl+Shift+3 { switch-layout "2"; }
+
+    Mod+R repeat=false hotkey-overlay-title="Open launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+    Mod+N repeat=false { spawn "dms" "ipc" "call" "notifications" "toggle"; }
+    Mod+V repeat=false { spawn "dms" "ipc" "call" "clipboard" "toggle"; }
+    Mod+Ctrl+Shift+V repeat=false { spawn "dms" "clipboard" "clear"; }
+    Mod+Ctrl+Alt+V repeat=false { spawn "wl-copy" "--clear"; }
+    Mod+Comma repeat=false { spawn "dms" "ipc" "call" "settings" "toggle"; }
+    Mod+M repeat=false { spawn "dms" "ipc" "call" "processlist" "toggle"; }
+    Mod+Alt+L repeat=false hotkey-overlay-title="Lock screen" { spawn "dms" "ipc" "call" "lock" "lock"; }
+    Mod+X repeat=false { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+
+    Mod+Left { focus-column-left-or-last; }
+    Mod+Right { focus-column-right-or-first; }
+    Mod+Up { focus-workspace-up; }
+    Mod+Down { focus-workspace-down; }
+    Mod+Shift+Left { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+Up { move-window-to-workspace-up; }
+    Mod+Shift+Down { move-window-to-workspace-down; }
+    Mod+Ctrl+Left { set-column-width "-20"; }
+    Mod+Ctrl+Right { set-column-width "+20"; }
+    Mod+Ctrl+Up { set-window-height "-20"; }
+    Mod+Ctrl+Down { set-window-height "+20"; }
+    Mod+Ctrl+Alt+Up { focus-window-up-or-bottom; }
+    Mod+Ctrl+Alt+Down { focus-window-down-or-top; }
+    Mod+Shift+C { center-column; }
+    Mod+F repeat=false { spawn-sh "niri msg action maximize-column && niri msg action set-window-height 100%"; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+Ctrl+F { toggle-window-floating; }
+    Mod+Alt+F { center-column; }
+    Mod+T { toggle-window-floating; }
+    Mod+Y { switch-preset-column-width; }
+    Mod+Ctrl+G { toggle-column-tabbed-display; }
+    Mod+Alt+Left { consume-or-expel-window-left; }
+    Mod+Alt+Right { consume-or-expel-window-right; }
+    Mod+Tab { focus-workspace-previous; }
+    Mod+O repeat=false hotkey-overlay-title="Toggle overview" { toggle-overview; }
+    Mod+U { focus-workspace-down; }
+    Mod+Page_Up { focus-workspace-up; }
+    Mod+Page_Down { focus-workspace-down; }
+    Mod+Shift+Page_Up { move-window-to-workspace-up; }
+    Mod+Shift+Page_Down { move-window-to-workspace-down; }
+    XF86Launch7 repeat=false hotkey-overlay-title="Toggle overview" { toggle-overview; }
+    Mod+Slash hotkey-overlay-title="Show shortcuts" { show-hotkey-overlay; }
+    Mod+Shift+E repeat=false { quit; }
+
+    Mod+1 { focus-workspace "terminal"; }
+    Mod+2 { focus-workspace "browser"; }
+    Mod+3 { focus-workspace "chat"; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+Shift+1 { move-window-to-workspace "terminal"; }
+    Mod+Shift+2 { move-window-to-workspace "browser"; }
+    Mod+Shift+3 { move-window-to-workspace "chat"; }
+    Mod+Shift+4 { move-window-to-workspace 4; }
+    Mod+Shift+5 { move-window-to-workspace 5; }
+    Mod+Shift+6 { move-window-to-workspace 6; }
+    Mod+Shift+7 { move-window-to-workspace 7; }
+    Mod+Shift+8 { move-window-to-workspace 8; }
+    Mod+Shift+9 { move-window-to-workspace 9; }
+    Mod+WheelScrollLeft cooldown-ms=150 { focus-workspace-up; }
+    Mod+WheelScrollRight cooldown-ms=150 { focus-workspace-down; }
+    Mod+MouseForward { spawn "ydotool" "click" "0xC4"; }
+    Mod+Shift+Q repeat=false { spawn-sh "pid=$(niri msg --json focused-window | jq -er '.pid | select(. > 1)') && kill \"$pid\""; }
+
+    XF86Tools repeat=false { spawn "wl-kbptr" "-o" "mode_floating.label_symbols=shtaregyniwfdoblcuxmkvqpjz" "-o" "mode_floating.source=detect" "-o" "mode_floating.label_color=#ffff" "-o" "mode_floating.label_select_color=#ff0f" "-o" "mode_floating.selectable_bg_color=#000c" "-o" "mode_floating.selectable_border_color=#0fff" "-o" "mode_floating.label_font_size=16 60% 100" "-o" "modes=floating,click"; }
+    XF86Launch5 repeat=false { spawn "wl-kbptr" "-o" "mode_floating.label_symbols=shtaregyniwfdoblcuxmkvqpjz" "-o" "mode_floating.source=detect" "-o" "mode_floating.label_color=#ffff" "-o" "mode_floating.label_select_color=#ff0f" "-o" "mode_floating.selectable_bg_color=#000c" "-o" "mode_floating.selectable_border_color=#0fff" "-o" "mode_floating.label_font_size=16 60% 100" "-o" "modes=floating"; }
+    XF86Launch6 repeat=false { spawn "wl-kbptr" "-o" "mode_tile.label_symbols=shtaregyniwfdoblcuxmkvqpjz" "-o" "home_row_keys=ntsghaeicrm" "-o" "modes=tile,bisect"; }
+    Ctrl+XF86Tools repeat=false { spawn "wl-kbptr" "-o" "mode_tile.label_symbols=shtaregyniwfdoblcuxmkvqpjz" "-o" "home_row_keys=ntsghaeicrm" "-o" "modes=tile,bisect"; }
+    Alt+XF86Tools repeat=false { spawn "wl-kbptr" "-o" "mode_floating.label_symbols=shtaregyniwfdoblcuxmkvqpjz" "-o" "mode_floating.source=detect" "-o" "mode_floating.label_color=#ffff" "-o" "mode_floating.label_select_color=#ff0f" "-o" "mode_floating.selectable_bg_color=#000c" "-o" "mode_floating.selectable_border_color=#0fff" "-o" "mode_floating.label_font_size=16 60% 100" "-o" "modes=floating,click" "-o" "mode_click.button=right"; }
+    Mod+G repeat=false hotkey-overlay-title="Pointer click hints" { spawn "wl-kbptr" "-o" "mode_floating.label_symbols=shtaregyniwfdoblcuxmkvqpjz" "-o" "mode_floating.source=detect" "-o" "mode_floating.label_color=#ffff" "-o" "mode_floating.label_select_color=#ff0f" "-o" "mode_floating.selectable_bg_color=#000c" "-o" "mode_floating.selectable_border_color=#0fff" "-o" "mode_floating.label_font_size=16 60% 100" "-o" "modes=floating,click"; }
+
+    Mod+Alt+Shift+M repeat=false { spawn "fish" "-c" "wallpaper toggle"; }
+    Mod+Alt+Shift+R repeat=false { spawn "fish" "-c" "wallpaper random"; }
+    Mod+Alt+Shift+P repeat=false { spawn "fish" "-c" "wallpaper undo"; }
+    Mod+Alt+Shift+BracketLeft repeat=false { spawn "fish" "-c" "wallpaper prev"; }
+    Mod+Alt+Shift+BracketRight repeat=false { spawn "fish" "-c" "wallpaper next"; }
+    Mod+Alt+Shift+W repeat=false { spawn "fish" "-c" "wallpaper toggle-nsfw"; }
+    Mod+Alt+Shift+T repeat=false { spawn "fish" "-c" "wallpaper toggle-restricted"; }
+    Mod+Alt+Shift+E repeat=false { spawn "fish" "-c" "wallpaper toggle-explicit"; }
+    Mod+Alt+Shift+D repeat=false { spawn "fish" "-c" "wallpaper toggle-default"; }
+    Mod+Alt+Shift+I repeat=false { spawn "fish" "-c" "wallpaper show"; }
+    Mod+Alt+Shift+C repeat=false { spawn "fish" "-c" "wallpaper reload"; }
+
+    Mod+F1 repeat=false { spawn "~/.config/hypr/scripts/screenshot.sh" "region"; }
+    Mod+F2 repeat=false { spawn "~/.config/hypr/scripts/screenshot.sh" "full"; }
+    Mod+F3 repeat=false { spawn-sh "dms screenshot region --stdout --no-file --no-clipboard | satty -f - --copy-command wl-copy"; }
+    Mod+Shift+F3 repeat=false { spawn "~/.config/hypr/scripts/screenshot.sh" "toggle-silent"; }
+    Mod+Alt+F3 repeat=false { spawn "~/.config/hypr/scripts/screenshot.sh" "toggle-send"; }
+    Mod+F4 repeat=false { spawn "hyprwhspr" "record" "toggle"; }
+    Mod+Alt+F4 repeat=false { spawn "hyprwhspr" "record" "toggle" "--lang" "ru"; }
+    Mod+Ctrl+F4 repeat=false { spawn "~/.local/bin/hyprwhspr-system" "visible"; }
+    Mod+Shift+F4 repeat=false { spawn "~/.local/bin/hyprwhspr-system" "stealth"; }
+    Mod+Ctrl+F1 repeat=false { spawn "fish" "-c" "recg"; }
+    Mod+Ctrl+F2 repeat=false { spawn "fish" "-c" "rec"; }
+    Mod+Shift+F1 repeat=false { spawn "fish" "-c" "recg --mic"; }
+    Mod+Shift+F2 repeat=false { spawn "fish" "-c" "rec --mic"; }
+    Mod+Alt+F1 repeat=false { spawn "fish" "-c" "recg --no-audio"; }
+    Mod+Alt+F2 repeat=false { spawn "fish" "-c" "rec --no-audio"; }
+    Mod+Ctrl+F3 repeat=false { spawn "fish" "-c" "ocr"; }
+    Mod+Shift+X repeat=false { spawn "~/.config/hypr/scripts/color-picker.sh"; }
+    Mod+Ctrl+F10 repeat=false { spawn "bash" "/home/razen/projects/dotfiles/bin/niri-toggle-opacity"; }
+
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioMicMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    Mod+F5 allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    Mod+F6 allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    Mod+F7 allow-when-locked=true { spawn "playerctl" "previous"; }
+    Mod+F8 allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    Mod+F9 allow-when-locked=true { spawn "playerctl" "next"; }
+    Mod+F11 allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    Mod+F12 allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+}
+
+include optional=true "~/.cache/matugen/niri-colors.kdl"
+include optional=true "~/.cache/niri-opacity.kdl"

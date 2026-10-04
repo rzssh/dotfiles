@@ -10,7 +10,7 @@ import time
 
 KINDS = {"done": "finished", "blocked": "needs input"}
 terminal_classes = os.environ.get("HERDR_TERMINAL_CLASSES") or os.environ.get("HERDR_TERMINAL_CLASS")
-TERMINAL_CLASSES = set(filter(None, (terminal_classes or "org.wezfurlong.wezterm").split(",")))
+TERMINAL_CLASSES = set(filter(None, (terminal_classes or "org.wezfurlong.wezterm,wezterm.startup").split(",")))
 terminal_pattern = "|".join(re.escape(name) for name in TERMINAL_CLASSES)
 TERMINAL_SELECTOR = os.environ.get("HERDR_WINDOW_SELECTOR", f"class:^({terminal_pattern})$")
 
@@ -57,7 +57,13 @@ def basename(path):
     return clean.rsplit("/", 1)[-1] or clean or "agent"
 
 
+def niri_session():
+    return bool(os.environ.get("NIRI_SOCKET")) or "niri" in os.environ.get("XDG_CURRENT_DESKTOP", "").lower().split(":")
+
+
 def hyprland_env():
+    if niri_session():
+        return None
     result = run("hyprctl", "instances", "-j", timeout=2)
     if not result or result.returncode != 0:
         return None
@@ -71,14 +77,19 @@ def hyprland_env():
 
 
 def active_terminal():
-    env = hyprland_env()
-    if not env:
-        return False
-    result = run("hyprctl", "activewindow", "-j", timeout=2, env=env)
+    if niri_session():
+        result = run("niri", "msg", "--json", "focused-window", timeout=2)
+        key = "app_id"
+    else:
+        env = hyprland_env()
+        if not env:
+            return False
+        result = run("hyprctl", "activewindow", "-j", timeout=2, env=env)
+        key = "class"
     if not result or result.returncode != 0:
         return False
     try:
-        return json.loads(result.stdout or "{}").get("class") in TERMINAL_CLASSES
+        return (json.loads(result.stdout or "{}") or {}).get(key) in TERMINAL_CLASSES
     except Exception:
         return False
 
@@ -88,6 +99,20 @@ def focus_pane(pane_id):
     if not result or result.returncode != 0:
         return
     time.sleep(0.2)
+    if niri_session():
+        result = run("niri", "msg", "--json", "windows", timeout=2)
+        if not result or result.returncode != 0:
+            return
+        try:
+            windows = sorted(json.loads(result.stdout), key=lambda window: not window.get("is_focused"))
+            window = next(window for window in windows if window.get("app_id") in TERMINAL_CLASSES)
+            window_id = window["id"]
+            if type(window_id) is not int or window_id < 0:
+                return
+        except (ValueError, TypeError, AttributeError, KeyError, StopIteration):
+            return
+        run("niri", "msg", "action", "focus-window", "--id", str(window_id))
+        return
     env = hyprland_env()
     if env:
         run(

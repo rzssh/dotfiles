@@ -1,6 +1,8 @@
 local mainMod     = "SUPER"
 local terminal    = "wezterm"
 local fileManager = "dolphin"
+local xkbSymbols = io.open((os.getenv("XDG_CONFIG_HOME") or os.getenv("HOME") .. "/.config") .. "/xkb/symbols/razen")
+if xkbSymbols then xkbSymbols:close() end
 
 hl.monitor({ output = "", mode = "1920x1080@360", position = "auto", scale = "auto" })
 
@@ -18,7 +20,7 @@ hl.env("HYPRCURSOR_SIZE", "24")
 hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --systemd --all")
     hl.exec_cmd(terminal, { workspace = "1 silent" })
-    hl.exec_cmd("gtk-launch org.telegram.desktop")
+    hl.exec_cmd("gtk-launch org.telegram.desktop.desktop")
     hl.exec_cmd("gtk-launch vesktop")
     hl.exec_cmd("gtk-launch zen-beta")
     hl.exec_cmd("gtk-launch youtube-music-webapp")
@@ -60,7 +62,8 @@ hl.config({
         layout = "dwindle",
     },
     input = {
-        kb_layout  = "us,ru,ua",
+        kb_layout  = xkbSymbols and "razen,razen,razen" or "us,ru,ua",
+        kb_variant = xkbSymbols and "us,ru,ua" or "",
         kb_options = "grp:win_space_toggle",
         repeat_rate  = 40,
         repeat_delay = 300,
@@ -133,6 +136,9 @@ hl.window_rule({ match = { class = "^org.wezfurlong.wezterm$" }, no_blur = true 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal), { description = "Open terminal" })
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd(fileManager), { description = "Open file manager" })
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd(terminal), { description = "Open terminal" })
+hl.bind(mainMod .. " + CTRL + P", hl.dsp.exec_cmd("dms ipc call clipboard toggle"), { description = "Open clipboard history" })
+hl.bind(mainMod .. " + ALT + P", hl.dsp.exec_cmd("dms ipc call notifications toggle"), { description = "Open notifications" })
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("1password"), { description = "Open 1Password" })
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("wayscriber --active"), { description = "Draw on screen" })
 hl.bind(mainMod .. " + CTRL + SHIFT + Q", hl.dsp.exec_cmd("systemctl poweroff"), { description = "Power off" })
@@ -171,6 +177,8 @@ hl.bind(mainMod .. " + CTRL + ALT + down", hl.dsp.group.next())
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.window.center())
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = 0 }))
 hl.bind(mainMod .. " + F",         hl.dsp.window.fullscreen({ mode = 1 }))
+hl.bind(mainMod .. " + CTRL + F", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + ALT + F", hl.dsp.window.center())
 hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.window.pin())
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"))
@@ -209,6 +217,11 @@ hl.on("keybinds.submap", function(name)
     end
 end)
 
+hl.bind("F13", hintAction(hintBase .. " -o modes=floating,click"), { description = "Pointer click" })
+hl.bind("F14", hintAction(hintBase .. " -o modes=floating"), { description = "Pointer hover" })
+hl.bind("F15", hintAction("wl-kbptr " .. hintKeys .. " " .. bisectKeys .. " -o modes=tile,bisect"), { description = "Pointer bisect" })
+hl.bind("CTRL + F13", hintAction("wl-kbptr " .. hintKeys .. " " .. bisectKeys .. " -o modes=tile,bisect"), { description = "Pointer bisect" })
+hl.bind("ALT + F13", hintAction(hintBase .. " -o modes=floating,click -o mode_click.button=right"), { description = "Pointer right click" })
 hl.bind(mainMod .. " + G", hl.dsp.submap("pointer"), { description = "Pointer hints" })
 hl.define_submap("pointer", function()
     hl.bind("C", hintAction(hintBase .. " -o modes=floating,click"))
@@ -243,6 +256,10 @@ hl.bind(mainMod .. " + ALT + 3", function() hl.config({ general = { layout = "sc
 hl.bind(mainMod .. " + tab", hl.dsp.focus({ workspace = "previous" }))
 hl.bind(mainMod .. " + O",   hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + U",   hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + Page_Up", hl.dsp.focus({ workspace = "e-1" }))
+hl.bind(mainMod .. " + Page_Down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + SHIFT + Page_Up", hl.dsp.window.move({ workspace = "e-1" }))
+hl.bind(mainMod .. " + SHIFT + Page_Down", hl.dsp.window.move({ workspace = "e+1" }))
 
 for i = 1, 9 do
     hl.bind(mainMod .. " + " .. i,         hl.dsp.focus({ workspace = i }))
@@ -271,6 +288,7 @@ hl.bind(mainMod .. " + F3", hl.dsp.exec_cmd([[sh -c 'dms screenshot region --std
 hl.bind(mainMod .. " + SHIFT + F3", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot.sh toggle-silent"), { description = "Toggle screenshot notifications" })
 hl.bind(mainMod .. " + ALT + F3", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot.sh toggle-send"), { description = "Toggle screenshot phone auto-send" })
 hl.bind(mainMod .. " + F4", hl.dsp.exec_cmd("hyprwhspr record toggle"), { description = "Toggle dictation" })
+hl.bind(mainMod .. " + ALT + F4", hl.dsp.exec_cmd("hyprwhspr record toggle --lang ru"), { description = "Toggle Russian dictation" })
 hl.bind(mainMod .. " + CTRL + F4", hl.dsp.exec_cmd("/home/razen/.local/bin/hyprwhspr-system visible"), { description = "Toggle system transcription" })
 hl.bind(mainMod .. " + SHIFT + F4", hl.dsp.exec_cmd("/home/razen/.local/bin/hyprwhspr-system stealth"), { description = "Toggle stealth system transcription" })
 hl.bind(mainMod .. " + CTRL + F1", hl.dsp.exec_cmd([[fish -c recg]]), { description = "Toggle region recording" })

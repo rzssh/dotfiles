@@ -6,7 +6,9 @@
 # ██║     ██║███████║██║  ██║
 # ╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝
 
-if test -d "/run/user/"(id -u)"/hypr"
+if set -q NIRI_SOCKET; or string match -riq '(^|:)niri(:|$)' -- "$XDG_CURRENT_DESKTOP"
+    set -eg HYPRLAND_INSTANCE_SIGNATURE
+else if not set -q HYPRLAND_INSTANCE_SIGNATURE; and test -d "/run/user/"(id -u)"/hypr"
     set -gx HYPRLAND_INSTANCE_SIGNATURE (ls -t /run/user/(id -u)/hypr/ 2>/dev/null | head -1)
 end
 

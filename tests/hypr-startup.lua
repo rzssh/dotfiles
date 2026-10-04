@@ -14,7 +14,7 @@ assert(#launches == 0, "Config reload must not launch applications")
 events["hyprland.start"]()
 assert(#launches == 7, "Login must launch six apps and import the environment")
 assert(launches[2][1] == "wezterm" and launches[2][2].workspace == "1 silent")
-local expected = { "org.telegram.desktop", "vesktop", "zen-beta", "youtube-music-webapp", "mailspring" }
+local expected = { "org.telegram.desktop.desktop", "vesktop", "zen-beta", "youtube-music-webapp", "mailspring" }
 for i, app in ipairs(expected) do assert(launches[i + 2][1] == "gtk-launch " .. app) end
 local destinations = {}
 for _, rule in ipairs(rules) do

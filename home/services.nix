@@ -54,7 +54,7 @@ in
     };
     hyprwhspr = graphical "hyprwhspr speech-to-text daemon" "${localPkgs.hyprwhspr}/bin/hyprwhspr";
     qmk-hid-host = graphical "QMK/ZMK raw HID status widget host" "${localPkgs.qmk-hid-host}/bin/qmk-hid-host -c ${config.xdg.configHome}/qmk-hid-host/config.json";
-    zmk-vim-mode = graphical "Sync keyboard adaptives with Vim mode" "${localPkgs.zmk-vim-mode}/bin/zmk-vim-mode daemon --any-vendor";
+    zmk-vim-mode = graphical "Sync keyboard adaptives with Vim mode" "${localPkgs.zmk-vim-mode}/bin/zmk-vim-mode daemon --any-vendor --terminal-app wezterm.startup --terminal-app wezterm.nvim";
     wl-clip-persist = graphical "Keep clipboard contents after the source window closes" "${pkgs.wl-clip-persist}/bin/wl-clip-persist --clipboard regular --all-mime-type-regex '(?i)^(?!(?:image|audio|video|font|model)/).+'";
     arrpc = graphical "arRPC Discord rich presence bridge" "${pkgs.arrpc}/bin/arrpc";
   };

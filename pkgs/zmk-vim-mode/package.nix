@@ -6,13 +6,13 @@
 
 buildGoModule {
   pname = "zmk-vim-mode";
-  version = "0-unstable";
+  version = "1.0.0-unstable-2026-10-03";
 
   src = fetchFromGitHub {
-    owner = "rafaelromao";
+    owner = "rzssh";
     repo = "zmk-vim-mode";
-    rev = "fb0cd49d47e9151644bc32d981bc65d107e66d29";
-    hash = "sha256-6XkbP07FP3Ah4pT8as2xS9KItdSZsUr2zYIL+XFAe2c=";
+    rev = "34a8dd2187c6335f5890c1b5c43fabdfac75ac86";
+    hash = "sha256-Hziq0NZKAWpkRbWNf5Dscblw7IaBoXWelqiWoxlOrxM=";
   };
 
   vendorHash = null;
@@ -25,7 +25,7 @@ buildGoModule {
 
   meta = {
     description = "Sync keyboard behavior with editor Vim mode";
-    homepage = "https://github.com/rafaelromao/zmk-vim-mode";
+    homepage = "https://github.com/rzssh/zmk-vim-mode";
     license = lib.licenses.mit;
     mainProgram = "zmk-vim-mode";
   };

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+wezterm start --class=wezterm.startup &
+for desktop in zen-beta youtube-music-webapp vesktop org.telegram.desktop.desktop mailspring; do
+    gtk-launch "$desktop" &
+done
+
+patterns='["^wezterm\\.startup$", "^zen(-beta)?$", "^(youtube-music|chrome-music\\.youtube\\.com__-Default)$", "^(vesktop|discord)$", "^org\\.telegram\\.desktop$", "^Mailspring$"]'
+for ((attempt = 0; attempt < 60; attempt++)); do
+    ids=$(niri msg -j windows | jq -c --argjson patterns "$patterns" '
+        . as $windows | [$patterns[] as $pattern |
+            [$windows[] | select(.is_floating == false and .title != "Media viewer") |
+                select((.app_id // "") | test($pattern))] | min_by(.id) | .id
+        ]
+    ')
+    [[ "$ids" != *null* ]] && break
+    sleep 1
+done
+
+while read -r id; do
+    niri msg action focus-window --id "$id"
+    niri msg action move-column-to-first
+done < <(jq -r 'reverse[] | select(. != null)' <<< "$ids")

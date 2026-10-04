@@ -198,7 +198,9 @@ in
       ];
       reconnectDelay = 1000;
     };
+    "xkb/symbols/razen".source = link "config/xkb/symbols/razen";
     "hypr/hyprland.lua".source = link "config/hypr/hyprland.lua";
+    "niri/config.kdl".source = link "config/niri/config.kdl";
     "hypr/xdph.conf".source = link "config/hypr/xdph.conf";
     "hypr/scripts".source = link "config/hypr/scripts";
     "menus/applications.menu".text = ''

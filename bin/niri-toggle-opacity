@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config="$HOME/.cache/niri-opacity.kdl"
+if [[ -f "$config" ]]; then
+    rm -- "$config"
+else
+    mkdir -p "${config%/*}"
+    printf 'window-rule {\n    match is-active=false\n    opacity 1.0\n}\n' > "$config"
+fi

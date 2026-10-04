@@ -17,6 +17,10 @@ input_path = "/home/razen/.config/matugen/templates/colors.json"
 output_path = "/home/razen/.cache/matugen/colors.json"
 post_hook = "/home/razen/.local/bin/theme-terminals || true; /home/razen/.local/bin/theme-hyprland || true; /home/razen/.local/bin/theme-vesktop || true; sh -c '/home/razen/.local/bin/theme-telegram >/dev/null 2>&1 & /home/razen/.local/bin/theme-icons >/dev/null 2>&1 &'"
 
+[templates.niri]
+input_path = "/home/razen/.config/matugen/templates/niri.kdl"
+output_path = "/home/razen/.cache/matugen/niri-colors.kdl"
+
 [templates.herdr]
 input_path = "/home/razen/.config/matugen/templates/herdr.toml"
 output_path = "/home/razen/.cache/matugen/herdr-theme.toml"
