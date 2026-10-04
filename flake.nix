@@ -35,7 +35,7 @@
     };
 
     dms-plugins = {
-      url = "github:AvengeMedia/dms-plugins/f4583449f12920e0a2f16808b00a860c27f0173d";
+      url = "github:AvengeMedia/dms-plugins";
       flake = false;
     };
 
@@ -52,8 +52,18 @@
     };
 
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.1.0";
+      url = "github:nix-community/lanzaboote/v1.2.0";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    figlet-fonts = {
+      url = "github:xero/figlet-fonts";
+      flake = false;
+    };
+
+    wl-kbptr-src = {
+      url = "github:moverest/wl-kbptr";
+      flake = false;
     };
 
     nixpkgs-bambu.url = "github:NixOS/nixpkgs/00fa9a692bafc08a86061886f888b843bf7fbdb0";
@@ -87,6 +97,14 @@
     in
     {
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
+
+      packages.x86_64-linux = import ./pkgs {
+        inherit inputs;
+        pkgs = import nixpkgs {
+          system = "x86_64-linux";
+          config.allowUnfree = true;
+        };
+      };
 
       templates = {
         node = shellTemplate "node";

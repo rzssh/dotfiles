@@ -6,11 +6,11 @@ let
   };
 in
 {
-  figlet = pkgs.callPackage ./figlet/package.nix { };
+  figlet = pkgs.callPackage ./figlet/package.nix { fonts = inputs.figlet-fonts; };
   flectar-mail = pkgs.callPackage ./flectar-mail/package.nix { };
   hyprwhspr = llamaPkgs.callPackage ./hyprwhspr/package.nix { };
   llama-cpp-cuda = llamaPkgs.llama-cpp.override { cudaSupport = true; };
   qmk-hid-host = pkgs.callPackage ./qmk-hid-host/package.nix { };
-  wl-kbptr = pkgs.callPackage ./wl-kbptr/package.nix { };
+  wl-kbptr = pkgs.callPackage ./wl-kbptr/package.nix { src = inputs.wl-kbptr-src; };
   zmk-vim-mode = pkgs.callPackage ./zmk-vim-mode/package.nix { };
 }

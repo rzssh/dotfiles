@@ -61,13 +61,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "hyprwhspr";
-  version = "1.45.0";
+  version = "1.47.0";
 
   src = fetchFromGitHub {
     owner = "goodroot";
     repo = "hyprwhspr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-jAUWxTvLNSO636WoE3bY7Ri/KVGjNgRUyQFrl76oysE=";
+    hash = "sha256-xCiZjsyb+ZMsyeZFR1GWkqVdCmYCmsyVRu6xR6J3hCc=";
   };
 
   nativeBuildInputs = [

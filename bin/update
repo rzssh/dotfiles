@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
+agents="$HOME/projects/agents"
+(cd "$agents" && bash ./bin/update)
+python3 "$agents/bin/update-sources.py" flake.nix
+nix flake update --refresh
+nix-update --flake --version=branch qmk-hid-host
+nix-update --flake --version=branch zmk-vim-mode
+nix-update --flake hyprwhspr
+nix-update --flake --version=unstable flectar-mail
+for client in codex claude; do
+    if [[ -x "$HOME/.local/bin/$client" ]]; then
+        "$HOME/.local/bin/$client" update
+    fi
+done
+printf 'Versions updated. Build and activate separately.\n'
