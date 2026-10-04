@@ -9,7 +9,7 @@ command -v git >/dev/null 2>&1 || exec nix-shell -p git --run "bash $0 $*"
 
 if [ ! -d "$DIR/.git" ]; then
   mkdir -p "$(dirname "$DIR")"
-  git clone --branch nixos "$REPO" "$DIR"
+  git clone --branch main "$REPO" "$DIR"
 fi
 
 cd "$DIR"

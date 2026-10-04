@@ -7,7 +7,7 @@
 | Layer      | Tooling                                                     |
 | ---------- | ----------------------------------------------------------- |
 | OS         | NixOS + CachyOS kernel                                      |
-| Compositor | Hyprland                                                    |
+| Compositor | Niri + Hyprland                                              |
 | Shell      | DankMaterialShell                                           |
 | Terminal   | WezTerm + herdr + fish                                      |
 | Editor     | [Neovim](https://github.com/rzssh/nvim)                     |
@@ -15,8 +15,10 @@
 
 ## Install
 
+This installs my machine setup, not a generic NixOS configuration.
+
 ```sh
-curl -fsSL https://raw.githubusercontent.com/rzssh/dotfiles/nixos/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rzssh/dotfiles/main/install.sh | bash
 ```
 
 ```sh
